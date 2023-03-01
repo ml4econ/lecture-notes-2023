@@ -1,11 +1,11 @@
 Machine Learning for Economists
 ================
 
-### Spring 2021 @ Hebrew University of Jerusalem
+### Spring 2023 @ Hebrew University of Jerusalem
 
 Instructor: [Itamar Caspi](https://itamarcaspi.rbind.io)
 
-Teaching assistant: David Harar
+Teaching assistant: [Ariel Karlinsky](https://akarlinsky.github.io/)
 
 :spiral_calendar: Spring semester, 2021
 :alarm_clock:     17:30 - 20:15
@@ -35,7 +35,7 @@ Course participants will learn to:
 
 Course participants are expected to:
 
-1. Have R, RStudio, and Git installed on their own computers.
+1. Have R, RStudio, Git, and GitHub Desktop installed on their own computers.
 2. Sing up for a (free) GitHub, Kaggle accounts.
 
 
@@ -63,73 +63,33 @@ The schedule below is tentative and subject to change, depending on time and cla
 
 ### Part I: Supervised Machine Learning
 
-1. Course Overview [(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2021/master/01-overview/01-overview.html)
-[(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2021/master/01-overview/01-overview.pdf) 
-
-2. Basic ML Concepts [(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2021/master/02-basic-ml-concepts/02-basic-ml-concepts.html)
-[(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2020/master/02-basic-ml-concepts/02-basic-ml-concepts.pdf) 
-
-3. R, Tidyverse, and Reproducible Projects [(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2021/master/03-reprod-vc/03-reprod-vc.html)
-[(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2021/master/03-reprod-vc/03-reprod-vc.pdf)  
-
-4. A Typical (Supervised) ML Workflow [(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2021/master/04-ml-workflow/04-ml-workflow.html)
-[(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2021/master/04-ml-workflow/04-ml-workflow.pdf)
-
-5. Regression and Regularization
-[(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2021/master/05-regression-regularization/05-regression-regularization.html)
-[(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2021/master/05-regression-regularization/05-regression-regularization.pdf)  
-  5.1 [Prepare browser data](https://raw.githack.com/ml4econ/lecture-notes-2021/master/05-regression-regularization/05-prepare-browser-data.html)  
-  5.2 [Ridge and lasso simulation](https://raw.githack.com/ml4econ/lecture-notes-2021/master/05-regression-regularization/05-simulations.html)  
-  5.3 [Ridge, lasso, PCR and PLS: A Tidymodels Workflow](https://raw.githack.com/ml4econ/lecture-notes-2021/master/05-regression-regularization/05-tidymodels-workflow.html)  
-
-6. Classification
-[(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2021/master/06-classification/06-classification.html) [(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2021/master/06-classification/06-classification.pdf)  
-  6.1[Classification: A Tidymodels workflow](https://raw.githack.com/ml4econ/lecture-notes-2021/master/06-classification/06-tidymodels-workflow-covid.html)
-
-7. Trees and Forests
-[(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2021/master/07-trees-forests/07-trees-forests.html) [(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2021/master/07-trees-forests/07-trees-forests.pdf)  
+TBA
 
 ### Part II: Causal Inference and ML
 
-8. Causal Inference
-[(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2021/master/08-causal-inference/08-causal-inference.html) [(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2021/master/08-causal-inference/08-causal-inference.pdf)
-
-9. High-Dimensional Confounding Adjustment
-[(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2021/master/09-lasso-ate/09-lasso-ate.html)
-[(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2021/master/09-lasso-ate/09-lasso-ate.pdf)
-
-10. High-Dimensional Heterogeneous Treatment Effects
-[(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2021/master/10-trees-cate/10-trees-cate.html)
-[(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2021/master/10-trees-cate/10-trees-cate.pdf)
+TBA
 
 ### Part III: Unsupervised Learning
 
-11. Text Mining
-[(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2021/master/11-text-mining/11-text-mining.html)
-[(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2021/master/11-text-mining/11-text-mining.pdf)
+TBA
 
 ### Part IV: Miscellaneous
 
-12. Prediction Policy and Algorithmic Bias
-[(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2021/master/12-pred-policy/12-pred-policy.html)
-[(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2021/master/12-pred-policy/12-pred-policy.html)
-
+TBA
 
 ### Projects
 
-A. Kaggle competition [(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2021/master/a-kaggle/a-kaggle.html)
-[(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2021/master/a-kaggle/a-kaggle.pdf)
+TBA
 
 ## Readings
 
-Can be found [here](https://github.com/ml4econ/lecture-notes-2021/blob/master/resources.md).
+Can be found [here](https://github.com/ml4econ/lecture-notes-2023/blob/master/resources.md).
 
 ## People
 
 + [**Itamar Caspi**](https://itamarcaspi.rbind.io) is Head of the Monetary Analysis Unit in the Research Department of the Bank of Israel, and an adjunct lecturer at the Hebrew University, having started off in 2010 as an Economist at the Ministry of Finance. In 2012 he moved to the Bank of Israel, and was promoted in 2018 to Senior Economist and elected to represent the Bank as a Research Fellow for three months at the Bank for International Settlements in Switzerland. He holds a BA in Economics and Business Administration from Ben-Gurion University, MA in Economics from the joint research program at Hebrew University and Tel-Aviv University, and a PhD in economics from Bar-Ilan University.
 
-+ **David Harar** is a research fellow at the IEP and former economist in the Israeli Antitrust Authority's research department. He holds an MA in Economics and is currently pursuing an MA in Statistics, both from the Hebrew University of Jerusalem. David's interests include competition economics, demand estimation, machine learning and econometrics.
-
++ [**Ariel Karlinsky**](https://akarlinsky.github.io/) is an Economist and Statistician, a PHD Student in Economics at the Hebrew University.He mostly does empirical work, my primary research interests are Labor Economics, Data Science, Economics of Conflict, Health Economics, Economics of Israel and Economic History. Ariel is the creator and maintainer of the World Mortality Dataset, an open dataset that tracks all-cause-mortality data from around the world. I’m a member of the World Health Organization Technical Advisory Group on COVID-19 Mortality Assessment. member of The Israeli Economic History Association and Midaat, an NGO dedicated to promoting public health via evidence based medicine and practices.
 -----
 
 ![](https://i.creativecommons.org/l/by/4.0/88x31.png) This work is
