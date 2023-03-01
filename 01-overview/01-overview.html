@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>01 - Course Overview</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Itamar Caspi" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/anchor-sections/anchor-sections.css" rel="stylesheet" />
+    <script src="libs/anchor-sections/anchor-sections.js"></script>
+    <link href="libs/font-awesome/css/all.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/v4-shims.css" rel="stylesheet" />
+    <link rel="stylesheet" href="style/middlebury.css" type="text/css" />
+    <link rel="stylesheet" href="style/middlebury-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# 01 - Course Overview
+## ml4econ, HUJI 2021
+### Itamar Caspi
+### March 14, 2021 (updated: 2021-06-06)
+
+---
+
+
+
+
+
+
+
+
+
+
+
+# An aside: about the structure of these slides
+
+- The course's slide decks are created using the [xaringan](https://slides.yihui.name/xaringan/#44) (/ʃæ.'riŋ.ɡæn/) R package and [Rmarkdown](https://rmarkdown.rstudio.com/).
+
+- Some slides include hidden comments. To view them, press __p__ on your keyboard
+
+&lt;img src="figs/comments.gif" width="80%" style="display: block; margin: auto;" /&gt;
+
+???
+
+Here is a comment
+
+
+---
+
+class: title-slide-section-gray
+
+# Outline
+
+1. [Logistics](#logistics)  
+
+2. [About the Course](#about)
+
+3. [To Do List](#todo)
+
+
+
+---
+class: title-slide-section-blue, center, middle
+name: logistics
+
+# Logistics
+
+
+---
+# ml4econ GitHub repository
+
+The class's GitHub repository: [https://github.com/ml4econ](https://github.com/ml4econ)
+
+&lt;img src="figs/repo.gif" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+# RStudio Cloud workspace
+
+[RStudio Cloud](https://rstudio.cloud/) is a hosted version of RStudio in the cloud that will make it easy for R and RStudio novices to learn data science and machine learning using R.
+
+&lt;img src="figs/rstudiocloud.gif" width="80%" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+# People
+
+
+- __Itamar Caspi__  
+  - Head of Monetary Analysis Unit, Research Department, Bank of Israel.
+  - email: [caspi.itamar@gmail.com](mailto:caspi.itamat@gmail.com) 
+  - homepage: [itamarcaspi.rbind.io](https://itamarcaspi.rbind.io/)
+  
+- __David Harar__  
+  - Research fellow at the IEP. MA in Economics and is currently pursuing an MA in Statistics, (HUJI).
+  - email: [david.harar@mail.huji.ac.il](mailto:david.harar@mail.huji.ac.il)
+
+
+* Meeting hours: after class, on demand.
+
+
+---
+
+# Feedback
+
+
+This is the second time we run this course `\(\Rightarrow\)` your continuous feedback is important!
+
+
+Please feel free to contact us by
+
+  - email  
+
+  - in person  
+
+  - or open an issue in our discussion forum
+
+
+---
+class: title-slide-section-blue, center, middle
+name: about
+
+
+
+---
+class: title-slide-section-blue, center, middle
+name: about
+
+
+# About the Course
+
+---
+
+# Prerequisites
+
+- Advanced course in econometrics.
+
+
+- Some experience with R (or another programming language) are a plus.
+
+
+---
+
+# This course is
+
+
+.pull-left[
+
+.big[__About__]
+
+How and when to apply ML methods in economics
+
+  - estimate treatment effects.
+  - prediction policy.
+  - work with new types of data (e.g., text).
+
+To do that we will need to understand
+
+  - what is ML?
+  - how it relates to stuff you already know?
+  - how it differs?
+
+]
+
+.pull-right[
+
+.big[__Not about__]
+
+- Cutting-edge ML techniques (e.g., deep learning)
+
+- Computational aspects (e.g., gradient descent)
+
+- Data wrangling (a.k.a. "feature engineering")
+
+- Distributed file systems (e.g., Hadoop, Spark) 
+
+
+]
+
+---
+
+# Tentative schedule
+
+| Week                  | Topic                                      |
+|:----------------------|:-------------------------------------------|
+| [**1**](#week-1)      | Course Overview &amp; ML Basics
+|
+| [**2**](#week-2)      | Reproducibility and ML Workflow                          |
+| [**3**](#week-3)      | Regression and Regularization              |
+| [**4**](#week-4)      | Classification                             |
+| [**5**](#week-5)      | Non-parametrics                            |
+| [**6**](#week-6)      | Unsupervised Learning                      | 
+| [**7**](#week-7)      | Text analysis                              |
+| [**8**](#week-7)      | Causal Inference                           |
+| [**9**](#week-8)      | Lasso and Average Treatment Effects        |
+| [**10**](#week-9)     | Trees and Heterogeneous Treatment Effects  |
+| [**11**](#week-10)    | Prediction Policy Problems                 |
+| [**12**](#week-11)    | The Economics of AI                        |
+
+
+
+&gt; __NOTE__: This schedule can (and probably will) go through changes!
+
+
+---
+
+# Readings on ML for economists
+
+&gt; All materials and lecture notes will be available on the [class website](https://ml4econ.github.io/course-spring2019/lectures.html).
+
+.pull-left[
+
+Please read the following excellent surveys:
+
+- [The impact of machine learning on economics](https://www.nber.org/chapters/c14009.pdf) Athey (2018)  
+In _The Economics of Artificial Intelligence: An Agenda_.  
+University of Chicago Press.   
+
+- [Machine learning: an applied econometric approach](https://www.aeaweb.org/articles?id=10.1257/jep.31.2.87) Mullainathan and Spiess (2017)  
+_Journal of Economic Perspectives_, 31(2), 87-106.  
+
+]
+
+.pull-right[
+
+&lt;img src="figs/susan_sendhil.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Readings on ML
+
+&gt; All materials and lecture notes will be available on the [course repo](https://ml4econ.github.io/course-spring2019/lectures.html).
+
+.pull-left[
+
+There are __no__ required textbooks.  
+
+A couple of suggestions:
+
+- [An Introduction to Statistical Learning with Applications in R (ISLR)](http://www-bcf.usc.edu/~gareth/ISL)  
+James, Hastie, Witten, and Tibshirani (2013)  
+__PDF available online__ 
+
+- [The Elements of Statistical Learning (ELS)](http://statweb.stanford.edu/~tibs/ElemStatLearn)  
+Hastie, Tibshirani, and Friedman (2009)  
+__PDF available online__  
+
+]
+
+.pull-right[
+
+&lt;img src="figs/books.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+]
+
+
+---
+
+# Textbooks (optional)
+
+&gt; All materials and lecture notes will be available on the [course repo](https://ml4econ.github.io/course-spring2019/lectures.html).
+
+.pull-left[
+
+There are __no__ required textbooks.  
+
+A couple of suggestions:
+
+- [Business Data Science by Matt Taddy](http://taddylab.com/BDS.html)  
+__No free version available__ 
+
+- [Econometrics by Bruce Hansen, Ch. 29](https://www.ssc.wisc.edu/~bhansen/econometrics/Econometrics.pdf)  
+__PDF available online__  
+
+]
+
+.pull-right[
+
+&lt;img src="figs/bds.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+]
+
+
+---
+
+# More resources
+
+Can be found at our GitHub repo:
+
+[https://github.com/ml4econ/lecture-notes-2020/blob/master/resources.md](https://github.com/ml4econ/lecture-notes-2020/blob/master/resources.md)
+
+
+---
+
+# Programming
+
+
+* Two of the most popular open-source programming languages for data science:  
+
+  - [&lt;i class="fab fa-r-project"&gt;&lt;/i&gt;](https://www.r-project.org/)  
+  
+  - [&lt;i class="fab fa-python"&gt;&lt;/i&gt; Python](https://www.python.org/)  
+
+* This course: R.  
+
+* Why R? See presentation notes and the [FAQ section](https://ml4econ.github.io/course-spring2019/faq.html) of our class website.  
+
+*  We do encourage you to try out Python. However, we will only be able to provide limited support for Python users. 
+
+
+
+---
+
+# Catching up with R
+
+
+&lt;img src="figs/primer.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+# Grading
+
+Assignments:
+
+- Submit 4 out of a total of 6 Problem sets.
+
+
+Projects: 
+
+- [Kaggle](https://www.kaggle.com/c/55750-machine-learning-for-economists-huji-2019#) prediction competition: predict.
+
+- Conduct a replication study based on one of the datasets included in the [experimentdatar](https://itamarcaspi.github.io/experimentdatar/) package, or a paper of your choice.
+
+.center[
+__GRADING:__ Assingments __20%__, kaggle __40%__, project __40%__.
+]
+
+???
+
+* One of your tasks in this course will be a [Kaggle](https://www.kaggle.com) competition. In this competition, you will rely on the “Boston Housing Data” to train and test machine learning models learned in the course. In particular, you will be required to apply the tools introduced in the course in order to predict ... [website](https://www.kaggle.com/t/97eb0edcbe7c406882c7c067076bedd3).
+  
+
+---
+
+# Kaggle
+
+&lt;img src="figs/kaggle.gif" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# experimentdatar
+
+We will also  make use of he [`experimentdatar`](https://itamarcaspi.github.io/experimentdatar/) data package that contains publicly available datasets that were used in Susan Athey and Guido Imbens' course ["Machine Learning and Econometrics"](https://www.aeaweb.org/conference/cont-ed/2018-webcasts) (AEA continuing Education, 2018).
+
+- You can install the **development** version from
+[GitHub](https://github.com/itamarcaspi/experimentdatar/)
+```r
+# install.packages("devtools")
+devtools::install_github("itamarcaspi/experimentdatar")
+```
+
+- __EXAMPLE:__ Load the [`experimentdatar`](https://itamarcaspi.github.io/experimentdatar/) package and the `social` dataset:
+```r
+library(experimentdatar)
+data(social)  
+```
+- Tips:  
+  1. Runnig `?social` privides variable definitions.
+  2. Running `dataDetails("social")` will open a link to the paper associated with `social`.
+
+---
+class: title-slide-section-blue, center, middle
+name: todo
+
+# To Do List
+
+---
+
+# Homework&lt;sup&gt;*&lt;/sup&gt;
+
+&lt;i class="fas fa-check-square"&gt;&lt;/i&gt; Download and install [Git](https://git-scm.com/downloads).  
+
+&lt;i class="fas fa-check-square"&gt;&lt;/i&gt; Download and install [R](https://cloud.r-project.org/) and [RStudio](https://www.rstudio.com/).  
+
+&lt;i class="fas fa-check-square"&gt;&lt;/i&gt; Create an account on [GitHub](http://github.com/)
+
+&lt;i class="fas fa-check-square"&gt;&lt;/i&gt; Download and install [GitHub Desktop](https://desktop.github.com/).
+
+
+
+.footnote[
+[*] Please consult the [Guides](https://ml4econ.github.io/course-spring2019/RnRStudio.html) section in the course's old website.
+]
+
+
+---
+class: .title-slide-final, center, inverse, middle
+
+# `slides %&gt;% end()`
+
+[&lt;i class="fa fa-github"&gt;&lt;/i&gt; Source code](https://github.com/ml4econ/lecture-notes-2021/blob/master/01-overview/01-overview.Rmd)  
+
+---
+# References
+
+[1] S. Athey. "The impact of machine learning on economics". In: _The
+Economics of Artificial Intelligence: An Agenda_. University of Chicago
+Press, 2018.
+
+[2] T. Hastie, R. Tibshirani, and J. Friedman. _The Elements of
+Statistical Learning: Data Mining, Inference, and Prediction, Second
+Edition_. Springer, פבר. 2009. ISBN: 9780387848570.
+
+[3] G. James, T. Hastie, D. Witten, et al. _An Introduction to Statistical
+Learning: With Applications in R_. Springer Texts in Statistics. Springer
+London, Limited, 2013. ISBN: 9781461471370.
+
+[4] S. Mullainathan and J. Spiess. "Machine learning: an applied
+econometric approach". In: _Journal of Economic Perspectives_ 31.2 (2017),
+pp. 87-106.
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"slideNumberFormat": "<div class=\"progress-bar-container\">\n  <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">\n  </div>\n</div>\n"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
