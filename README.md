@@ -12,8 +12,7 @@ Teaching assistant: [Ariel Karlinsky](https://akarlinsky.github.io/)
 :hotel:           Social Sciences 2202
 :writing_hand:    [github.com/ml4econ](https://github.com/ml4econ/lecture-notes-2023)
 
-:family:          [Moodle Discussion Forum](https://moodle2.cs.huji.ac.il/nu20/mod/forum/view.php?id=342325)
-
+:family:          [Moodle Discussion Forum](https://moodle2.cs.huji.ac.il/nu22/mod/forum/view.php?id=286095)
 -----
 
 ## Overview
