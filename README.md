@@ -1,4 +1,4 @@
-Machine Learning for Economists
+Machine Learning for Economists (57750)
 ================
 
 ### Spring 2023 @ Hebrew University of Jerusalem
@@ -7,41 +7,42 @@ Instructor: [Itamar Caspi](https://itamarcaspi.rbind.io)
 
 Teaching assistant: [Ariel Karlinsky](https://akarlinsky.github.io/)
 
-:spiral_calendar: Spring semester, 2021
+:spiral_calendar: Spring semester, 2023
 :alarm_clock:     17:30 - 20:15
 :hotel:           There's no place like home...
-:writing_hand:    [github.com/ml4econ](https://github.com/ml4econ/lecture-notes-2021)
+:writing_hand:    [github.com/ml4econ](https://github.com/ml4econ/lecture-notes-2023)
 
-:family:          [Moodle Discussion Forum](https://moodle2.cs.huji.ac.il/nu20/mod/forum/view.php?id=342325)
+:family:          [Moodle Discussion Forum](https://moodle2.cs.huji.ac.il/nu22/mod/forum/view.php?id=342325)
 
 -----
 
 ## Overview
 
-This course covers topics that range between data science, machine learning, and econometrics. In particular, it introduces concepts from the world of ML that can potentially contribute to empirical economics. The course exposes the students to popular supervised and unsupervised machine learning methods, with an emphasis on the challenges and opportunities of integrating these methods in empirical economics, and the relevance of ML to policy analysis and causal inference. The various topics are illustrated through applications, reading empirical articles, and doing applied work.
+This course encompasses a wide range of topics including data science, machine learning, and econometrics. Its primary objective is to acquaint students with the fundamental concepts of machine learning that can potentially enhance empirical economics. The course introduces popular supervised and unsupervised machine learning methods, while emphasizing the challenges and opportunities of incorporating these methods in empirical economics. Additionally, it highlights the relevance of machine learning to policy analysis and causal inference. The course utilizes real-world applications, empirical articles, and hands-on assignments to illustrate various topics.
 
 ## Learning objectives
 
-Course participants will learn to:
+During the course, attendees will gain proficiency in the following:
 
-1. Apply best-practices for data science in the context of empirical research in economics.
+1. Implementing data science best-practices in the context of empirical research within economics.
 
-2. Develop an in-depth and practical knowledge of the challenges and opportunities that arise in applied empirical work that involves high dimensional data.
+2. Acquiring comprehensive and pragmatic knowledge of the obstacles and prospects encountered in applied empirical work utilizing high-dimensional data.
 
-3. Integrate techniques and insights from the world of machine learning into applied empirical research in economics.
+3. Assimilating techniques and insights from the field of machine learning into applied empirical research conducted in economics.
 
 
 ## Prework
 
-Course participants are expected to:
+It is anticipated that participants in the course will:
 
-1. Have R, RStudio, Git, and GitHub Desktop installed on their own computers.
-2. Sing up for a (free) GitHub, Kaggle accounts.
+1. Possess their own computers with R, RStudio (Posit), Git, and GitHub Desktop installed.
+
+2. Register for a GitHub and Kaggle account, which are available at no cost.
 
 
 ## Schedule
 
-The schedule below is tentative and subject to change, depending on time and class interests. We will move at a pace dictated by class discussions.  Please check this page often for updates.
+The following schedule is subject to change based on class interests and time constraints. Our pace will be guided by class discussions, and we kindly request that you check this page regularly for updates.
 
 | Week                  | Topic                                               |
 |:----------------------|:----------------------------------------------------|
@@ -63,7 +64,11 @@ The schedule below is tentative and subject to change, depending on time and cla
 
 ### Part I: Supervised Machine Learning
 
-TBA
+1. Course Overview [(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/01-overview/01-overview.html)
+[(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/01-overview/01-overview.pdf) 
+
+2. Basic ML Concepts [(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/02-basic-ml-concepts/02-basic-ml-concepts.html)
+[(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/02-basic-ml-concepts/02-basic-ml-concepts.pdf) 
 
 ### Part II: Causal Inference and ML
 

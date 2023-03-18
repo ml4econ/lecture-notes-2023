@@ -6,8 +6,6 @@
     <meta name="author" content="Itamar Caspi" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/remark-css/default.css" rel="stylesheet" />
-    <link href="libs/anchor-sections/anchor-sections.css" rel="stylesheet" />
-    <script src="libs/anchor-sections/anchor-sections.js"></script>
     <link href="libs/font-awesome/css/all.css" rel="stylesheet" />
     <link href="libs/font-awesome/css/v4-shims.css" rel="stylesheet" />
     <link rel="stylesheet" href="style/middlebury.css" type="text/css" />
@@ -17,10 +15,18 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
+.title[
 # 01 - Course Overview
-## ml4econ, HUJI 2021
+]
+.subtitle[
+## ml4econ, HUJI 2023
+]
+.author[
 ### Itamar Caspi
-### March 14, 2021 (updated: 2021-06-06)
+]
+.date[
+### March 19, 2023 (updated: 2023-03-18)
+]
 
 ---
 
@@ -76,11 +82,11 @@ The class's GitHub repository: [https://github.com/ml4econ](https://github.com/m
 &lt;img src="figs/repo.gif" width="80%" style="display: block; margin: auto;" /&gt;
 
 ---
-# RStudio Cloud workspace
+# Posit Cloud workspace
 
-[RStudio Cloud](https://rstudio.cloud/) is a hosted version of RStudio in the cloud that will make it easy for R and RStudio novices to learn data science and machine learning using R.
+[Posit Cloud](https://posit.cloud/) is a hosted version of RStudio in the cloud that will make it easy for R and Python novices to learn data science and machine learning using R and Python.
 
-&lt;img src="figs/rstudiocloud.gif" width="80%" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/posit.jpg" width="80%" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -93,12 +99,12 @@ The class's GitHub repository: [https://github.com/ml4econ](https://github.com/m
   - email: [caspi.itamar@gmail.com](mailto:caspi.itamat@gmail.com) 
   - homepage: [itamarcaspi.rbind.io](https://itamarcaspi.rbind.io/)
   
-- __David Harar__  
-  - Research fellow at the IEP. MA in Economics and is currently pursuing an MA in Statistics, (HUJI).
-  - email: [david.harar@mail.huji.ac.il](mailto:david.harar@mail.huji.ac.il)
+- __Ariel Karlinsky__  
+  - Ariel Karlinsky is a PHD student in economics at Hebrew University who researches various economic fields and maintains the World Mortality Dataset.
+  - email: [karlinsky@gmail.com](mailto:karlinsky@gmail.com)
 
 
-* Meeting hours: after class, on demand.
+* Meeting hours: after class/zoom, on demand.
 
 
 ---
@@ -106,7 +112,7 @@ The class's GitHub repository: [https://github.com/ml4econ](https://github.com/m
 # Feedback
 
 
-This is the second time we run this course `\(\Rightarrow\)` your continuous feedback is important!
+This is the fourth time we run this course `\(\Rightarrow\)` your continuous feedback is important!
 
 
 Please feel free to contact us by
@@ -138,7 +144,7 @@ name: about
 - Advanced course in econometrics.
 
 
-- Some experience with R (or another programming language) are a plus.
+- Some early experience with R (or another programming language) are a plus.
 
 
 ---
@@ -168,7 +174,7 @@ To do that we will need to understand
 
 .big[__Not about__]
 
-- Cutting-edge ML techniques (e.g., deep learning)
+- Cutting-edge ML techniques (e.g., generative AI)
 
 - Computational aspects (e.g., gradient descent)
 
@@ -208,7 +214,7 @@ To do that we will need to understand
 
 # Readings on ML for economists
 
-&gt; All materials and lecture notes will be available on the [class website](https://ml4econ.github.io/course-spring2019/lectures.html).
+&gt; All materials and lecture notes will be available on the [class website](https://ml4econ.github.io/course-spring2023/lectures.html).
 
 .pull-left[
 
@@ -232,7 +238,7 @@ _Journal of Economic Perspectives_, 31(2), 87-106.
 
 # Readings on ML
 
-&gt; All materials and lecture notes will be available on the [course repo](https://ml4econ.github.io/course-spring2019/lectures.html).
+&gt; All materials and lecture notes will be available on the [course repo](https://ml4econ.github.io/course-spring2023/lectures.html).
 
 .pull-left[
 
@@ -240,11 +246,11 @@ There are __no__ required textbooks.
 
 A couple of suggestions:
 
-- [An Introduction to Statistical Learning with Applications in R (ISLR)](http://www-bcf.usc.edu/~gareth/ISL)  
+- [An Introduction to Statistical Learning with Applications in R (ISLR), 2 ed.](https://www.statlearning.com/)  
 James, Hastie, Witten, and Tibshirani (2013)  
 __PDF available online__ 
 
-- [The Elements of Statistical Learning (ELS)](http://statweb.stanford.edu/~tibs/ElemStatLearn)  
+- [The Elements of Statistical Learning (ELS)](https://hastie.su.domains/ElemStatLearn/download.html)  
 Hastie, Tibshirani, and Friedman (2009)  
 __PDF available online__  
 
@@ -261,7 +267,7 @@ __PDF available online__
 
 # Textbooks (optional)
 
-&gt; All materials and lecture notes will be available on the [course repo](https://ml4econ.github.io/course-spring2019/lectures.html).
+&gt; All materials and lecture notes will be available on the [course repo](https://ml4econ.github.io/course-spring2023/lectures.html).
 
 .pull-left[
 
@@ -272,7 +278,7 @@ A couple of suggestions:
 - [Business Data Science by Matt Taddy](http://taddylab.com/BDS.html)  
 __No free version available__ 
 
-- [Econometrics by Bruce Hansen, Ch. 29](https://www.ssc.wisc.edu/~bhansen/econometrics/Econometrics.pdf)  
+- [Econometrics by Bruce Hansen, Ch. 29](https://www.ssc.wisc.edu/~bhansen/econometrics/)  
 __PDF available online__  
 
 ]
@@ -316,8 +322,31 @@ Can be found at our GitHub repo:
 
 # Catching up with R
 
+[Posit Primers](https://posit.cloud/learn/primers)
 
-&lt;img src="figs/primer.png" width="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/primer.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+# Large Language Models (LLMs)
+
+We encourage you to use [ChatGPT](https://openai.com/blog/chatgpt), [BingAI](https://www.bing.com/), or any other LLM in this course, as it is an **essential skill to acquire**.
+
+It is important you understand the (current) limitations of LLMs:
+
+- Prompt engineering is necessary for quality outcomes.
+- Always assume that it is wrong.
+- Acknowledge its use in assignments and explain what prompts were used.
+
+
+A couple of useful resources:
+
+- Follow [@emollick](https://twitter.com/emollick) (Ethan Mollick)
+- Read ["Language Models and Cognitive Automation for Economic Research"](nber.org/papers/w30957) by Korinek (2023).
+
+
+**Share your discoveries with us and your classmates!**
 
 
 ---
@@ -331,7 +360,7 @@ Assignments:
 
 Projects: 
 
-- [Kaggle](https://www.kaggle.com/c/55750-machine-learning-for-economists-huji-2019#) prediction competition: predict.
+- Kaggle prediction competition.
 
 - Conduct a replication study based on one of the datasets included in the [experimentdatar](https://itamarcaspi.github.io/experimentdatar/) package, or a paper of your choice.
 
@@ -384,7 +413,7 @@ name: todo
 
 &lt;i class="fas fa-check-square"&gt;&lt;/i&gt; Download and install [Git](https://git-scm.com/downloads).  
 
-&lt;i class="fas fa-check-square"&gt;&lt;/i&gt; Download and install [R](https://cloud.r-project.org/) and [RStudio](https://www.rstudio.com/).  
+&lt;i class="fas fa-check-square"&gt;&lt;/i&gt; Download and install [R and RStudio](https://posit.co/download/rstudio-desktop/).  
 
 &lt;i class="fas fa-check-square"&gt;&lt;/i&gt; Create an account on [GitHub](http://github.com/)
 
@@ -393,7 +422,7 @@ name: todo
 
 
 .footnote[
-[*] Please consult the [Guides](https://ml4econ.github.io/course-spring2019/RnRStudio.html) section in the course's old website.
+[*] Feel free consult the [Guides](https://ml4econ.github.io/course-spring2019/RnRStudio.html) section in the course's old website.
 ]
 
 
@@ -402,26 +431,26 @@ class: .title-slide-final, center, inverse, middle
 
 # `slides %&gt;% end()`
 
-[&lt;i class="fa fa-github"&gt;&lt;/i&gt; Source code](https://github.com/ml4econ/lecture-notes-2021/blob/master/01-overview/01-overview.Rmd)  
+[&lt;i class="fa fa-github"&gt;&lt;/i&gt; Source code](https://github.com/ml4econ/lecture-notes-2023/blob/master/01-overview/01-overview.Rmd)  
 
 ---
 # References
 
-[1] S. Athey. "The impact of machine learning on economics". In: _The
-Economics of Artificial Intelligence: An Agenda_. University of Chicago
-Press, 2018.
+&lt;a name=bib-athey2018the&gt;&lt;/a&gt;[[1]](#cite-athey2018the) S. Athey. "The impact of machine learning on
+economics". In: _The Economics of Artificial Intelligence: An Agenda_. University of Chicago Press,
+2018.
 
-[2] T. Hastie, R. Tibshirani, and J. Friedman. _The Elements of
-Statistical Learning: Data Mining, Inference, and Prediction, Second
-Edition_. Springer, פבר. 2009. ISBN: 9780387848570.
+[2] T. Hastie, R. Tibshirani, and J. Friedman. _The Elements of Statistical Learning: Data Mining,
+Inference, and Prediction, Second Edition_. Springer, פבר. 2009. ISBN: 9780387848570.
 
-[3] G. James, T. Hastie, D. Witten, et al. _An Introduction to Statistical
-Learning: With Applications in R_. Springer Texts in Statistics. Springer
-London, Limited, 2013. ISBN: 9781461471370.
+[3] G. James, T. Hastie, D. Witten, et al. _An Introduction to Statistical Learning: With Applications
+in R_. Springer Texts in Statistics. Springer London, Limited, 2013. ISBN: 9781461471370.
 
-[4] S. Mullainathan and J. Spiess. "Machine learning: an applied
-econometric approach". In: _Journal of Economic Perspectives_ 31.2 (2017),
-pp. 87-106.
+[4] A. Korinek. "Language Models and Cognitive Automation for Economic Research". In: _NBER Working
+Paper_ 30957 (פבר. 2023). DOI: [10.3386/w30957](https://doi.org/10.3386%2Fw30957).
+
+[5] S. Mullainathan and J. Spiess. "Machine learning: an applied econometric approach". In: _Journal
+of Economic Perspectives_ 31.2 (2017), pp. 87-106.
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
@@ -472,6 +501,19 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
 (function() {
   "use strict"
   // Replace <script> tags in slides area to make them executable

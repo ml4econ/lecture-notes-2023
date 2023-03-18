@@ -1,8 +1,8 @@
 ---
 title: "01 - Course Overview"
-subtitle: "ml4econ, HUJI 2021"
+subtitle: "ml4econ, HUJI 2023"
 author: "Itamar Caspi"
-date: "March 14, 2021 (updated: `r Sys.Date()`)"
+date: "March 19, 2023 (updated: `r Sys.Date()`)"
 output:
   xaringan::moon_reader:
     css: [default, "style/middlebury.css", "style/middlebury-fonts.css"]
@@ -103,13 +103,13 @@ knitr::include_graphics("figs/repo.gif")
 ```
 
 ---
-# RStudio Cloud workspace
+# Posit Cloud workspace
 
-[RStudio Cloud](https://rstudio.cloud/) is a hosted version of RStudio in the cloud that will make it easy for R and RStudio novices to learn data science and machine learning using R.
+[Posit Cloud](https://posit.cloud/) is a hosted version of RStudio in the cloud that will make it easy for R and Python novices to learn data science and machine learning using R and Python.
 
 ```{r, echo=FALSE, out.width = "80%", fig.align='center'}
 
-knitr::include_graphics("figs/rstudiocloud.gif")
+knitr::include_graphics("figs/posit.jpg")
 
 ```
 
@@ -124,12 +124,12 @@ knitr::include_graphics("figs/rstudiocloud.gif")
   - email: [caspi.itamar@gmail.com](mailto:caspi.itamat@gmail.com) 
   - homepage: [itamarcaspi.rbind.io](https://itamarcaspi.rbind.io/)
   
-- __David Harar__  
-  - Research fellow at the IEP. MA in Economics and is currently pursuing an MA in Statistics, (HUJI).
-  - email: [david.harar@mail.huji.ac.il](mailto:david.harar@mail.huji.ac.il)
+- __Ariel Karlinsky__  
+  - Ariel Karlinsky is a PHD student in economics at Hebrew University who researches various economic fields and maintains the World Mortality Dataset.
+  - email: [karlinsky@gmail.com](mailto:karlinsky@gmail.com)
 
 
-* Meeting hours: after class, on demand.
+* Meeting hours: after class/zoom, on demand.
 
 
 ---
@@ -137,7 +137,7 @@ knitr::include_graphics("figs/rstudiocloud.gif")
 # Feedback
 
 
-This is the second time we run this course $\Rightarrow$ your continuous feedback is important!
+This is the fourth time we run this course $\Rightarrow$ your continuous feedback is important!
 
 
 Please feel free to contact us by
@@ -169,7 +169,7 @@ name: about
 - Advanced course in econometrics.
 
 
-- Some experience with R (or another programming language) are a plus.
+- Some early experience with R (or another programming language) are a plus.
 
 
 ---
@@ -199,7 +199,7 @@ To do that we will need to understand
 
 .big[__Not about__]
 
-- Cutting-edge ML techniques (e.g., deep learning)
+- Cutting-edge ML techniques (e.g., generative AI)
 
 - Computational aspects (e.g., gradient descent)
 
@@ -239,7 +239,7 @@ To do that we will need to understand
 
 # Readings on ML for economists
 
-> All materials and lecture notes will be available on the [class website](https://ml4econ.github.io/course-spring2019/lectures.html).
+> All materials and lecture notes will be available on the [class website](https://ml4econ.github.io/course-spring2023/lectures.html).
 
 .pull-left[
 
@@ -267,7 +267,7 @@ knitr::include_graphics("figs/susan_sendhil.png")
 
 # Readings on ML
 
-> All materials and lecture notes will be available on the [course repo](https://ml4econ.github.io/course-spring2019/lectures.html).
+> All materials and lecture notes will be available on the [course repo](https://ml4econ.github.io/course-spring2023/lectures.html).
 
 .pull-left[
 
@@ -275,11 +275,11 @@ There are __no__ required textbooks.
 
 A couple of suggestions:
 
-- [An Introduction to Statistical Learning with Applications in R (ISLR)](http://www-bcf.usc.edu/~gareth/ISL)  
+- [An Introduction to Statistical Learning with Applications in R (ISLR), 2 ed.](https://www.statlearning.com/)  
 `r Citet(bib, "james2013introduction")`  
 __PDF available online__ 
 
-- [The Elements of Statistical Learning (ELS)](http://statweb.stanford.edu/~tibs/ElemStatLearn)  
+- [The Elements of Statistical Learning (ELS)](https://hastie.su.domains/ElemStatLearn/download.html)  
 `r Citet(bib, "hastie2009elements")`  
 __PDF available online__  
 
@@ -300,7 +300,7 @@ knitr::include_graphics("figs/books.png")
 
 # Textbooks (optional)
 
-> All materials and lecture notes will be available on the [course repo](https://ml4econ.github.io/course-spring2019/lectures.html).
+> All materials and lecture notes will be available on the [course repo](https://ml4econ.github.io/course-spring2023/lectures.html).
 
 .pull-left[
 
@@ -311,7 +311,7 @@ A couple of suggestions:
 - [Business Data Science by Matt Taddy](http://taddylab.com/BDS.html)  
 __No free version available__ 
 
-- [Econometrics by Bruce Hansen, Ch. 29](https://www.ssc.wisc.edu/~bhansen/econometrics/Econometrics.pdf)  
+- [Econometrics by Bruce Hansen, Ch. 29](https://www.ssc.wisc.edu/~bhansen/econometrics/)  
 __PDF available online__  
 
 ]
@@ -359,12 +359,35 @@ Can be found at our GitHub repo:
 
 # Catching up with R
 
+[Posit Primers](https://posit.cloud/learn/primers)
 
-```{r datacamp, echo=FALSE, out.width = "70%", fig.align='center'}
+```{r datacamp, echo=FALSE, out.width = "80%", fig.align='center'}
 
 knitr::include_graphics("figs/primer.png")
 
 ```
+
+
+---
+
+# Large Language Models (LLMs)
+
+We encourage you to use [ChatGPT](https://openai.com/blog/chatgpt), [BingAI](https://www.bing.com/), or any other LLM in this course, as it is an **essential skill to acquire**.
+
+It is important you understand the (current) limitations of LLMs:
+
+- Prompt engineering is necessary for quality outcomes.
+- Always assume that it is wrong.
+- Acknowledge its use in assignments and explain what prompts were used.
+
+
+A couple of useful resources:
+
+- Follow [@emollick](https://twitter.com/emollick) (Ethan Mollick)
+- Read ["Language Models and Cognitive Automation for Economic Research"](nber.org/papers/w30957) by `r Citet(bib, "korinek2023language")`.
+
+
+**Share your discoveries with us and your classmates!**
 
 
 ---
@@ -378,7 +401,7 @@ Assignments:
 
 Projects: 
 
-- [Kaggle](https://www.kaggle.com/c/55750-machine-learning-for-economists-huji-2019#) prediction competition: predict.
+- Kaggle prediction competition.
 
 - Conduct a replication study based on one of the datasets included in the [experimentdatar](https://itamarcaspi.github.io/experimentdatar/) package, or a paper of your choice.
 
@@ -435,7 +458,7 @@ name: todo
 
 <i class="fas fa-check-square"></i> Download and install [Git](https://git-scm.com/downloads).  
 
-<i class="fas fa-check-square"></i> Download and install [R](https://cloud.r-project.org/) and [RStudio](https://www.rstudio.com/).  
+<i class="fas fa-check-square"></i> Download and install [R and RStudio](https://posit.co/download/rstudio-desktop/).  
 
 <i class="fas fa-check-square"></i> Create an account on [GitHub](http://github.com/)
 
@@ -444,7 +467,7 @@ name: todo
 
 
 .footnote[
-[*] Please consult the [Guides](https://ml4econ.github.io/course-spring2019/RnRStudio.html) section in the course's old website.
+[*] Feel free consult the [Guides](https://ml4econ.github.io/course-spring2019/RnRStudio.html) section in the course's old website.
 ]
 
 
@@ -453,7 +476,7 @@ class: .title-slide-final, center, inverse, middle
 
 # `slides %>% end()`
 
-[<i class="fa fa-github"></i> Source code](https://github.com/ml4econ/lecture-notes-2021/blob/master/01-overview/01-overview.Rmd)  
+[<i class="fa fa-github"></i> Source code](https://github.com/ml4econ/lecture-notes-2023/blob/master/01-overview/01-overview.Rmd)  
 
 ---
 # References
