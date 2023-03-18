@@ -7,21 +7,12 @@ Instructor: [Itamar Caspi](https://itamarcaspi.rbind.io)
 
 Teaching assistant: [Ariel Karlinsky](https://akarlinsky.github.io/)
 
-<<<<<<< HEAD
-:spiral_calendar: Spring semester, 2023
-:alarm_clock:     17:30 - 20:15
-:hotel:           There's no place like home...
-:writing_hand:    [github.com/ml4econ](https://github.com/ml4econ/lecture-notes-2023)
-
-:family:          [Moodle Discussion Forum](https://moodle2.cs.huji.ac.il/nu22/mod/forum/view.php?id=342325)
-=======
 :spiral_calendar: Second semester, 2022-2023
 :alarm_clock:     16:30 - 19:15
 :hotel:           Social Sciences 2202
 :writing_hand:    [github.com/ml4econ](https://github.com/ml4econ/lecture-notes-2023)
->>>>>>> e5a4c0927b9bf3142c7a9e1e0024950cd5c85ae9
-
 :family:          [Moodle Discussion Forum](https://moodle2.cs.huji.ac.il/nu22/mod/forum/view.php?id=286095)
+
 -----
 
 ## Overview
