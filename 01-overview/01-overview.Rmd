@@ -361,9 +361,22 @@ Can be found at our GitHub repo:
 
 [Posit Primers](https://posit.cloud/learn/primers)
 
-```{r datacamp, echo=FALSE, out.width = "80%", fig.align='center'}
+```{r catch, echo=FALSE, out.width = "80%", fig.align='center'}
 
 knitr::include_graphics("figs/primer.png")
+
+```
+
+
+---
+
+# Econometrics with R
+
+[Introduction to Econometrics with R (Hanck, Arnold, Gerber, and Schmelzer)](https://www.econometrics-with-r.org/index.html)
+
+```{r introR, echo=FALSE, out.width = "25%", fig.align='center'}
+
+knitr::include_graphics("figs/introR.png")
 
 ```
 
