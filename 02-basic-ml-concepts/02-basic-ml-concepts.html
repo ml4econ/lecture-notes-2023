@@ -25,7 +25,7 @@ class: center, middle, inverse, title-slide
 ### Itamar Caspi
 ]
 .date[
-### March 19, 2023 (updated: 2023-03-18)
+### March 19, 2023 (updated: 2023-03-19)
 ]
 
 ---
@@ -170,7 +170,7 @@ Applications:
 ---
 # Reinforcement Learning (RL)
  
-A definition by [Sutton and Barto (2018)](#bib-sutton2018rli):
+A definition by &lt;a name=cite-sutton2018rli&gt;&lt;/a&gt;[Sutton and Barto (2018)](#bib-sutton2018rli):
 
 &lt;midd-blockquote&gt;
 _"Reinforcement learning is learning what to do—how to map situations to actions—so as to maximize a numerical reward signal. The learner is not told which actions to take, but instead must discover which actions yield the most reward by trying them."_
@@ -248,7 +248,7 @@ In this case, `\(Y=\{spam, ham\}\)`, and `\(X\)` is the email text.
 
 ???
 
-A fascinating discussion on Amazon's shipping-then-shopping business model appears in the book ["Prediction Machines: The Simple Economics of Artificial Intelligence"](https://books.google.com/books/about/Prediction_Machines.html?id=wJY4DwAAQBAJ) ([Agrawal, Gans, and Goldfarb, 2018](#bib-agrawal2018prediction)).
+A fascinating discussion on Amazon's shipping-then-shopping business model appears in the book ["Prediction Machines: The Simple Economics of Artificial Intelligence"](https://books.google.com/books/about/Prediction_Machines.html?id=wJY4DwAAQBAJ) &lt;a name=cite-agrawal2018prediction&gt;&lt;/a&gt;([Agrawal, Gans, and Goldfarb, 2018](#bib-agrawal2018prediction)).
 ---
 # Supervised Learning Algorithms
 
@@ -294,7 +294,7 @@ $$ \text{big data} + \text{computational advancements} = \text{the rise of ML}$$
 ]
 
 .pull-right[
-The "two cultures" ([Breiman, 2001](#bib-breiman2001statistical)):
+The "two cultures" &lt;a name=cite-breiman2001statistical&gt;&lt;/a&gt;([Breiman, 2001](#bib-breiman2001statistical)):
 
 - Statisticians assume a data generating process and try to learn  about it using data (parameters, confidence intervals, assumptions.) 
 
@@ -397,39 +397,39 @@ Here a small sample from our simulated table:
  &lt;/thead&gt;
 &lt;tbody&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 752 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 76 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 84 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 76 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 73.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 922 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 95 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 93 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 95 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 82.5 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 705 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 83 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 72 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 83 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 76.5 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 180 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 84 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 59 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 84 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 77.0 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 498 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 99 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 851 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 79 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 73 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 99 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 84.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 79 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.5 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 929 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 77 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 94 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 77 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 73.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 403 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 81 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 90 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 81 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75.5 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 227 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 78 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 78 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 433 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 97 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 59 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 97 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 83.5 &lt;/td&gt;
   &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
@@ -452,8 +452,8 @@ Here a small sample from our simulated table:
  &lt;/thead&gt;
 &lt;tbody&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 312.102 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 199.4203 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 325.848 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 220.4238 &lt;/td&gt;
   &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
@@ -870,7 +870,7 @@ __TOY PROBLEM:__ Say that we find in the data that `coffee` is a good predictor 
 
 ???
 
-The title of this slide "To Explain or to Predict?" is the name of a must-read [paper](https://projecteuclid.org/euclid.ss/1294167961) by [Shmueli (2010)](#bib-shmueli2010explain) that clarifies the distinction between predicting and explaining.
+The title of this slide "To Explain or to Predict?" is the name of a must-read [paper](https://projecteuclid.org/euclid.ss/1294167961) by &lt;a name=cite-shmueli2010explain&gt;&lt;/a&gt;[Shmueli (2010)](#bib-shmueli2010explain) that clarifies the distinction between predicting and explaining.
 
 ---
 # ML in aid of econometrics
@@ -901,24 +901,30 @@ class: .title-slide-final, center, inverse, middle
 Goldfarb. _Prediction Machines: The Simple Economics of Artificial Intelligence_. Harvard Business
 Review Press, 2018.
 
-&lt;a name=bib-athey2018the&gt;&lt;/a&gt;[[2]](#cite-athey2018the) S. Athey. "The impact of machine learning on
-economics". In: _The Economics of Artificial Intelligence: An Agenda_. University of Chicago Press,
-2018.
+[2] S. Athey. "The impact of machine learning on economics". In: _The Economics of Artificial
+Intelligence: An Agenda_. University of Chicago Press, 2018.
 
 &lt;a name=bib-breiman2001statistical&gt;&lt;/a&gt;[[3]](#cite-breiman2001statistical) L. Breiman. "Statistical
 modeling: The two cultures (with comments and a rejoinder by the author)". In: _Statistical science_
 16.3 (2001), pp. 199-231.
 
-&lt;a name=bib-shmueli2010explain&gt;&lt;/a&gt;[[4]](#cite-shmueli2010explain) G. Shmueli. "To explain or to
-predict?" In: _Statistical science_ 25.3 (2010), pp. 289-310.
+[4] T. Hastie, R. Tibshirani, and J. Friedman. _The Elements of Statistical Learning: Data Mining,
+Inference, and Prediction, Second Edition_. Springer, פבר. 2009. ISBN: 9780387848570.
 
-&lt;a name=bib-sutton2018rli&gt;&lt;/a&gt;[[5]](#cite-sutton2018rli) R. S. Sutton and A. G. Barto. _Reinforcement
-Learning: An Introduction_. MIT Press, 2018.
+[5] G. James, T. Hastie, D. Witten, et al. _An Introduction to Statistical Learning: With Applications
+in R_. Springer Texts in Statistics. Springer London, Limited, 2013. ISBN: 9781461471370.
+
+[6] S. Mullainathan and J. Spiess. "Machine learning: an applied econometric approach". In: _Journal
+of Economic Perspectives_ 31.2 (2017), pp. 87-106.
 
 ---
 # References
 
+[1] S. Mullainathan and J. Spiess. "Machine learning: an applied econometric approach". In: _Journal
+of Economic Perspectives_ 31.2 (2017), pp. 87-106.
 
+&lt;a name=bib-shmueli2010explain&gt;&lt;/a&gt;[[2]](#cite-shmueli2010explain) G. Shmueli. "To explain or to
+predict?" In: _Statistical science_ 25.3 (2010), pp. 289-310.
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>

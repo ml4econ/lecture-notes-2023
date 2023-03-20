@@ -333,7 +333,7 @@ knitr::include_graphics("figs/bds.png")
 
 Can be found at our GitHub repo:
 
-[https://github.com/ml4econ/lecture-notes-2020/blob/master/resources.md](https://github.com/ml4econ/lecture-notes-2020/blob/master/resources.md)
+[https://github.com/ml4econ/lecture-notes-2023/blob/master/resources.md](https://github.com/ml4econ/lecture-notes-2020/blob/master/resources.md)
 
 
 ---
