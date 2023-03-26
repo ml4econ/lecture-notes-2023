@@ -258,6 +258,14 @@ knitr::include_graphics("figs/chat_dplyr.png")
 ```
 
 
+---
+
+# Even better
+
+```{r chat2, echo=FALSE, out.width = "45%", fig.align='center'}
+knitr::include_graphics("figs/chat_dplyr2.png")
+```
+
 
 ---
 
