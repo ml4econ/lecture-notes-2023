@@ -24,7 +24,7 @@ output:
 
 R packages used to produce this presentation
 
-```{r load packages, message=FALSE}
+```{r load packages, message=FALSE, warning=FALSE}
 library(tidyverse)  # for data wrangling and plotting
 library(tidymodels) # for modeling the tidy way
 library(knitr)      # for presenting tables
