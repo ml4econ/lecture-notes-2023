@@ -232,7 +232,7 @@ df_new$xx <- df_new$x^2
 
 ---
 
-# "Piped" code?
+# "Pipped" code?
 
 - How about this one?
 
