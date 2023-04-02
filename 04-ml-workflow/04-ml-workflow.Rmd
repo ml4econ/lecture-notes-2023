@@ -1,0 +1,537 @@
+---
+title: "04 - A Typical (Supervised) ML Workflow"
+subtitle: "ml4econ, HUJI 2023"
+author: "Itamar Caspi"
+date: "April 16, 2023 (updated: `r Sys.Date()`)"
+output:
+  xaringan::moon_reader:
+    css: [default, "style/middlebury.css", "style/middlebury-fonts.css"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+      slideNumberFormat: |
+        <div class="progress-bar-container">
+          <div class="progress-bar" style="width: calc(%current% / %total% * 100%);">
+          </div>
+        </div>
+      
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(
+  eval = TRUE,
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  cache = FALSE,
+  dev = "svglite",
+  fig.ext = ".svg")
+
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+```
+
+
+# Packages and setup
+
+We will use the following packages during the presentation:
+```{r load_pack, message=FALSE, warning=FALSE, eval=TRUE}
+
+library(tidyverse)   # for data wrangling and visualization
+library(tidymodels)  # for data modeling
+library(GGally)      # for pairs plot
+library(skimr)       # for summary statistics
+library(here)        # for referencing folders and files
+
+```
+
+For the presentation, we will select a specific `ggplot` theme (not relevant otherwise):
+```{r ggplot_theme}
+theme_set(theme_grey(20))
+```
+
+
+---
+# The `tidymodels` package
+
+.pull-left[
+```{r tidymodels_logo, echo=FALSE, out.width = "80%", fig.align='center'}
+knitr::include_graphics("figs/tidymodels.png")
+```
+]
+.pull-right[
+
+>"[`tidymodels`](https://github.com/tidymodels/tidymodels) is a "meta-package" for modeling and statistical analysis that share the underlying design philosophy, grammar, and data structures of the tidyverse."
+
+]
+
+
+---
+# Supervised Machine Learning Workflow
+
+1. [Define the Prediction Task](#background)
+
+2. [Explore the Data](#eda)
+
+3. [Set Model and Tuning Parameters](#model)
+
+4. [Perform Cross-Validation](#cv)
+
+5. [Evaluate the Model](#eval)
+
+
+---
+class: title-slide-section-blue, center, middle
+name: background
+
+# Step 1: Define the Prediction Task
+
+
+---
+
+# Welcome to the `BostonHousing` dataset️
+
+.pull-left[
+- Dataset: 506 census tracts from the 1970 Boston census (Harrison & Rubinfeld, 1978)
+
+Components:
+- `medv` (target): Median home value in thousands of dollars
+- `lstat` (predictor): Percentage of lower status population
+- `chas` (predictor): Proximity to Charles River (1 = yes, 0 = no)
+
+**Objective:** Predict `medv` based on the given predictors
+
+
+]
+.pull-right[
+```{r boston_pic, echo=FALSE, out.width = "1000%", fig.align='center'}
+knitr::include_graphics("figs/boston.jpg")
+```
+Source: [https://www.bostonusa.com/](https://www.bostonusa.com/)
+]
+
+---
+
+# A bird's-eye view of Boston
+
+```{r boston_air, echo=FALSE, out.width = "80%", fig.align='center'}
+knitr::include_graphics("https://media.wbur.org/wp/2019/11/1125_bosheatmap-2-1000x510.jpg")
+```
+Source: [https://www.wbur.org/news/2019/11/25/heat-mapping-boston-museum-of-science](https://www.wbur.org/news/2019/11/25/heat-mapping-boston-museum-of-science)
+
+
+---
+# Load the Data
+
+We will utilize the `read_csv()` function to import the raw dataset.
+```{r load_data, message = TRUE}
+boston_raw <- read_csv(here("04-ml-workflow/data","BostonHousing.csv"))
+```
+
+---
+# What Type of Data?
+
+For a better understanding of the data structure, apply the `glimpse()` function:
+```{r glimpse}
+glimpse(boston_raw)
+```
+
+The `chas` variable predominantly consists of zeros, which implies that it should be treated as a categorical factor.
+
+---
+# Initial Data Filtering
+
+Select `medv` and `lstat`
+```{r filter_data}
+boston <- boston_raw %>% 
+  as_tibble() %>% 
+  select(medv, lstat, chas) %>% 
+  mutate(chas = as_factor(chas))
+
+head(boston)
+```
+
+
+
+---
+class: title-slide-section-blue, center, middle
+name: split
+
+# Step 2: Split the Data
+
+
+---
+# Initial Split 
+
+To perform an initial train-test split, we will use the `initial_split()`, `training()`, and `testing()` functions from the [rsample](https://tidymodels.github.io/rsample/) package.
+
+Remember to set a seed for reproducibility.
+```{r seed}
+set.seed(1203) 
+```
+
+Initial split:
+```{r initial_split}
+boston_split <- boston %>% 
+  initial_split(prop = 2/3, strata = medv)
+
+boston_split
+```
+
+---
+# Preparing Training and Test Sets
+
+```{r train_test_raw}
+boston_train_raw <- training(boston_split)
+boston_test_raw  <- testing(boston_split)
+
+head(boston_train_raw, 5)
+```
+
+
+```{r head_test_raw}
+head(boston_test_raw, 5)
+```
+
+---
+class: title-slide-section-blue, center, middle
+name: eda
+
+# Step 3: Explore the Data
+
+---
+# Summary Statistics Using `skimr`
+
+```{r skimr, eval=FALSE}
+boston_train_raw %>% 
+  skim()
+```
+
+(Not visually appealing on the slides)
+
+
+---
+# Pairs Plot Using `GGally`
+
+.pull-left[
+
+We will now create a __pairs plot__, which efficiently displays every variable in a dataset against all the others.
+```{r pairs, fig.width=6, fig.show='hide', fig.retina=3}
+boston_train_raw %>% ggpairs()
+```
+]
+.pull-right[
+```{r, ref.label = 'pairs', echo=FALSE}
+
+```
+]
+ 
+---
+# Select a Model
+
+.pull-left[
+
+We will select the class of polynomial models, represented as follows:
+
+$$medv_i = \beta_0 + \sum_{j=1}^{\lambda}\beta_j lstat_i^j+\varepsilon_i$$
+```{r poly, fig.width=6, fig.show='hide', fig.retina=3}
+
+boston_train_raw %>% ggplot(aes(lstat, medv)) +
+  geom_point() +
+  geom_smooth(
+    method = lm,
+    formula = y ~ poly(x,1),
+    se = FALSE,
+    color = "blue"
+  ) +
+  geom_smooth(
+    method = lm,
+    formula = y ~ poly(x,10),
+    se = FALSE,
+    color = "red"
+  )
+```
+]
+
+.pull-right[
+In blue \lambda=1$; in red, $\lambda = 10$.
+```{r, ref.label = 'poly', echo=FALSE}
+
+```
+]
+ 
+ 
+---
+class: title-slide-section-blue, center, middle
+name: model
+
+# Step 4: Set Model and Tuning Parameters
+
+
+---
+
+# Data Preprocessing using `recipes`
+
+The `recipes` package is an excellent resource for data preprocessing, seamlessly integrating with the tidy approach to machine learning.
+
+```{r recipe}
+boston_rec <- 
+  recipe(medv ~ lstat + chas, data = boston_train_raw) %>% 
+  step_poly(lstat, degree = tune("lambda")) %>% 
+  step_dummy(chas)
+
+boston_rec
+```
+
+
+---
+# Set a Grid for $\lambda$
+
+What are the tuning parameters we need to consider?
+
+```{r params}
+boston_rec %>% extract_parameter_set_dials()
+```
+
+We must tune the polynomial degree parameter $(\lambda)$ while constructing our models using the training data. In this example, we will establish a range between 1 and 8:
+```{r grid}
+lambda_grid <- expand_grid("lambda" = 1:8)
+```
+
+---
+# Define the Model
+
+Using the linear regression model:
+```{r model}
+
+lm_mod <- linear_reg()%>%
+  set_engine("lm")
+
+lm_mod
+```
+Note that in this case, there are no tuning parameters involved.
+
+
+
+---
+class: title-slide-section-blue, center, middle
+name: cv
+
+# Step 5: Cross-validation
+
+
+---
+# Split the Training Set to 5-folds
+
+We will apply the `vfold_cv()` function from the [rsample](https://tidymodels.github.io/rsample/) package to divide the training set into 5-folds:
+```{r cv_split}
+cv_splits <- boston_train_raw %>% 
+  vfold_cv(v = 5)
+  
+cv_splits
+```
+
+
+---
+# Define the Workflow
+
+Next, we define a `workflow()` that combines a model specification with a recipe or model preprocessor.
+```{r workflow}
+boston_wf <- 
+  workflow() %>%
+  add_model(lm_mod) %>%
+  add_recipe(boston_rec)
+```
+Note that in this case, there are no tuning parameters involved.
+
+---
+# Estimate CV-RMSE Over the $\lambda$ Grid
+
+We will now calculate the cross-validated root mean squared error (CV-RMSE) for each value of $\lambda$.
+```{r tune}
+boston_results <- 
+  boston_wf %>% 
+  tune_grid(
+  resamples = cv_splits,
+  grid      = lambda_grid
+)
+
+boston_results
+```
+
+---
+# Find the Optimal $\lambda$
+
+Let's identify the top-3 best-performing models.
+```{r rmse}
+ boston_results %>% 
+  show_best(metric = "rmse", n = 3)
+```
+
+<midd-blockquote> _"[I]n reality there is rarely if ever a true underlying model, and even if there was a true underlying model, selecting that model will not necessarily give the best forecasts..."_ .right[&mdash; [__Rob J. Hyndman__](https://robjhyndman.com/hyndsight/crossvalidation/)] </midd-blockquote>
+
+
+---
+# And Now Using a Graph
+
+.pull-left[
+```{r cv_plot, echo=TRUE, fig.width=6, fig.show='hide', fig.retina=3}
+boston_results %>% 
+  autoplot()
+```
+]
+.pull-right[
+```{r, ref.label = 'cv_plot', echo=FALSE}
+
+```
+
+]
+
+---
+class: title-slide-section-blue, center, middle
+name: eval
+
+# Step 6: Evaluate the Model
+
+
+---
+
+# Use the Test Set to Evaluate the Best Model
+
+Choose the optimal value of $\lambda$
+```{r best_lambda}
+best_lambda <- boston_results %>% 
+  select_best(metric = "rmse")
+
+best_lambda
+```
+
+Create a recipe using the optimal $\lambda = 4$
+```{r prep}
+boston_final <- boston_rec %>% 
+  finalize_recipe(best_lambda)
+```
+
+
+---
+# Apply the Recipe to the Training and Test Sets
+
+The `juice()` function applies the recipe to the training set, while the `bake()` function applies it to the test set.
+```{r test_train}
+boston_train <- boston_final %>% 
+  prep() %>% 
+  juice()
+
+boston_test <- boston_final %>% 
+  prep() %>% 
+  bake(new_data = boston_test_raw)
+```
+
+For instance, let's examine the training set:
+```{r head_train}
+head(boston_train, 3)
+```
+
+---
+
+# Fit the Model to the Training Set
+
+Fit the optimal model (with $\lambda = 4$) to the training set:
+```{r fit}
+boston_fit <- lm_mod %>% 
+  fit(medv ~ ., data = boston_train)
+```
+
+The following are the estimated coefficients:
+```{r broom_fit}
+boston_fit %>% tidy()
+```
+
+
+---
+# Make Predictions Using the Test Set
+
+Generate a tibble that includes the predictions and the actual values:
+```{r pred}
+boston_pred <- boston_fit %>% 
+  predict(new_data = boston_test) %>%   #<<
+  bind_cols(boston_test) %>% 
+  select(medv, .pred)
+
+head(boston_pred)
+```
+
+It's worth noting that this is the first time we are utilizing the test set!
+
+---
+# Test-RMSE
+
+Calculate the root mean square error (RMSE) for the test set (test-RMSE):
+```{r test_rmse}
+boston_pred %>% 
+  rmse(medv, .pred)
+```
+The above is a measure of our model's performance on "general" data.
+
+<midd-blockquote>__NOTE:__ The test set RMSE estimates the predicted squared error on unseen data, provided the best model.</midd-blockquote>
+
+---
+# Always plot your prediction errors
+
+.pull-left[
+
+Plotting the prediction errors $(y_i-\hat{y}_i)$ against the target variable provides critical information regarding prediction quality.
+```{r resid, fig.width=6, fig.show='hide', fig.retina=3}
+
+boston_pred %>% 
+  mutate(resid = medv - .pred) %>% 
+  ggplot(aes(medv, resid)) +
+  geom_point() +
+  geom_hline(yintercept = 0, color = "red")
+
+```
+For example, our predictions for high-end levels of `medv` are highly biased, indicating that there's potential for improvement...
+
+]
+
+.pull-right[
+```{r, ref.label = 'resid', echo=FALSE}
+
+```
+]
+
+---
+# (A shortcut)
+
+The `last_fit()` function from `tune` is a much quicker way to obtain the test-set RMSE. 
+
+Firstly, we need to modify our workflow to utilize the optimal $\lambda$ value.
+```{r, eval=FALSE}
+boston_wf <- 
+  workflow() %>%
+  add_model(lm_mod) %>%
+  add_recipe(boston_final)  #<<
+```
+
+We will now use the optimal model to estimate the out-of-sample RMSE.
+```{r, eval=FALSE}
+boston_wf %>% 
+  last_fit(split = boston_split) %>%  #<<
+  collect_metrics() %>% 
+  filter(.metric == "rmse")
+```
+
+
+
+---
+class: .title-slide-final, center, inverse, middle
+
+# `slides::end()`
+
+[<i class="fa fa-github"></i> Source code](https://github.com/ml4econ/lecture-notes-2023/tree/master/04-ml-workflow)  
+
+
+

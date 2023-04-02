@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>04 - A Typical (Supervised) ML Workflow</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Itamar Caspi" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/all.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/v4-shims.css" rel="stylesheet" />
+    <link rel="stylesheet" href="style/middlebury.css" type="text/css" />
+    <link rel="stylesheet" href="style/middlebury-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# 04 - A Typical (Supervised) ML Workflow
+]
+.subtitle[
+## ml4econ, HUJI 2023
+]
+.author[
+### Itamar Caspi
+]
+.date[
+### April 16, 2023 (updated: 2023-03-30)
+]
+
+---
+
+
+
+
+
+# Packages and setup
+
+We will use the following packages during the presentation:
+
+```r
+library(tidyverse)   # for data wrangling and visualization
+library(tidymodels)  # for data modeling
+library(GGally)      # for pairs plot
+library(skimr)       # for summary statistics
+library(here)        # for referencing folders and files
+```
+
+For the presentation, we will select a specific `ggplot` theme (not relevant otherwise):
+
+```r
+theme_set(theme_grey(20))
+```
+
+
+---
+# The `tidymodels` package
+
+.pull-left[
+&lt;img src="figs/tidymodels.png" width="80%" style="display: block; margin: auto;" /&gt;
+]
+.pull-right[
+
+&gt;"[`tidymodels`](https://github.com/tidymodels/tidymodels) is a "meta-package" for modeling and statistical analysis that share the underlying design philosophy, grammar, and data structures of the tidyverse."
+
+]
+
+
+---
+# Supervised Machine Learning Workflow
+
+1. [Define the Prediction Task](#background)
+
+2. [Explore the Data](#eda)
+
+3. [Set Model and Tuning Parameters](#model)
+
+4. [Perform Cross-Validation](#cv)
+
+5. [Evaluate the Model](#eval)
+
+
+---
+class: title-slide-section-blue, center, middle
+name: background
+
+# Step 1: Define the Prediction Task
+
+
+---
+
+# Welcome to the `BostonHousing` dataset️
+
+.pull-left[
+- Dataset: 506 census tracts from the 1970 Boston census (Harrison &amp; Rubinfeld, 1978)
+
+Components:
+- `medv` (target): Median home value in thousands of dollars
+- `lstat` (predictor): Percentage of lower status population
+- `chas` (predictor): Proximity to Charles River (1 = yes, 0 = no)
+
+**Objective:** Predict `medv` based on the given predictors
+
+
+]
+.pull-right[
+&lt;img src="figs/boston.jpg" width="1000%" style="display: block; margin: auto;" /&gt;
+Source: [https://www.bostonusa.com/](https://www.bostonusa.com/)
+]
+
+---
+
+# A bird's-eye view of Boston
+
+&lt;img src="https://media.wbur.org/wp/2019/11/1125_bosheatmap-2-1000x510.jpg" width="80%" style="display: block; margin: auto;" /&gt;
+Source: [https://www.wbur.org/news/2019/11/25/heat-mapping-boston-museum-of-science](https://www.wbur.org/news/2019/11/25/heat-mapping-boston-museum-of-science)
+
+
+---
+# Load the Data
+
+We will utilize the `read_csv()` function to import the raw dataset.
+
+```r
+boston_raw &lt;- read_csv(here("04-ml-workflow/data","BostonHousing.csv"))
+```
+
+```
+## Rows: 506 Columns: 14
+## -- Column specification ----------------------------------------------------------------------------------------------------------
+## Delimiter: ","
+## dbl (14): crim, zn, indus, chas, nox, rm, age, dis, rad, tax, ptratio, b, lstat, medv
+## 
+## i Use `spec()` to retrieve the full column specification for this data.
+## i Specify the column types or set `show_col_types = FALSE` to quiet this message.
+```
+
+---
+# What Type of Data?
+
+For a better understanding of the data structure, apply the `glimpse()` function:
+
+```r
+glimpse(boston_raw)
+```
+
+```
+## Rows: 506
+## Columns: 14
+## $ crim    &lt;dbl&gt; 0.00632, 0.02731, 0.02729, 0.03237, 0.06905, 0.02985, 0.08829, 0.14455, 0.21124, 0.17004, 0.22489, 0.11747, 0.09~
+## $ zn      &lt;dbl&gt; 18.0, 0.0, 0.0, 0.0, 0.0, 0.0, 12.5, 12.5, 12.5, 12.5, 12.5, 12.5, 12.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,~
+## $ indus   &lt;dbl&gt; 2.31, 7.07, 7.07, 2.18, 2.18, 2.18, 7.87, 7.87, 7.87, 7.87, 7.87, 7.87, 7.87, 8.14, 8.14, 8.14, 8.14, 8.14, 8.14~
+## $ chas    &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0~
+## $ nox     &lt;dbl&gt; 0.538, 0.469, 0.469, 0.458, 0.458, 0.458, 0.524, 0.524, 0.524, 0.524, 0.524, 0.524, 0.524, 0.538, 0.538, 0.538, ~
+## $ rm      &lt;dbl&gt; 6.575, 6.421, 7.185, 6.998, 7.147, 6.430, 6.012, 6.172, 5.631, 6.004, 6.377, 6.009, 5.889, 5.949, 6.096, 5.834, ~
+## $ age     &lt;dbl&gt; 65.2, 78.9, 61.1, 45.8, 54.2, 58.7, 66.6, 96.1, 100.0, 85.9, 94.3, 82.9, 39.0, 61.8, 84.5, 56.5, 29.3, 81.7, 36.~
+## $ dis     &lt;dbl&gt; 4.0900, 4.9671, 4.9671, 6.0622, 6.0622, 6.0622, 5.5605, 5.9505, 6.0821, 6.5921, 6.3467, 6.2267, 5.4509, 4.7075, ~
+## $ rad     &lt;dbl&gt; 1, 2, 2, 3, 3, 3, 5, 5, 5, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5~
+## $ tax     &lt;dbl&gt; 296, 242, 242, 222, 222, 222, 311, 311, 311, 311, 311, 311, 311, 307, 307, 307, 307, 307, 307, 307, 307, 307, 30~
+## $ ptratio &lt;dbl&gt; 15.3, 17.8, 17.8, 18.7, 18.7, 18.7, 15.2, 15.2, 15.2, 15.2, 15.2, 15.2, 15.2, 21.0, 21.0, 21.0, 21.0, 21.0, 21.0~
+## $ b       &lt;dbl&gt; 396.90, 396.90, 392.83, 394.63, 396.90, 394.12, 395.60, 396.90, 386.63, 386.71, 392.52, 396.90, 390.50, 396.90, ~
+## $ lstat   &lt;dbl&gt; 4.98, 9.14, 4.03, 2.94, 5.33, 5.21, 12.43, 19.15, 29.93, 17.10, 20.45, 13.27, 15.71, 8.26, 10.26, 8.47, 6.58, 14~
+## $ medv    &lt;dbl&gt; 24.0, 21.6, 34.7, 33.4, 36.2, 28.7, 22.9, 27.1, 16.5, 18.9, 15.0, 18.9, 21.7, 20.4, 18.2, 19.9, 23.1, 17.5, 20.2~
+```
+
+The `chas` variable predominantly consists of zeros, which implies that it should be treated as a categorical factor.
+
+---
+# Initial Data Filtering
+
+Select `medv` and `lstat`
+
+```r
+boston &lt;- boston_raw %&gt;% 
+  as_tibble() %&gt;% 
+  select(medv, lstat, chas) %&gt;% 
+  mutate(chas = as_factor(chas))
+
+head(boston)
+```
+
+```
+## # A tibble: 6 x 3
+##    medv lstat chas 
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;fct&gt;
+## 1  24    4.98 0    
+## 2  21.6  9.14 0    
+## 3  34.7  4.03 0    
+## 4  33.4  2.94 0    
+## 5  36.2  5.33 0    
+## 6  28.7  5.21 0
+```
+
+
+
+---
+class: title-slide-section-blue, center, middle
+name: split
+
+# Step 2: Split the Data
+
+
+---
+# Initial Split 
+
+To perform an initial train-test split, we will use the `initial_split()`, `training()`, and `testing()` functions from the [rsample](https://tidymodels.github.io/rsample/) package.
+
+Remember to set a seed for reproducibility.
+
+```r
+set.seed(1203) 
+```
+
+Initial split:
+
+```r
+boston_split &lt;- boston %&gt;% 
+  initial_split(prop = 2/3, strata = medv)
+
+boston_split
+```
+
+```
+## &lt;Training/Testing/Total&gt;
+## &lt;336/170/506&gt;
+```
+
+---
+# Preparing Training and Test Sets
+
+
+```r
+boston_train_raw &lt;- training(boston_split)
+boston_test_raw  &lt;- testing(boston_split)
+
+head(boston_train_raw, 5)
+```
+
+```
+## # A tibble: 5 x 3
+##    medv lstat chas 
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;fct&gt;
+## 1  16.5  29.9 0    
+## 2  15    20.4 0    
+## 3  13.6  21.0 0    
+## 4  15.2  18.7 0    
+## 5  14.5  19.9 0
+```
+
+
+
+```r
+head(boston_test_raw, 5)
+```
+
+```
+## # A tibble: 5 x 3
+##    medv lstat chas 
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;fct&gt;
+## 1  24    4.98 0    
+## 2  21.6  9.14 0    
+## 3  27.1 19.2  0    
+## 4  18.9 17.1  0    
+## 5  18.2 10.3  0
+```
+
+---
+class: title-slide-section-blue, center, middle
+name: eda
+
+# Step 3: Explore the Data
+
+---
+# Summary Statistics Using `skimr`
+
+
+```r
+boston_train_raw %&gt;% 
+  skim()
+```
+
+(Not visually appealing on the slides)
+
+
+---
+# Pairs Plot Using `GGally`
+
+.pull-left[
+
+We will now create a __pairs plot__, which efficiently displays every variable in a dataset against all the others.
+
+```r
+boston_train_raw %&gt;% ggpairs()
+```
+]
+.pull-right[
+![](04-ml-workflow_files/figure-html/unnamed-chunk-1-1..svg)&lt;!-- --&gt;
+]
+ 
+---
+# Select a Model
+
+.pull-left[
+
+We will select the class of polynomial models, represented as follows:
+
+`$$medv_i = \beta_0 + \sum_{j=1}^{\lambda}\beta_j lstat_i^j+\varepsilon_i$$`
+
+```r
+boston_train_raw %&gt;% ggplot(aes(lstat, medv)) +
+  geom_point() +
+  geom_smooth(
+    method = lm,
+    formula = y ~ poly(x,1),
+    se = FALSE,
+    color = "blue"
+  ) +
+  geom_smooth(
+    method = lm,
+    formula = y ~ poly(x,10),
+    se = FALSE,
+    color = "red"
+  )
+```
+]
+
+.pull-right[
+In blue \lambda=1$; in red, `\(\lambda = 10\)`.
+![](04-ml-workflow_files/figure-html/unnamed-chunk-2-1..svg)&lt;!-- --&gt;
+]
+ 
+ 
+---
+class: title-slide-section-blue, center, middle
+name: model
+
+# Step 4: Set Model and Tuning Parameters
+
+
+---
+
+# Data Preprocessing using `recipes`
+
+The `recipes` package is an excellent resource for data preprocessing, seamlessly integrating with the tidy approach to machine learning.
+
+
+```r
+boston_rec &lt;- 
+  recipe(medv ~ lstat + chas, data = boston_train_raw) %&gt;% 
+  step_poly(lstat, degree = tune("lambda")) %&gt;% 
+  step_dummy(chas)
+
+boston_rec
+```
+
+```
+## Recipe
+## 
+## Inputs:
+## 
+##       role #variables
+##    outcome          1
+##  predictor          2
+## 
+## Operations:
+## 
+## Orthogonal polynomials on lstat
+## Dummy variables from chas
+```
+
+
+---
+# Set a Grid for `\(\lambda\)`
+
+What are the tuning parameters we need to consider?
+
+
+```r
+boston_rec %&gt;% extract_parameter_set_dials()
+```
+
+```
+## Collection of 1 parameters for tuning
+## 
+##  identifier   type    object
+##      lambda degree nparam[+]
+```
+
+We must tune the polynomial degree parameter `\((\lambda)\)` while constructing our models using the training data. In this example, we will establish a range between 1 and 8:
+
+```r
+lambda_grid &lt;- expand_grid("lambda" = 1:8)
+```
+
+---
+# Define the Model
+
+Using the linear regression model:
+
+```r
+lm_mod &lt;- linear_reg()%&gt;%
+  set_engine("lm")
+
+lm_mod
+```
+
+```
+## Linear Regression Model Specification (regression)
+## 
+## Computational engine: lm
+```
+Note that in this case, there are no tuning parameters involved.
+
+
+
+---
+class: title-slide-section-blue, center, middle
+name: cv
+
+# Step 5: Cross-validation
+
+
+---
+# Split the Training Set to 5-folds
+
+We will apply the `vfold_cv()` function from the [rsample](https://tidymodels.github.io/rsample/) package to divide the training set into 5-folds:
+
+```r
+cv_splits &lt;- boston_train_raw %&gt;% 
+  vfold_cv(v = 5)
+  
+cv_splits
+```
+
+```
+## #  5-fold cross-validation 
+## # A tibble: 5 x 2
+##   splits           id   
+##   &lt;list&gt;           &lt;chr&gt;
+## 1 &lt;split [268/68]&gt; Fold1
+## 2 &lt;split [269/67]&gt; Fold2
+## 3 &lt;split [269/67]&gt; Fold3
+## 4 &lt;split [269/67]&gt; Fold4
+## 5 &lt;split [269/67]&gt; Fold5
+```
+
+
+---
+# Define the Workflow
+
+Next, we define a `workflow()` that combines a model specification with a recipe or model preprocessor.
+
+```r
+boston_wf &lt;- 
+  workflow() %&gt;%
+  add_model(lm_mod) %&gt;%
+  add_recipe(boston_rec)
+```
+Note that in this case, there are no tuning parameters involved.
+
+---
+# Estimate CV-RMSE Over the `\(\lambda\)` Grid
+
+We will now calculate the cross-validated root mean squared error (CV-RMSE) for each value of `\(\lambda\)`.
+
+```r
+boston_results &lt;- 
+  boston_wf %&gt;% 
+  tune_grid(
+  resamples = cv_splits,
+  grid      = lambda_grid
+)
+
+boston_results
+```
+
+```
+## # Tuning results
+## # 5-fold cross-validation 
+## # A tibble: 5 x 4
+##   splits           id    .metrics          .notes          
+##   &lt;list&gt;           &lt;chr&gt; &lt;list&gt;            &lt;list&gt;          
+## 1 &lt;split [268/68]&gt; Fold1 &lt;tibble [16 x 5]&gt; &lt;tibble [0 x 3]&gt;
+## 2 &lt;split [269/67]&gt; Fold2 &lt;tibble [16 x 5]&gt; &lt;tibble [0 x 3]&gt;
+## 3 &lt;split [269/67]&gt; Fold3 &lt;tibble [16 x 5]&gt; &lt;tibble [0 x 3]&gt;
+## 4 &lt;split [269/67]&gt; Fold4 &lt;tibble [16 x 5]&gt; &lt;tibble [0 x 3]&gt;
+## 5 &lt;split [269/67]&gt; Fold5 &lt;tibble [16 x 5]&gt; &lt;tibble [0 x 3]&gt;
+```
+
+---
+# Find the Optimal `\(\lambda\)`
+
+Let's identify the top-3 best-performing models.
+
+```r
+ boston_results %&gt;% 
+  show_best(metric = "rmse", n = 3)
+```
+
+```
+## # A tibble: 3 x 7
+##   lambda .metric .estimator  mean     n std_err .config             
+##    &lt;int&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
+## 1      6 rmse    standard    5.29     5   0.273 Preprocessor6_Model1
+## 2      5 rmse    standard    5.29     5   0.279 Preprocessor5_Model1
+## 3      7 rmse    standard    5.33     5   0.293 Preprocessor7_Model1
+```
+
+&lt;midd-blockquote&gt; _"[I]n reality there is rarely if ever a true underlying model, and even if there was a true underlying model, selecting that model will not necessarily give the best forecasts..."_ .right[&amp;mdash; [__Rob J. Hyndman__](https://robjhyndman.com/hyndsight/crossvalidation/)] &lt;/midd-blockquote&gt;
+
+
+---
+# And Now Using a Graph
+
+.pull-left[
+
+```r
+boston_results %&gt;% 
+  autoplot()
+```
+]
+.pull-right[
+![](04-ml-workflow_files/figure-html/unnamed-chunk-3-1..svg)&lt;!-- --&gt;
+
+]
+
+---
+class: title-slide-section-blue, center, middle
+name: eval
+
+# Step 6: Evaluate the Model
+
+
+---
+
+# Use the Test Set to Evaluate the Best Model
+
+Choose the optimal value of `\(\lambda\)`
+
+```r
+best_lambda &lt;- boston_results %&gt;% 
+  select_best(metric = "rmse")
+
+best_lambda
+```
+
+```
+## # A tibble: 1 x 2
+##   lambda .config             
+##    &lt;int&gt; &lt;chr&gt;               
+## 1      6 Preprocessor6_Model1
+```
+
+Create a recipe using the optimal `\(\lambda = 4\)`
+
+```r
+boston_final &lt;- boston_rec %&gt;% 
+  finalize_recipe(best_lambda)
+```
+
+
+---
+# Apply the Recipe to the Training and Test Sets
+
+The `juice()` function applies the recipe to the training set, while the `bake()` function applies it to the test set.
+
+```r
+boston_train &lt;- boston_final %&gt;% 
+  prep() %&gt;% 
+  juice()
+
+boston_test &lt;- boston_final %&gt;% 
+  prep() %&gt;% 
+  bake(new_data = boston_test_raw)
+```
+
+For instance, let's examine the training set:
+
+```r
+head(boston_train, 3)
+```
+
+```
+## # A tibble: 3 x 8
+##    medv lstat_poly_1 lstat_poly_2 lstat_poly_3 lstat_poly_4 lstat_poly_5 lstat_poly_6 chas_X1
+##   &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;   &lt;dbl&gt;
+## 1  16.5       0.126        0.0942      -0.0311      -0.118       -0.0932       0.0108       0
+## 2  15         0.0565      -0.0399      -0.0549       0.0406       0.0604      -0.0342       0
+## 3  13.6       0.0606      -0.0358      -0.0613       0.0335       0.0693      -0.0218       0
+```
+
+---
+
+# Fit the Model to the Training Set
+
+Fit the optimal model (with `\(\lambda = 4\)`) to the training set:
+
+```r
+boston_fit &lt;- lm_mod %&gt;% 
+  fit(medv ~ ., data = boston_train)
+```
+
+The following are the estimated coefficients:
+
+```r
+boston_fit %&gt;% tidy()
+```
+
+```
+## # A tibble: 8 x 5
+##   term         estimate std.error statistic   p.value
+##   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)     22.3      0.295    75.6   1.41e-209
+## 2 lstat_poly_1  -126.       5.21    -24.2   4.33e- 75
+## 3 lstat_poly_2    52.8      5.21     10.1   3.49e- 21
+## 4 lstat_poly_3   -21.4      5.23     -4.09  5.36e-  5
+## 5 lstat_poly_4    20.9      5.23      3.99  8.29e-  5
+## 6 lstat_poly_5   -14.7      5.23     -2.80  5.34e-  3
+## 7 lstat_poly_6     4.22     5.22      0.807 4.20e-  1
+## 8 chas_X1          4.45     1.12      3.96  9.27e-  5
+```
+
+
+---
+# Make Predictions Using the Test Set
+
+Generate a tibble that includes the predictions and the actual values:
+
+```r
+boston_pred &lt;- boston_fit %&gt;% 
+* predict(new_data = boston_test) %&gt;%
+  bind_cols(boston_test) %&gt;% 
+  select(medv, .pred)
+
+head(boston_pred)
+```
+
+```
+## # A tibble: 6 x 2
+##    medv .pred
+##   &lt;dbl&gt; &lt;dbl&gt;
+## 1  24    31.3
+## 2  21.6  23.3
+## 3  27.1  15.0
+## 4  18.9  16.7
+## 5  18.2  22.2
+## 6  19.9  24.0
+```
+
+It's worth noting that this is the first time we are utilizing the test set!
+
+---
+# Test-RMSE
+
+Calculate the root mean square error (RMSE) for the test set (test-RMSE):
+
+```r
+boston_pred %&gt;% 
+  rmse(medv, .pred)
+```
+
+```
+## # A tibble: 1 x 3
+##   .metric .estimator .estimate
+##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+## 1 rmse    standard        5.00
+```
+The above is a measure of our model's performance on "general" data.
+
+&lt;midd-blockquote&gt;__NOTE:__ The test set RMSE estimates the predicted squared error on unseen data, provided the best model.&lt;/midd-blockquote&gt;
+
+---
+# Always plot your prediction errors
+
+.pull-left[
+
+Plotting the prediction errors `\((y_i-\hat{y}_i)\)` against the target variable provides critical information regarding prediction quality.
+
+```r
+boston_pred %&gt;% 
+  mutate(resid = medv - .pred) %&gt;% 
+  ggplot(aes(medv, resid)) +
+  geom_point() +
+  geom_hline(yintercept = 0, color = "red")
+```
+For example, our predictions for high-end levels of `medv` are highly biased, indicating that there's potential for improvement...
+
+]
+
+.pull-right[
+![](04-ml-workflow_files/figure-html/unnamed-chunk-4-1..svg)&lt;!-- --&gt;
+]
+
+---
+# (A shortcut)
+
+The `last_fit()` function from `tune` is a much quicker way to obtain the test-set RMSE. 
+
+Firstly, we need to modify our workflow to utilize the optimal `\(\lambda\)` value.
+
+```r
+boston_wf &lt;- 
+  workflow() %&gt;%
+  add_model(lm_mod) %&gt;%
+* add_recipe(boston_final)
+```
+
+We will now use the optimal model to estimate the out-of-sample RMSE.
+
+```r
+boston_wf %&gt;% 
+* last_fit(split = boston_split) %&gt;%
+  collect_metrics() %&gt;% 
+  filter(.metric == "rmse")
+```
+
+
+
+---
+class: .title-slide-final, center, inverse, middle
+
+# `slides::end()`
+
+[&lt;i class="fa fa-github"&gt;&lt;/i&gt; Source code](https://github.com/ml4econ/lecture-notes-2023/tree/master/04-ml-workflow)  
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"slideNumberFormat": "<div class=\"progress-bar-container\">\n  <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">\n  </div>\n</div>\n"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
