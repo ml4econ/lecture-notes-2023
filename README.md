@@ -70,7 +70,8 @@ The following schedule is subject to change based on class interests and time co
 [(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/02-basic-ml-concepts/02-basic-ml-concepts.pdf) 
 3. Reproducibility and Version Control [(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/03-reprod-vc/03-reprod-vc.html)
 [(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/03-reprod-vc/03-reprod-vc.pdf)  
-
+4. A Typical (Supervised) ML Workflow [(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/04-ml-workflow/04-ml-workflow.html)
+[(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/04-ml-workflow/04-ml-workflow.pdf)
 
 ### Part II: Causal Inference and ML
 
