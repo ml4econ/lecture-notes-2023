@@ -127,7 +127,7 @@ Source: [https://www.wbur.org/news/2019/11/25/heat-mapping-boston-museum-of-scie
 # Load the Data
 
 We will utilize the `read_csv()` function to import the raw dataset.
-```{r load_data, message = TRUE}
+```{r load_data, message=FALSE}
 boston_raw <- read_csv(here("04-ml-workflow/data","BostonHousing.csv"))
 ```
 
@@ -509,7 +509,7 @@ For example, our predictions for high-end levels of `medv` are highly biased, in
 The `last_fit()` function from `tune` is a much quicker way to obtain the test-set RMSE. 
 
 Firstly, we need to modify our workflow to utilize the optimal $\lambda$ value.
-```{r, eval=FALSE}
+```{r, eval=TRUE}
 boston_wf <- 
   workflow() %>%
   add_model(lm_mod) %>%
@@ -517,7 +517,7 @@ boston_wf <-
 ```
 
 We will now use the optimal model to estimate the out-of-sample RMSE.
-```{r, eval=FALSE}
+```{r, eval=TRUE}
 boston_wf %>% 
   last_fit(split = boston_split) %>%  #<<
   collect_metrics() %>% 
