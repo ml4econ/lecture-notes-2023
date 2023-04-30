@@ -257,7 +257,7 @@ boston_train_raw %>% ggplot(aes(lstat, medv)) +
 ]
 
 .pull-right[
-In blue \lambda=1$; in red, $\lambda = 10$.
+In blue $\lambda=1$; in red, $\lambda = 10$.
 ```{r, ref.label = 'poly', echo=FALSE}
 
 ```
