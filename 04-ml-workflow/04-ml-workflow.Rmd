@@ -409,7 +409,7 @@ best_lambda <- boston_results %>%
 best_lambda
 ```
 
-Create a recipe using the optimal $\lambda = 4$
+Create a recipe using the optimal $\lambda = 6$
 ```{r prep}
 boston_final <- boston_rec %>% 
   finalize_recipe(best_lambda)
@@ -439,7 +439,7 @@ head(boston_train, 3)
 
 # Fit the Model to the Training Set
 
-Fit the optimal model (with $\lambda = 4$) to the training set:
+Fit the optimal model (with $\lambda = 6$) to the training set:
 ```{r fit}
 boston_fit <- lm_mod %>% 
   fit(medv ~ ., data = boston_train)
