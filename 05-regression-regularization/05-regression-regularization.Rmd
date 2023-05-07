@@ -2,7 +2,7 @@
 title: "05 - Regression and Regularization"
 subtitle: "ml4econ, HUJI 2023"
 author: "Itamar Caspi"
-date: "May 07, 2021 (updated: `r Sys.Date()`)"
+date: "May 07, 2023 (updated: `r Sys.Date()`)"
 output:
   xaringan::moon_reader:
     css: [default, "style/middlebury.css", "style/middlebury-fonts.css"]
