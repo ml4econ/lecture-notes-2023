@@ -1,0 +1,177 @@
+---
+title: "Ridge and Lasso Simulations"
+author: "Itamar Caspi"
+date: '(updated: `r Sys.Date()`)'
+output:
+  html_document:
+    code_folding: show
+    highlight: haddock
+    keep_md: no
+    theme: journal
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  eval = TRUE,
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  comment = NA,
+  dpi = 300
+)
+```
+
+# Load packages
+```{r packages}
+if (!require("pacman")) install.packages("pacman")
+
+pacman::p_load(
+  glmnet,   # for estimating ridge and lasso
+  leaps,    # for best subset selection
+  MASS,     # for simulating multivariate normal
+  tidyverse # for wrangling and plotting
+)
+```
+
+# Set seed for replication
+```{r seed}
+set.seed(1203)
+```
+
+# Set parameters
+```{r params}
+n <- 100 # sample size
+p <- 100 # number of feature
+s <- 3   # number of features with non-zero coefficients
+```
+
+# Generate data
+
+## independent features
+
+Generate response and features
+```{r ind_features}
+X_ind <- matrix(rnorm(n * p), ncol = p)
+beta  <- c(rep(5, s), rep(0, p - s))
+Y_ind <- X_ind %*% beta + rnorm(n)
+```
+
+## dependent features
+
+Variance covariance matrix
+```{r cov}
+Sigma <- matrix(
+  c(1,    0.9, 0.2,
+    0.9,  1,   0,
+    0.2,  0,   1  ),
+  nrow = s,
+  ncol = s
+)
+
+cov2cor(Sigma)
+```
+
+Generate response and features
+```{r dep_features}
+X_1   <- mvrnorm(n = n, rep(0, s), Sigma = Sigma)
+X_2   <- matrix(rnorm(n * (p - s)), ncol = p - s)
+X_dep <- cbind(X_1, X_2)
+beta  <- c(rep(5, s), rep(0, p - s))
+Y_dep  <- X_dep %*% beta + rnorm(n)
+```
+
+
+# Estimate regularization path
+
+## independent features
+
+Regularization path
+```{r path_ind}
+fit_lasso <- glmnet(X_ind, Y_ind)
+plot(fit_lasso, xvar = "lambda", label = TRUE)
+
+fit_ridge <- glmnet(X_ind, Y_ind, alpha = 0)
+plot(fit_ridge, xvar = "lambda", label = TRUE)
+```
+
+Tuning $\lambda$
+```{r tune_ind}
+cv_lasso <- cv.glmnet(X_ind, Y_ind)
+plot(cv_lasso, xvar = "lambda", label = TRUE)
+
+cv_ridge <- cv.glmnet(X_ind, Y_ind, alpha = 0)
+plot(cv_ridge, xvar = "lambda", label = TRUE)
+```
+
+## Dependent features
+
+Regularization path
+```{r path_dep}
+fit_lasso <- glmnet(X_dep, Y_dep)
+plot(fit_lasso, xvar = "lambda", label = TRUE)
+
+fit_ridge <- glmnet(X_dep, Y_dep, alpha = 0)
+plot(fit_ridge, xvar = "lambda", label = TRUE)
+```
+
+Tuning $\lambda$
+```{r tune_dep}
+cv_lasso <- cv.glmnet(X_dep, Y_dep)
+plot(cv_lasso, xvar = "lambda", label = TRUE)
+
+cv_ridge <- cv.glmnet(X_dep, Y_dep, alpha = 0)
+plot(cv_ridge, xvar = "lambda", label = TRUE)
+```
+
+# Thresholding
+
+Simulate data
+```{r}
+y      <- seq(-0.5, 0.5, 0.1)
+n      <- length(y)
+X      <- diag(n)
+lambda <- 0.1
+```
+
+OLS
+```{r}
+ols   <- lm(y ~ X - 1)
+b_ols <- coef(ols)
+```
+
+Ridge
+```{r}
+ridge   <- glmnet(X, y, alpha = 0, standardize = TRUE, intercept = FALSE)
+b_ridge <- coef(ridge, s = lambda)[2:(n+1),1]
+```
+
+Lasso
+```{r}
+lasso   <- glmnet(X, y, alpha = 1, standardize = TRUE, intercept = FALSE)
+b_lasso <- coef(lasso, s = lambda)[2:(n+1),1]
+```
+
+Plot results
+```{r}
+bs <- cbind(b_ols,b_lasso,b_ridge) %>%
+  as_tibble() 
+
+bs %>% 
+  ggplot(aes(x = b_ols)) +
+  geom_line(aes(y = b_ols,   color = "ols")) +
+  geom_line(aes(y = b_lasso, color = "lasso")) +
+  geom_line(aes(y = b_ridge, color = "ridge")) +
+  labs(
+    x = expression(beta^{OLS}),
+    y = "coefficient estimate"
+  )
+```
+
+Best subset selection
+```{r}
+subset <- regsubsets(x = X, y = y, intercept = FALSE, nvmax = 10)
+summary(subset)
+```

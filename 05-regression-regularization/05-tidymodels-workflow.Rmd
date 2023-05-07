@@ -1,0 +1,303 @@
+---
+title: "Ridge/Lasso, PCR, and PLS"
+subtitle: "A Tidymodels Workflow"
+author: "Itamar Caspi"
+date: '(updated: `r Sys.Date()`)'
+output:
+  html_document:
+    code_folding: show
+    highlight: haddock
+    keep_md: no
+    theme: journal
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+---
+
+# Load packages
+
+Load packages
+```{r pacman, message=FALSE, warning=FALSE, eval=TRUE}
+if (!require("pacman")) install.packages("pacman")
+
+pacman::p_load(
+  tidyverse,   # for data wrangling and visualization
+  tidymodels,  # for data modeling
+  plsmod,      # for estimating pls regression
+  here         # for referencing files and folders
+)
+```
+
+and set seed for replication
+```{r}
+set.seed(1203)
+```
+
+# Read data
+```{r}
+browser <- here("05-regression-regularization/data","browser-sample.csv") %>% 
+  read_csv()
+```
+
+# Sample spliting
+
+Split the data to training and test sets, and the training set to 10 folds for cross-validation.
+```{r}
+browser_split <- browser %>% 
+  initial_split(prop = 0.75)
+
+browser_train <- training(browser_split)
+browser_test  <- testing(browser_split)
+
+browser_folds <- browser_train %>% 
+  vfold_cv(v = 5)
+```
+
+# Lasso or ridge
+
+## Specify model recipe and workflow
+
+Set `mixture = 0` for ridge and `mixture = 1` for lasso. `penalty` is $\lambda$. We'll go for ridge:
+```{r}
+lm_spec <- linear_reg() %>% 
+  set_args(penalty = tune(), mixture = 0, nlambda = 10) %>% 
+  set_engine("glmnet") %>% 
+  set_mode("regression")
+```
+
+```{r}
+browser_rec <- recipe(log_spend ~ .,data = browser_train) %>% 
+  step_center(all_predictors()) %>% 
+  step_scale(all_predictors()) %>% 
+  step_zv(all_predictors())
+```
+
+```{r}
+lm_wfl <- workflow() %>% 
+  add_recipe(browser_rec) %>% 
+  add_model(lm_spec)
+```
+
+## Tune hyperparameter
+
+```{r}
+lm_results <- lm_wfl %>% 
+  tune_grid(
+    resamples = browser_folds
+  )
+```
+
+show best results
+```{r}
+lm_results %>% 
+  show_best(metric = "rmse")
+```
+
+## Set best lambda
+
+Two options: lambda that minimizes RMSE, and the 1 standard error rule of thumb:
+```{r}
+lambda_min <- lm_results %>% 
+  select_best(metric = "rmse")
+
+lambda_1se <- lm_results %>% 
+  select_by_one_std_err(
+    metric = "rmse",
+    desc(penalty)
+  ) %>% 
+  select(penalty)
+```
+
+## Evaluate model on the test set
+```{r}
+lm_wfl_final <- lm_wfl %>%
+  finalize_workflow(lambda_1se)
+```
+
+```{r}
+browser_test_results <- lm_wfl_final %>% 
+  last_fit(split = browser_split)
+```
+
+```{r}
+ridge_results <- browser_test_results %>% 
+  collect_metrics() %>% 
+  filter(.metric == "rmse") %>% 
+  mutate(method = "ridge")
+```
+
+
+# PCR
+
+## Specify model recipe and workflow
+
+Specify a linear model. Note that in this case, there are no tuning parameters.
+```{r}
+lm_spec <- linear_reg() %>% 
+  set_engine("lm") %>% 
+  set_mode("regression")
+```
+
+Note how the number of PCs is determined inside the recipe object.
+```{r}
+browser_rec <- recipe(log_spend ~ ., data = browser_train) %>% 
+  step_center(all_predictors()) %>% 
+  step_scale(all_predictors()) %>% 
+  step_zv(all_predictors()) %>% 
+  step_pca(all_predictors(), num_comp = tune())
+```
+
+```{r}
+lm_wfl <- workflow() %>% 
+  add_recipe(browser_rec) %>% 
+  add_model(lm_spec)
+```
+
+## Tune hyperparameter
+```{r}
+num_comp_grid <- expand_grid(num_comp = 1:10)
+```
+
+```{r}
+lm_results <- lm_wfl %>% 
+  tune_grid(
+    resamples = browser_folds,
+    grid = num_comp_grid
+  )
+```
+
+show best results
+```{r}
+lm_results %>% 
+  show_best(metric = "rmse")
+```
+
+## Set best number of components
+
+Two options: `num_comp` that minimizes RMSE, and the 1 standard error rule of thumb:
+```{r}
+num_comp_min <- lm_results %>% 
+  select_best(metric = "rmse")
+
+num_comp_1se <- lm_results %>% 
+  select_by_one_std_err(
+    metric = "rmse",
+    desc(num_comp)
+  ) %>% 
+  select(num_comp)
+```
+
+## Evaluate model on the test set
+```{r}
+lm_wfl_final <- lm_wfl %>%
+  finalize_workflow(num_comp_1se)
+```
+
+```{r}
+browser_test_results <- lm_wfl_final %>% 
+  last_fit(split = browser_split)
+```
+
+```{r}
+pcr_results <- browser_test_results %>% 
+  collect_metrics() %>% 
+  filter(.metric == "rmse") %>% 
+  mutate(method = "pcr")
+```
+
+# PLS
+
+To run tidymodels' `plsmod` we'll need to make sure we have installed the `{mixOmics}` package.
+
+```{r, eval=FALSE}
+install.packages("BiocManager")
+BiocManager::install("mixOmics")
+```
+
+## Specify model recipe and workflow
+
+Specify `plsmod`
+```{r}
+pls_spec <- pls() %>% 
+  set_args(num_comp = tune()) %>% 
+  set_engine("mixOmics") %>% 
+  set_mode("regression")
+```
+
+```{r}
+browser_rec <- recipe(log_spend ~ ., data = browser_train) %>% 
+  step_center(all_predictors()) %>% 
+  step_scale(all_predictors()) %>% 
+  step_zv(all_predictors())
+```
+
+```{r}
+pls_wfl <- workflow() %>% 
+  add_recipe(browser_rec) %>% 
+  add_model(pls_spec)
+```
+
+## Tune hyperparameter
+```{r}
+num_comp_grid <- expand_grid(num_comp = 1:10)
+```
+
+```{r}
+pls_results <- pls_wfl %>% 
+  tune_grid(
+    resamples = browser_folds,
+    grid = num_comp_grid
+  )
+```
+
+show best results
+```{r}
+pls_results %>% 
+  show_best(metric = "rmse")
+```
+
+## Set best number of components
+
+Two options: `num_comp` that minimizes RMSE, and the 1 standard error rule of thumb:
+```{r}
+num_comp_min <- pls_results %>% 
+  select_best(metric = "rmse")
+
+num_comp_1se <- pls_results %>% 
+  select_by_one_std_err(
+    metric = "rmse",
+    desc(num_comp)
+  ) %>% 
+  select(num_comp)
+```
+
+## Evaluate model on the test set
+```{r}
+pls_wfl_final <- pls_wfl %>%
+  finalize_workflow(num_comp_1se)
+```
+
+```{r}
+browser_test_results <- pls_wfl_final %>% 
+  last_fit(split = browser_split)
+```
+
+```{r}
+pls_results <- browser_test_results %>% 
+  collect_metrics() %>% 
+  filter(.metric == "rmse") %>% 
+  mutate(method = "pls")
+```
+
+
+# Summary
+
+```{r}
+bind_rows(
+  ridge_results,
+  pcr_results,
+  pls_results
+) %>% 
+  arrange(.estimate)
+```
+

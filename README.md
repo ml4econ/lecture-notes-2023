@@ -72,6 +72,13 @@ The following schedule is subject to change based on class interests and time co
 [(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/03-reprod-vc/03-reprod-vc.pdf)  
 4. A Typical (Supervised) ML Workflow [(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/04-ml-workflow/04-ml-workflow.html)
 [(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/04-ml-workflow/04-ml-workflow.pdf)
+5. Regression and Regularization
+[(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2021/master/05-regression-regularization/05-regression-regularization.html)
+[(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/05-regression-regularization/05-regression-regularization.pdf)  
+  5.1 [Prepare browser data](https://raw.githack.com/ml4econ/lecture-notes-2023/master/05-regression-regularization/05-prepare-browser-data.html)  
+  5.2 [Ridge and lasso simulation](https://raw.githack.com/ml4econ/lecture-notes-2023/master/05-regression-regularization/05-simulations.html)  
+  5.3 [Ridge, lasso, PCR and PLS: A Tidymodels Workflow](https://raw.githack.com/ml4econ/lecture-notes-2023/master/05-regression-regularization/05-tidymodels-workflow.html)
+
 
 ### Part II: Causal Inference and ML
 

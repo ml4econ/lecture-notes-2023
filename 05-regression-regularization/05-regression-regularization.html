@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>05 - Regression and Regularization</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Itamar Caspi" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/all.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/v4-shims.css" rel="stylesheet" />
+    <link rel="stylesheet" href="style/middlebury.css" type="text/css" />
+    <link rel="stylesheet" href="style/middlebury-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# 05 - Regression and Regularization
+]
+.subtitle[
+## ml4econ, HUJI 2023
+]
+.author[
+### Itamar Caspi
+]
+.date[
+### May 07, 2021 (updated: 2023-05-06)
+]
+
+---
+
+
+
+
+
+# Packages and setup
+
+Use the [{`pacman`}](https://cran.r-project.org/web/packages/pacman/vignettes/Introduction_to_pacman.html) package that automatically loads and installs packages if necessary:
+
+
+```r
+if (!require("pacman")) install.packages("pacman")
+
+pacman::p_load(
+  tidyverse,   # for data wrangling and visualization
+  knitr,       # for displaying nice tables
+  broom,       # for tidying estimation output
+  here,        # for referencing folders and files
+  glmnet,      # for estimating lasso and ridge
+  gamlr,       # for forward stepwise selection
+  pls,         # for estimating PCR and PLS
+  elasticnet,  # for estimating PCR and PLS
+  ggfortify    # for enhancing data visualization
+)
+```
+
+Set a theme for `ggplot` (Relevant only for the presentation)
+
+```r
+theme_set(theme_grey(20))
+```
+
+And set a seed for replication
+
+```r
+set.seed(1203)
+```
+
+---
+
+# Resources on hige-dimensional statsitics
+
+.pull-left[
+- [_Statistical Learning with Sparsity - The Lasso and Generalizations_](https://web.stanford.edu/~hastie/StatLearnSparsity/)  (Hastie, Tibshirani, and Wainwright),
+(PDF available online)
+
+- [_Statistics for High-Dimensional Data - Methods, Theory and Applications_](https://www.springer.com/gp/book/9783642201912) (Buhlmann and van de Geer)
+
+- [_High Dimensional Statistics - A Non-Asymptotic Viewpoint_](https://www.cambridge.org/core/books/highdimensional-statistics/8A91ECEEC38F46DAB53E9FF8757C7A4E) (Wainwright)
+]
+
+.pull-right[
+&lt;img src="figs/sparsebooks3.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+
+---
+# Outline
+
+ - [Linear regression](#linear)  
+ 
+ - [Penalized regression](#penalized)
+
+ - [Subset selection](#subset)  
+
+ - [Shrinkage](#shrink)  
+
+ - [Dimension Reduction](#dim)  
+
+
+---
+class: title-slide-section-blue, center, middle
+name: linear
+
+# Linear Regression
+
+---
+
+# Econometrics
+
+In econometrics, we typically assume a "true" linear data generating process (DGP):
+
+`$$y_{i}=\beta_{0}+\sum_{j=1}^{p} x_{i j} \beta_{j}+\varepsilon_{i}$$`
+
+where `\(y_i\)` is the outcome variable, `\(x_{ij},\ldots,x_{ip}\)` represent explanatory or control variables (including interactions, polynomials, etc.), and `\(\varepsilon_i\)` is the regression error.
+
+**Sample**: `\(\{(x_1,\ldots,x_p,y_i)\}_{i=1}^{n}\)`
+
+---
+
+# Estimation
+
+Ordinary least squares minimizes:
+
+`$$\underset{\beta_{0}, \beta}{\operatorname{min}} \sum_{i=1}^{N}\left(y_{i}-\beta_{0}-\sum_{j=1}^{p} x_{i j} \beta_{j}\right)^{2}$$`
+
+The emphasis is on in-sample fit (minimizing residual sum of squares).
+
+Typical workflow:
+- Impose identifying assumptions (causal claims).
+- Estimate `\(\beta_0,\ldots,\beta_p\)` using the entire sample.
+- Assume a random sample from a larger population.
+- Perform hypothesis testing.
+
+
+---
+# Supervised Learning
+
+Consider the following linear data generating process (DGP):
+
+`$$y_{i}=\beta_{0}+\sum_{j=1}^{p} x_{i j} \beta_{j}+\varepsilon_{i}$$`
+
+where `\(y_i\)` is the predicted (response) variable, `\(x_{i1},\ldots,x_{ip}\)` are the features, and `\(\varepsilon_i\)` is the irreducible error.
+
+- **Training set**: `\(\{(x_{1i},\ldots,x_{ip},y_i)\}_{i=1}^{n}\)`
+- **Test set**: `\(\{(x_{1i},\ldots,x_{ip},y_i)\}_{i=n+1}^{m}\)`
+
+&gt; Typical assumptions: (1) independent observations; (2) stable DGP across both training and test sets.
+
+Our objective is to predict unseen data, `\(\widehat{y}_i\)`.
+
+
+---
+
+# Dffierent objective, different approach
+
+To illustrate how these two approaches (estimation vs. prediction) differ, consider the following data generating process&lt;sup&gt;1&lt;/sup&gt;:
+
+`$$y_i = \beta_0 + \beta_1 x_i + \varepsilon_i,\qquad \varepsilon_i\sim N(0,\sigma^2)$$`
+where `\(\beta_0=0\)` and `\(\beta_1=2\)`.
+
+Next, suppose you get a sample of size `\(n\)` and use it to estimate the model and get (standard errors in parentheses):
+
+`$$\begin{aligned}
+&amp;y_{i}=0.0\hspace{0.35cm}+\hspace{0.35cm}2.0\times x_{i}+\widehat{\varepsilon}_{i}\\
+&amp;\hspace{1.4cm}(0.2)\hspace{0.85cm}(10.0)
+\end{aligned}$$`
+
+Given a new unseen `\(x^0\)` and the output above, how would you predict `\(y^0\)`?
+
+.footnote[
+[1] Adapted from Susan Athey's lecture.
+]
+
+---
+
+# Standard Errors and Prediction Accuracy
+
+- OLS prioritizes unbiasedness first, followed by efficiency.
+
+- OLS is unbiased, providing accurate predictions on average. But is that our goal?
+
+- A noisy estimated coefficient (high standard error) leads to a variable prediction (high variability).
+
+- The bias-variance trade-off comes into play.
+
+- Prediction involves balancing bias and variance.
+
+
+**Note:** In multivariate regression, the complexity increases due to the correlation structure of the `\(x\)`'s.
+
+
+---
+
+# Illustration: Browser Data
+
+In this lecture, we will use Matt Taddy's **browser dataset** (available in our repo), which contains web browsing logs for 10,000 people. Taddy extracted a year's worth of browser logs for the 1,000 most heavily trafficked websites. Each browser in the sample spent at least $1 online during the same year.
+
+The goal of estimation is to predict spending based on browser history:
+
+`$$\log(spend_i) = \beta_0 + \beta'visits_i + \varepsilon_i,\qquad \text{for }i=1,\ldots,n$$`
+
+where `\(visits_i\)` is a vector of site-visit percentages. This model can be used to segment expected user budget as a function of browser history.
+
+
+---
+
+# Loading Data
+
+Specifically, we will use a sample from the browser dataset, consisting of 250 websites and 1,000 users.
+
+
+```r
+browser &lt;- here("05-regression-regularization/data", "browser-all.csv") %&gt;% 
+  read_csv()
+```
+
+The log spending by the first user and the fraction of times she visited the first 4 websites are as follows:
+
+```r
+browser[6, 1:5]
+```
+
+```
+## # A tibble: 1 x 5
+##   log_spend `123greetings.com` `204.95.60.12` `2o7.net` `65.115.67.11`
+##       &lt;dbl&gt;              &lt;dbl&gt;          &lt;dbl&gt;     &lt;dbl&gt;          &lt;dbl&gt;
+## 1      7.74                  0         0.0483    0.0483         0.0322
+```
+
+__NOTE:__ The design matrix in this case is sparse.
+
+
+---
+
+# Transforming Data to Matrices
+
+It is useful to transform the data into response and feature vectors/matrices:
+
+
+```r
+browser_mat &lt;- browser %&gt;% 
+  as.matrix()
+
+Y_browser &lt;- browser_mat[, 1]     # response
+X_browser &lt;- browser_mat[, 2:201] # features
+```
+
+
+---
+
+# OLS Results
+
+Estimate the model using `lm()`:
+
+```r
+lm_fit &lt;- lm(log_spend ~ ., data = browser)
+```
+
+Display the estimation output, sorted by `\(p\)`-values:
+
+```r
+lm_fit %&gt;% 
+  tidy() %&gt;% 
+  arrange(p.value) %&gt;% 
+  head(3) %&gt;% 
+  kable(format = "html", digits = 2)
+```
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; term &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; estimate &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; std.error &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; statistic &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; p.value &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; `bizrate.com-o01` &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.86 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.25 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.54 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; staples.com &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.33 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.22 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.91 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; victoriassecret.com &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.45 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.25 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.91 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+---
+
+# Model Performance
+
+What is the training-set MSE?
+
+
+```r
+lm_fit %&gt;% 
+  augment() %&gt;%
+  summarise(mse = mean((log_spend - .fitted)^2)) %&gt;% 
+  kable(format = "html", digits = 3)
+```
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; mse &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 2.075 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+This is clearly an _underestimate_ of the test set MSE.
+
+
+---
+class: title-slide-section-blue, center, middle
+name: penalized
+
+# Penalized Linear Regression
+
+---
+
+# Estimation with Penalization
+
+Penalized (or regularized) sum of squares solves:
+
+`$$\underset{\beta_{0}, \beta}{\operatorname{min}} \sum_{i=1}^{N}\left(y_{i}-\beta_{0}-\sum_{j=1}^{p} x_{i j} \beta_{j}\right)^{2} \text { subject to }R(\beta) \leq t$$`
+
+where `\(R(\cdot)\)` is a penalty function that measures the **expressiveness** of the model.
+
+As the number of features grows, linear models become *more* expressive.
+
+
+
+---
+
+# Notation: Norms
+
+Suppose `\(\boldsymbol{\beta}\)` is a `\(p\times 1\)` vector with a typical element `\(\beta_i\)`.
+
+- The `\(\ell_0\)`-norm is defined as `\(||\boldsymbol{\beta}||_0=\sum_{j=1}^{p}\boldsymbol{1}_{\{\beta_j\neq0\}}\)`, i.e., the number of non-zero elements in `\(\boldsymbol{\beta}\)`.
+
+- The `\(\ell_1\)`-norm is defined as `\(||\boldsymbol{\beta}||_1=\sum_{j=1}^{p}|\beta_j|\)`.
+
+- The `\(\ell_2\)`-norm is defined as `\(||\boldsymbol{\beta}||_2=\left(\sum_{j=1}^{p}|\beta_j|^2\right)^{\frac{1}{2}}\)`, i.e., Euclidean norm.
+
+
+---
+# Commonly Used Penalty Functions
+
+It is often convenient to rewrite the regularization problem in the Lagrangian form:
+
+`$$\underset{\beta_{0}, \beta}{\operatorname{min}} \sum_{i=1}^{N}\left(y_{i}-\beta_{0}-\sum_{j=1}^{p} x_{i j} \beta_{j}\right)^{2}+\lambda R(\beta)$$`
+
+**Note:** There is a one-to-one correspondence between `\(\lambda\)` and `\(t\)`.
+
+|  Method          |  `\(R(\boldsymbol{\beta})\)`             |
+|:-----------------|:-------------------------------------|
+| OLS              | 0                                    |
+| Subset selection | `\(\lVert\boldsymbol{\beta}\rVert_0\)`   |
+| Lasso            | `\(\lVert\boldsymbol{\beta}\rVert_1\)`   |
+| Ridge            | `\(\lVert\boldsymbol{\beta}\rVert_2^2\)` |
+| Elastic Net&lt;sup&gt;*&lt;/sup&gt;      | `\(\alpha\lVert\boldsymbol{\beta}\rVert_1 + (1-\alpha)\lVert\boldsymbol{\beta}\rVert_2^2\)` |
+
+.footnote[
+[*] Elastic Net will not be covered in this lecture. It is essentially a combination of ridge and lasso.
+]
+
+
+
+---
+class: title-slide-section-blue, center, middle
+name: subset
+
+# Best Subset Selection
+
+
+---
+
+# Our Goal
+
+`$$\underset{\beta_{0}, \beta}{\operatorname{min}} \sum_{i=1}^{N}\left(y_{i}-\beta_{0}-\sum_{j=1}^{p} x_{i j} \beta_{j}\right)^{2} \text { subject to }\lVert\boldsymbol{\beta}\rVert_0 \leq t$$`
+
+**In words**: Select the best model according to some statistical criteria, among all possible combinations of `\(t\)` features or fewer.
+
+
+---
+
+# Best Subset Selection Algorithm
+
+1. For `\(k=0,1, \ldots ,p\)`
+
+  1.1 Fit all models that contain exactly `\(k\)` predictors. If `\(k=0\)`, the forecast is the unconditional mean.
+  
+  1.2 Pick the best (e.g., highest `\(R^2\)`) among these models, and denote it by `\(\mathcal{M}_{k}\)`.
+  
+2. Optimize over `\(\{\mathcal{M}_{0}, \ldots, \mathcal{M}_{p}\}\)` using cross-validation (or other criteria)
+
+Issues:
+
+1. The algorithm is very slow: at each step, we deal with `\(p \choose k\)` models ("N-P complete").
+2. The prediction is highly unstable: the subsets of variables in `\(\mathcal{M}_{10}\)` and `\(\mathcal{M}_{11}\)` can be very different from each other, leading to high variance (the best subset of `\(\mathcal{M}_3\)` need not include any of the variables in the best subset of `\(\mathcal{M}_2\)`).
+
+
+
+---
+
+# Faster Subset Selection Algorithms
+
+Instead of estimating all possible combinations, follow a particular path of models:
+
+- Forward stepwise selection: Start simple and expand (feasible even if `\(p&gt;n\)`)
+
+- Backward stepwise selection: Start with the full model and drop features (not recommended)
+
+
+
+---
+
+# Forward Stepwise Algorithm
+
+1. Let `\(\mathcal{M}_{0}\)` denote the null model, which contains just an intercept.
+
+2. For `\(k=0, \ldots, p-1:\)`
+
+  2.1 Consider all `\(p-k\)` models that augment the predictors in `\(\mathcal{M}_{k}\)` with one additional predictor.
+  
+  2.2 Choose the best among these `\(p-k\)` models and call it `\(\mathcal{M}_{k+1}\)`. Here, "best" is defined as having the highest `\(R^{2}\)`
+  
+3. Select a single best model from among `\(\mathcal{M}_{0}, \ldots, \mathcal{M}_{p}\)` using cross-validation.
+
+&lt;midd-blockquote&gt;This is our first example of a **greedy algorithm**: making the locally optimal selection at each stage with the intent of finding a global optimum.&lt;/midd-blockquote&gt;
+
+---
+
+# Stepwise Using `gamlr`
+
+.pull-left[
+[`{gamlr}`](https://github.com/TaddyLab/gamlr) is an R package that enables you, among other things, to estimate a forward stepwise regression model.
+
+
+```r
+fit_step &lt;- gamlr(X_browser, Y_browser, gamma=Inf, lmr=.1)
+plot(fit_step, df=FALSE, select=FALSE)
+```
+The figure on the right shows the value of the coefficients along the forward stepwise selection path. Notice how jagged the solution paths are. This discontinuity is the cause for instability in subset selection algorithms.
+]
+.pull-right[
+![](05-regression-regularization_files/figure-html/unnamed-chunk-9-1..svg)&lt;!-- --&gt;
+]
+
+
+---
+class: title-slide-section-blue, center, middle
+name: shrink
+
+# Shrinkage
+
+
+---
+
+# Prerequisite: Centering and Scaling
+
+In what follows, we assume that each feature is centered and scaled to have mean zero and unit variance:
+
+`$$\frac{x_{ij} - \widehat\mu_i}{\widehat\sigma_{i}}, \qquad\text{for }j=1,2, \ldots, p$$`
+
+where `\(\widehat\mu_i\)` and `\(\widehat\sigma_i\)` are the estimated mean and standard deviation of `\(x_i\)` estimated over the _training_ set.
+
+__NOTE:__ Centering and scaling are not important when using OLS. Can you think of why?
+
+
+---
+# Ridge Regression
+
+Ridge regression was introduced into the statistics literature by Hoerl and Kennard (1970). 
+
+The optimization problem:
+`$$\underset{\beta_{0}, \beta}{\operatorname{min}} \sum_{i=1}^{N}\left(y_{i}-\beta_{0}-\sum_{j=1}^{p} x_{i j} \beta_{j}\right)^{2}+\lambda \lVert\boldsymbol{\beta}\rVert_2^2$$`
+
+or in a budget constraint form:
+`$$\underset{\beta_{0}, \beta}{\operatorname{min}} \sum_{i=1}^{N}\left(y_{i}-\beta_{0}-\sum_{j=1}^{p} x_{i j} \beta_{j}\right)^{2} \text { subject to }\lVert\boldsymbol{\beta}\rVert_2^2 \leq t$$`
+
+Ridge regression places a "budget constraint" on the sum of squared betas. This constraint incorporates the cost of being "too far away" from the null hypothesis of `\(\beta_j=0\)` (what if this assumption is wrong?).
+
+
+---
+
+# Illistration of Ridge in 2-D
+
+.pull-left[
+
+The solid blue area represents the constraint region, `\(\beta_{1}^{2}+\beta_{2}^{2} \leq t\)`, while the red ellipses are the contours of the RSS. `\(\widehat\beta\)` is the OLS estimator.
+
+
+]
+
+.pull-right[
+
+&lt;img src="figs/ridge.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+Source: [James et al. (2017) ](http://faculty.marshall.usc.edu/gareth-james/ISL/index.html) 
+
+]
+
+
+---
+
+# Ridge Regression Solution
+
+The problem in matrix notation:
+
+`$$\underset{\boldsymbol{\beta}}{\operatorname{min}}\:\:(\mathbf{y}-\mathbf{X} \boldsymbol{\beta})^{\prime}(\mathbf{y}-\mathbf{X} \boldsymbol{\beta})+\lambda \boldsymbol{\beta}^{\prime} \boldsymbol{\beta}$$`
+
+The ridge estimator is given by:
+
+`$$\widehat{\boldsymbol{\beta}}^{\text {R}}=\left(\mathbf{X}^{\prime} \mathbf{X}+\lambda \mathbf{I}\right)^{-1} \mathbf{X}^{\prime} \mathbf{y}$$`
+
+__NOTE:__ We can have a solution even if `\(\mathrm{X}\)` is not of full rank (e.g., due to multicollinearity) since `\(\mathbf{X}^{\prime} \mathbf{X}+\lambda \mathbf{I}\)` is non-singular (since `\(\lambda&gt;0\)`.)
+
+
+---
+
+# Bayesian Interpretation of Ridge Regression
+
+- Consider the regression model:
+
+`$$y_{i}\sim N\left(\mathbf{x}_i^{\prime}\boldsymbol{\beta} , \sigma^2\right)$$`
+
+where we assume that `\(\sigma\)` is known.
+
+- Suppose we put an independent prior on each `\(\beta_{j}\)`:
+
+`$$\beta_{j} \sim {N}\left(0, \tau^{2}\right)$$`
+
+- The posterior mean for `\(\boldsymbol{\beta}\)` is:
+
+`$$\widehat{\boldsymbol{\beta}}_{\text {posterior}}=\left(\mathbf{X}^{\prime} \mathbf{X}+\frac{\sigma^{2}}{\tau^{2}} \mathbf{1}\right)^{-1} \mathbf{X}^{\prime} \mathbf{y}$$`
+
+- Therefore, `\(\lambda = \frac{\sigma^{2}}{\tau^{2}}\)`.
+
+---
+
+# Ridge Regression using `glmnet`
+
+.pull-left[
+[`{glmnet}`](https://web.stanford.edu/~hastie/glmnet/glmnet_alpha.html) enables you to estimate ridge regression, along with its path for `\(\lambda\)`. 
+
+(Note that we need to set `alpha` to 0.)
+
+
+```r
+fit_ridge &lt;- glmnet(
+  x = X_browser,
+  y = Y_browser,
+  alpha = 0
+)
+plot(fit_ridge, xvar = "lambda")
+```
+The figure on the right shows the ridge *regularization path*, i.e., the values of the (standardized) coefficients for different values of (log) `\(\lambda\)`.
+]
+.pull-right[
+![](05-regression-regularization_files/figure-html/unnamed-chunk-11-1..svg)&lt;!-- --&gt;
+]
+
+---
+
+# Tuning `\(\lambda\)`
+
+.pull-left[
+The `cv.glmnet()` function streamlines cross-validation for ridge regression.
+
+You can modify the default number of folds (10) by adjusting the `nfolds` parameter.
+
+
+```r
+cv_ridge &lt;- cv.glmnet(x = X_browser, y = Y_browser, alpha = 0)
+plot(cv_ridge)
+```
+
+- _Left_ dotted vertical line: Optimal `\(\lambda\)` with minimum MSE
+- _Right_ dotted vertical line: Largest `\(\lambda\)` with MSE not exceeding one SE from the minimum
+
+]
+.pull-right[
+![](05-regression-regularization_files/figure-html/unnamed-chunk-12-1..svg)&lt;!-- --&gt;
+]
+
+
+
+# Pros and cons of ridge
+
+__PROS:__
+
+- For large `\(p\)`, ridge regression significantly reduces variance (by introducing bias).
+- Operates effectively even when `\(p &gt; n\)`.
+
+__CONS:__
+
+- Although ridge regression shrinks all coefficients towards zero, it does not set any to exactly zero. Thus, interpreting results can be challenging when `\(p\)` is large.
+
+
+
+---
+
+# Lasso Regression
+
+Lasso (Least Absolute Shrinkage and Selection Operator) was introduced by Tibshirani (1996). The optimization problem is:
+`$$\underset{\beta_{0}, \beta}{\operatorname{min}} \sum_{i=1}^{N}\left(y_{i}-\beta_{0}-\sum_{j=1}^{p} x_{i j} \beta_{j}\right)^{2}+\lambda \lVert\boldsymbol{\beta}\rVert_1$$`
+
+Lasso imposes a "budget constraint" on the sum of _absolute_ `\(\beta\)` values. 
+
+In contrast to ridge regression, the lasso penalty is linear (shifting from 1 to 2 is equivalent to shifting from 101 to 102).
+
+A significant advantage of lasso is that it performs model selection by zeroing out most of the `\(\beta\)` values in the model (resulting in a _sparse_ solution).
+
+Any penalty involving the `\(\ell_1\)` norm exhibits this behavior.
+
+
+---
+
+# Lasso vs. ridge
+
+.pull-left[
+
+Contours of error and constraint functions for lasso (left) and ridge (right):
+
+- The solid blue areas represent constraint regions: `\(\beta_{1}^{2}+\beta_{2}^{2} \leq t\)` for ridge and `\(|\beta_{1}|+|\beta_{2}| \leq t\)` for lasso.
+- The red ellipses depict the contours of the residual sum of squares (RSS).
+- `\(\widehat\beta\)` denotes the ordinary least squares (OLS) estimator.
+
+
+]
+
+.pull-right[
+
+&lt;img src="figs/lassovsridge.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+Source: [James et al. (2017) ](http://faculty.marshall.usc.edu/gareth-james/ISL/index.html) 
+
+]
+
+---
+
+&lt;blockquote class="twitter-tweet" data-lang="he"&gt;&lt;p lang="en" dir="ltr"&gt;Illustration of the Lasso and its path in 2D: for t small enough, the solution is sparse! &lt;a href="https://t.co/0JV23e32DF"&gt;pic.twitter.com/0JV23e32DF&lt;/a&gt;&lt;/p&gt;&amp;mdash; Pierre Ablin (@PierreAblin) &lt;a href="https://twitter.com/PierreAblin/status/1107625298936451073?ref_src=twsrc%5Etfw"&gt;March 18 2019&lt;/a&gt;&lt;/blockquote&gt;
+&lt;script async src="https://platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt;
+
+---
+
+# Bayesian Interpretation of Lasso
+
+Under lasso, the prior distribution of `\(\boldsymbol{\beta}\)` is the double exponential (Laplace) distribution with density `\(\frac{1}{2\tau} \exp (-|\boldsymbol{\beta}| / \tau)\)`, where `\(\tau = \frac{1}{\lambda}\)`. The posterior mode corresponds to the lasso solution.
+
+- Left: Normal prior (ridge)
+- Right: Laplace prior (lasso)
+
+
+&lt;img src="figs/priors.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+Source: [James et al. (2017) ](http://faculty.marshall.usc.edu/gareth-james/ISL/index.html) 
+
+---
+# Estimating Lasso with `glmnet`
+
+.pull-left[
+Use the `glmnet()` function with `alpha = 1` (default setting) to estimate the entire lasso regularization path.
+
+```r
+fit_lasso &lt;- glmnet(
+  x = X_browser,
+  y = Y_browser,
+  alpha = 1
+)
+plot(fit_lasso, xvar = "lambda")
+```
+]
+.pull-right[
+![](05-regression-regularization_files/figure-html/unnamed-chunk-15-1..svg)&lt;!-- --&gt;
+]
+
+
+---
+
+# Tuning `\(\lambda\)`
+
+.pull-left[
+
+```r
+cv_lasso &lt;- cv.glmnet(x = X_browser, y = Y_browser, alpha = 1, nfolds = 10)
+plot(cv_lasso, xvar = "lambda")
+```
+]
+.pull-right[
+![](05-regression-regularization_files/figure-html/unnamed-chunk-16-1..svg)&lt;!-- --&gt;
+]
+
+---
+
+# Which features were selected?
+
+.pull-left[
+Using `s = lambda.min`:
+
+```r
+coef(cv_lasso, s = "lambda.min") %&gt;%
+  tidy() %&gt;%
+  as_tibble()
+```
+
+```
+## # A tibble: 72 x 3
+##    row             column    value
+##    &lt;chr&gt;           &lt;chr&gt;     &lt;dbl&gt;
+##  1 (Intercept)     s1      6.02   
+##  2 65.115.67.11    s1      0.00247
+##  3 about.com       s1     -0.0683 
+##  4 active.com      s1      0.0581 
+##  5 adoutput.com    s1     -0.0305 
+##  6 adrevolver.com  s1     -0.0352 
+##  7 adserver.com    s1      0.0156 
+##  8 adsonar.com     s1      0.0249 
+##  9 advertising.com s1     -0.0104 
+## 10 ajc.com         s1     -0.0664 
+## # ... with 62 more rows
+```
+]
+.pull-right[
+Using `s = lamda.1se`:
+
+```r
+coef(cv_lasso, s = "lambda.1se") %&gt;%
+  tidy() %&gt;%
+  as_tibble()
+```
+
+```
+## # A tibble: 26 x 3
+##    row              column    value
+##    &lt;chr&gt;            &lt;chr&gt;     &lt;dbl&gt;
+##  1 (Intercept)      s1      6.04   
+##  2 adrevolver.com   s1     -0.00384
+##  3 amazon.com       s1      0.0749 
+##  4 atomz.com        s1      0.165  
+##  5 azjmp.com        s1     -0.168  
+##  6 bestbuy.com      s1      0.0906 
+##  7 cheaptickets.com s1      0.306  
+##  8 checkm8.com      s1     -0.0912 
+##  9 circuitcity.com  s1      0.146  
+## 10 citysearch.com   s1      0.615  
+## # ... with 16 more rows
+```
+]
+
+
+---
+# Understanding Shrinkage
+
+Assume that `\(n = p\)` and `\(\mathbf{X}\)` is an `\(n \times p\)` orthonormal matrix with unit vectors. We are estimating a regression without an intercept.
+
+Under these assumptions, OLS finds `\(\beta_1,\ldots,\beta_p\)` that minimize `\(\sum_{j=1}^{p}\left(y_{j}-\beta_{j}\right)^{2}\)`. The solution is `\(\hat{\beta}^{\text{OLS}}_{j}=y_{j}\)` (i.e., a perfect fit, `\(R^2 = 1\)`).
+
+Ridge and lasso estimates take the following forms:
+`$$\hat{\beta}_{j}^{Ridge}=\frac{\hat{\beta}^{\text{OLS}}}{(1+\lambda)},\qquad\qquad \hat{\beta}_{j}^{Lasso}=\left\{\begin{array}{ll}
+\hat{\beta}^{\text{OLS}}-\lambda / 2 &amp; \text { if } \hat{\beta}^{\text{OLS}}&gt;\lambda / 2 \\
+\hat{\beta}^{\text{OLS}}+\lambda / 2 &amp; \text { if } \hat{\beta}^{\text{OLS}}&lt;-\lambda / 2 \\
+0 &amp; \text { if }\left|\hat{\beta}^{\text{OLS}}\right| \leq \lambda / 2
+\end{array}\right.$$`
+
+Best-subset selection eliminates all variables with coefficients smaller than the `\(t^\text{th}\)` largest.
+
+---
+
+# Shrinkage and Implications for Econometric Analysis
+
+Ridge regression shrinks coefficients proportionally, while lasso regression shrinks them by a similar amount, setting sufficiently small coefficients to zero. This type of shrinkage in lasso is referred to as "soft-thresholding."
+
+&lt;img src="figs/soft.png" width="65%" style="display: block; margin: auto;" /&gt;
+Source: [James et al. (2017) ](http://faculty.marshall.usc.edu/gareth-james/ISL/index.html) 
+
+__Main takeaway:__ Ridge and lasso coefficients should not be directly used in subsequent econometric analysis, unless you adopt a Bayesian approach.
+
+
+---
+class: title-slide-section-blue, center, middle
+name: dim
+
+# Dimensionality Reduction
+
+---
+
+# Alternative Approach
+
+__Main Idea:__ Instead of selecting and/or shrinking `\(\boldsymbol{\beta}\)`, aim to find `\(M\)` linear combinations of the `\(x\)` variables, where `\(M &lt; p\)`, and use them to predict `\(y\)`.
+
+
+---
+
+# Motivating Example
+
+Consider the following regression model:
+
+`$$y_i = \beta_1 x_{i1} + \beta_2 x_{i2} + \varepsilon_i$$`
+
+Next, define a new variable, `\(f_i\)`, as a linear combination of `\(x_{i1}, x_{i2}\)`:
+
+`$$f_{i} = \lambda_{1} x_{i1} + \lambda_{2} x_{i2}$$`
+for some constants `\(\lambda_1\)` and `\(\lambda_2\)`. This "factor" represents a lower-dimension version of the feature space (one variable instead of two).
+
+According to the dimension reduction approach, it is possible that
+
+`$$\hat{y}_i = \hat\alpha{f}_{i}$$`
+(estimated by, for example, OLS) could provide better predictions.
+
+---
+
+# Relation to Penalized Regression
+
+Since:
+
+`$$\hat{y}_i = \hat{\alpha} f_i = \hat{\alpha}\lambda_{1}x_{i1} + \hat{\alpha}\lambda_{2}x_{i2},$$`
+
+dimension reduction can be viewed as a method that puts a constraint on the estimated `\(\beta\)`'s, i.e.,
+
+`$$y_i = \beta^{*}_1 x_{i1} + \beta_2^* x_{i2} + \varepsilon_i$$`
+where
+`$$\beta^{*}_1 = \alpha\lambda_{1}\qquad\text{and}\qquad \beta^*_2 = \alpha\lambda_2$$`
+
+The main challenges involved are:
+1. How to choose (estimate) `\(\lambda_1\)`, `\(\lambda_2\)`?
+2. How many factors to use? (In this case, since `\(p=2\)`, `\(M\)` can be at most 2.)
+
+---
+
+# General Case
+
+- Let `\(f_1, f_2, \ldots, f_p\)` represent `\(p\)` linear combinations of the features `\(x_1, x_2, \ldots, x_p\)`, such that:
+
+`$$f_{im} = \lambda_{m1} x_{1i} + \ldots + \lambda_{mp} x_{ip},\qquad \text{for } m = 1,\ldots,p$$`
+
+- The linear model is given by:
+`$$y_i = \alpha_0 + \sum_{m=1}^{M}\alpha_m f_{im} + \varepsilon_i,\qquad \text{for } i = 1,\ldots,N$$`
+where `\(M &lt; p\)`, and the model is estimated by OLS.
+
+- The main challenge lies in estimating and selecting the number of factors in a way that improves prediction accuracy (i.e., reducing variance compared to OLS).
+
+
+---
+# Principal components regression (PCR)
+
+Let `\(\mathbf{x}=(x_1,\ldots,x_p)\)` and `\(\boldsymbol{\lambda}_1=(\lambda_{k1},\ldots,\lambda_{kp})\)` denote a vector of features and scalars, respectively. Principal component analysis (PCA) amounts to:
+
+(1) Find a linear combinations `\(\boldsymbol{\lambda}_1\)` of the elements of `\(\mathbf{x}\)` that maximizes its variance.
+
+(2) Next, find a linear combination `\(\boldsymbol{\lambda}_2\)` of the elements of `\(\mathbf{x}\)`, uncorrelated with `\(\boldsymbol{\lambda_1}^{\prime}\mathbf{x}\)` having maximum variance.
+`$$\vdots$$`
+`\((p)\)` Finally, find a linear combination `\(\boldsymbol{\lambda}_p\)` of the elements of `\(\mathbf{x}\)`, uncorrelated with `\(\boldsymbol{\lambda_1}^{\prime}\mathbf{x},\ldots,\boldsymbol{\lambda_{p-11}}^{\prime}\mathbf{x}\)` having maximum variance.
+
+&lt;midd-blockquote&gt; `\(\boldsymbol{\lambda_k}^{\prime}\mathbf{x}\)` is the `\(k^{\text{th}}\)` __principal component__ (PC), and `\(\boldsymbol{\lambda_k}\)` is the vector of coefficients or __loadings__ for the `\(k^{\text{th}}\)` PC.
+ &lt;/midd-blockqoute&gt;
+
+---
+# Illustration in 2-D
+
+&lt;img src="figs/pca.gif" width="100%" style="display: block; margin: auto;" /&gt;
+
+[Source](https://stats.stackexchange.com/questions/134282/relationship-between-svd-and-pca-how-to-use-svd-to-perform-pca)
+
+---
+
+# Illustration: NBC TV Pilots Data
+
+- To illustrate, we will use Matt Taddy's NBC pilots dataset, which includes survey responses from focus groups on TV show pilots, as well as the first year of ratings results.
+
+- Our objective: Predict viewer interest based on pilot surveys, thus helping studios make better programming decisions.
+
+- The survey data includes 6241 views and 20 questions for 40 shows.
+
+- `PE` is our outcome of interest. It measures viewer engagement with the show, which is reported on a 0 (no attention) to 100 (fully engaged) scale.
+
+
+---
+# Read `shows` Dataset
+
+`shows` includes data on 40 TV shows.
+
+```r
+shows &lt;- here("05-regression-regularization/data", "nbc_showdetails.csv") %&gt;% 
+  read_csv()
+
+head(shows)
+```
+
+```
+## # A tibble: 6 x 6
+##   Show                               Network    PE   GRP Genre           Duration
+##   &lt;chr&gt;                              &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;              &lt;dbl&gt;
+## 1 Living with Ed                     HGTV     54   151   Reality               30
+## 2 Monarch Cove                       LIFE     64.6 376.  Drama/Adventure       60
+## 3 Top Chef                           BRAVO    78.6 808.  Reality               60
+## 4 Iron Chef America                  FOOD     62.6  17.3 Reality               30
+## 5 Trading Spaces: All Stars          TLC      56    44.1 Reality               60
+## 6 Lisa Williams: Life Among the Dead LIFE     56.2 383.  Reality               60
+```
+
+---
+# Read `survey` results dataset
+
+The `survey` dataset includes 6241 views and 20 questions for 40 shows.
+
+```r
+survey &lt;- here("05-regression-regularization/data", "nbc_pilotsurvey.csv") %&gt;% 
+  read_csv()
+
+head(survey)
+```
+
+```
+## # A tibble: 6 x 22
+##   Viewer Show      Q1_At~1 Q1_Ex~2 Q1_Ha~3 Q1_En~4 Q1_Cu~5 Q1_Mo~6 Q1_Co~7 Q1_An~8 Q1_In~9 Q2_Re~*
+##    &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+## 1     71 Iron Che~       3       4       4       3       5       4       3       2       2       3
+## 2     71 Trading ~       4       4       3       4       5       2       3       3       2       4
+## 3     71 House Hu~       4       4       4       5       5       3       3       2       1       2
+## 4     71 What Not~       4       3       3       3       4       2       2       4       2       2
+## 5     71 America'~       4       4       3       4       4       4       3       3       4       3
+## 6     73 Next            2       4       2       4       2       3       3       3       3       2
+## # ... with 10 more variables: Q2_Funny &lt;dbl&gt;, Q2_Confusing &lt;dbl&gt;, Q2_Predictable &lt;dbl&gt;,
+## #   Q2_Entertaining &lt;dbl&gt;, Q2_Fantasy &lt;dbl&gt;, Q2_Original &lt;dbl&gt;, Q2_Believable &lt;dbl&gt;,
+## #   Q2_Boring &lt;dbl&gt;, Q2_Dramatic &lt;dbl&gt;, Q2_Suspenseful &lt;dbl&gt;, and abbreviated variable names
+## #   1: Q1_Attentive, 2: Q1_Excited, 3: Q1_Happy, 4: Q1_Engaged, 5: Q1_Curious, 6: Q1_Motivated,
+## #   7: Q1_Comforted, 8: Q1_Annoyed, 9: Q1_Indifferent, *: Q2_Relatable
+```
+
+---
+# Aggregating Survey Data
+
+We will now aggregate viewer answers by show using the `mean` function as the aggregating function.
+
+```r
+survey_mean &lt;- survey %&gt;% 
+  select(-Viewer) %&gt;% 
+  group_by(Show) %&gt;% 
+  summarise_all(list(mean)) 
+
+head(survey_mean)
+```
+
+```
+## # A tibble: 6 x 21
+##   Show     Q1_At~1 Q1_Ex~2 Q1_Ha~3 Q1_En~4 Q1_Cu~5 Q1_Mo~6 Q1_Co~7 Q1_An~8 Q1_In~9 Q2_Re~* Q2_Fu~*
+##   &lt;chr&gt;      &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+## 1 30 Rock     3.69    3.47    3.65    3.74    3.58    2.96    2.97    2.12    2.50    3.05    3.71
+## 2 America~    3.84    3.69    3.58    3.84    3.71    3.32    2.95    2.42    2.47    2.87    3.49
+## 3 America~    3.67    3.50    3.46    3.58    3.71    3.01    2.86    2.25    2.43    3.01    3.53
+## 4 Bones       4.12    3.71    3.42    4.06    4.15    3.29    2.95    1.72    2.11    3.14    3.39
+## 5 Close t~    3.80    3.32    3.16    3.83    3.73    3.18    2.83    1.93    2.11    3.17    2.91
+## 6 Cold Ca~    4.05    3.53    3.15    3.91    3.96    3.06    2.78    1.89    2.19    3.13    2.96
+## # ... with 9 more variables: Q2_Confusing &lt;dbl&gt;, Q2_Predictable &lt;dbl&gt;, Q2_Entertaining &lt;dbl&gt;,
+## #   Q2_Fantasy &lt;dbl&gt;, Q2_Original &lt;dbl&gt;, Q2_Believable &lt;dbl&gt;, Q2_Boring &lt;dbl&gt;, Q2_Dramatic &lt;dbl&gt;,
+## #   Q2_Suspenseful &lt;dbl&gt;, and abbreviated variable names 1: Q1_Attentive, 2: Q1_Excited,
+## #   3: Q1_Happy, 4: Q1_Engaged, 5: Q1_Curious, 6: Q1_Motivated, 7: Q1_Comforted, 8: Q1_Annoyed,
+## #   9: Q1_Indifferent, *: Q2_Relatable, *: Q2_Funny
+```
+
+---
+# Joining `shows` and `survey` into a Single Tibble
+
+We will now generate a tibble that holds `PE` and the mean survey answers, as well as `Genre` and `Show`.
+
+```r
+df_join &lt;- shows %&gt;% 
+  left_join(survey_mean) %&gt;% 
+  select(PE, starts_with("Q"), Genre, Show)
+
+head(df_join)
+```
+
+```
+## # A tibble: 6 x 23
+##      PE Q1_Atten~1 Q1_Ex~2 Q1_Ha~3 Q1_En~4 Q1_Cu~5 Q1_Mo~6 Q1_Co~7 Q1_An~8 Q1_In~9 Q2_Re~* Q2_Fu~*
+##   &lt;dbl&gt;      &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+## 1  54         3.89    3.78    3.93    3.87    3.80    3.61    3.57    2.61    3.12    3.72    3.93
+## 2  64.6       4.05    3.86    3.83    3.88    4       3.94    3.91    2.97    3.15    3.98    3.78
+## 3  78.6       3.85    3.60    3.63    3.77    3.86    3.20    3       2.19    2.40    3.22    3.57
+## 4  62.6       3.91    3.69    3.61    3.85    3.94    3.33    3.05    2.12    2.44    3.13    3.54
+## 5  56         3.81    3.54    3.51    3.78    3.91    3.29    2.80    2.10    2.43    3.23    3.48
+## 6  56.2       3.72    3.65    3.55    3.66    3.76    3.57    3.38    2.20    2.58    3.47    3.38
+## # ... with 11 more variables: Q2_Confusing &lt;dbl&gt;, Q2_Predictable &lt;dbl&gt;, Q2_Entertaining &lt;dbl&gt;,
+## #   Q2_Fantasy &lt;dbl&gt;, Q2_Original &lt;dbl&gt;, Q2_Believable &lt;dbl&gt;, Q2_Boring &lt;dbl&gt;, Q2_Dramatic &lt;dbl&gt;,
+## #   Q2_Suspenseful &lt;dbl&gt;, Genre &lt;chr&gt;, Show &lt;chr&gt;, and abbreviated variable names
+## #   1: Q1_Attentive, 2: Q1_Excited, 3: Q1_Happy, 4: Q1_Engaged, 5: Q1_Curious, 6: Q1_Motivated,
+## #   7: Q1_Comforted, 8: Q1_Annoyed, 9: Q1_Indifferent, *: Q2_Relatable, *: Q2_Funny
+```
+
+---
+# Setting up the Data for PCR
+
+The features matrix, i.e., the mean survey answers, is given by:
+
+```r
+X &lt;- df_join %&gt;% 
+  select(starts_with("Q")) %&gt;% 
+  as.matrix()
+```
+
+Principal components based on `X` (scaled):
+
+```r
+PC &lt;- X %&gt;% 
+  prcomp(scale. = TRUE) %&gt;% 
+* predict()
+```
+where we've used the `prcomp()` and `predict()` function to extract the PCs. Setting `scale.=TRUE` makes sure that `X` is scaled prior to running PCA.
+
+Response variable (`PE`):
+
+```r
+Y &lt;- df_join %&gt;% 
+  select(PE) %&gt;% 
+  as.matrix()
+```
+
+# Performing PCR with the `pls` package
+
+.pull-left[
+While there are several R packages that can be used to perform principal component regression (PCR), the `{pls}` package is often considered the most convenient option, aside from using `{tidymodels}`.
+
+```r
+cv_pcr &lt;- pcr(
+  Y ~ X,
+  scale = TRUE,
+  validation = "CV",
+  segments = 10       
+)
+validationplot(cv_pcr)
+```
+]
+.pull-right[
+![](05-regression-regularization_files/figure-html/unnamed-chunk-27-1..svg)&lt;!-- --&gt;
+]
+
+---
+# Understanding Principal Components
+
+.pull-left[
+To better understand PCs, we can examine the loadings matrix (a.k.a, the "rotation matrix.")
+
+First, we can apply `prcomp()` to the feature matrix and store the output in the `pca` object:
+
+```r
+pca &lt;- X %&gt;% prcomp(scale. = TRUE)
+```
+Next, we can access the rotation matrix using `$rotation`. In the example below, we'll look at the first two components:
+
+```r
+pca$rotation[, 1:2] %&gt;% round(1)
+```
+]
+.pull-right[
+
+```
+##                  PC1  PC2
+## Q1_Attentive    -0.3  0.0
+## Q1_Excited      -0.3  0.1
+## Q1_Happy        -0.1  0.2
+## Q1_Engaged      -0.3  0.0
+## Q1_Curious      -0.3  0.0
+## Q1_Motivated    -0.2  0.3
+## Q1_Comforted    -0.1  0.4
+## Q1_Annoyed       0.2  0.3
+## Q1_Indifferent   0.2  0.4
+## Q2_Relatable    -0.1  0.3
+## Q2_Funny         0.1  0.2
+## Q2_Confusing    -0.1  0.3
+## Q2_Predictable   0.2  0.3
+## Q2_Entertaining -0.3 -0.1
+## Q2_Fantasy      -0.1  0.2
+## Q2_Original     -0.3  0.1
+## Q2_Believable   -0.1  0.1
+## Q2_Boring        0.2  0.4
+## Q2_Dramatic     -0.2  0.0
+## Q2_Suspenseful  -0.3  0.0
+```
+]
+
+---
+# Explained Variance (Scree Plot)
+
+.pull-left[
+And here is the cumulative variance explained by each PC ("scree plot")
+
+```r
+pca %&gt;% 
+  tidy("pcs") %&gt;% 
+  ggplot(aes(PC, percent)) +
+  geom_line() +
+  geom_point() +
+  labs(
+    y = "percent of explaind variance",
+    x = "principal component number"
+  )
+```
+]
+.pull-right[
+![](05-regression-regularization_files/figure-html/unnamed-chunk-31-1..svg)&lt;!-- --&gt;
+]
+
+---
+# Plot data with PCs on axis
+
+.pull-left[
+The code below generates a scatter plot of the survey data using the first two principal components as the x and y axis.
+
+```r
+pca %&gt;% 
+  autoplot(
+    data = df_join,
+    colour = "Genre",
+    size = 3
+  ) +
+  theme(legend.position = "top")
+```
+]
+.pull-right[
+![](05-regression-regularization_files/figure-html/unnamed-chunk-32-1..svg)&lt;!-- --&gt;
+]
+
+---
+# Notes about PCR, Ridge, and Lasso
+
+Here are some important notes to keep in mind when working with PCR, Ridge, and Lasso:
+
+- PCR is an unsupervised method that extracts PCs without using y. While it is possible to extract PCs first and then proceed to cross-validation, this may result in overfitting and biased estimates (why?).
+
+- PCR assumes that the data is _dense_, whereas Lasso assumes that the data is _sparse._
+
+- Ridge regression can be interpreted as an algorithm that shrinks the PCs of x that have small variance, while PCR leaves M PCs untouched and removes the rest.&lt;sup&gt;*&lt;/sup&gt;
+
+.footnote[
+[*] For more information, please see Section 3.4.1 in Hastie et al. (2009).
+]
+
+---
+
+# Sparse PCA (SPCA)
+
+Sparse principal component analysis (SPCA) is a technique that employs lasso-type penalties to produce components with many loadings equal to zero (Zou, Hastie, and Tibshirani, 2006).
+
+To estimate SPCA, we can use the `spca()` function from the [`{elasticnet}`](https://cran.r-project.org/web/packages/elasticnet/index.html) package, as shown below:
+
+
+```r
+spc &lt;- spca(
+  x = X,
+  K = 2,
+  type = "predictor",
+  sparse = "varnum",
+  para = c(4, 4)
+)
+```
+In the code above, `type = "predictor"` indicates that the input is a feature matrix (rather than, for example, a covariance matrix), and the number of PCs K is limited to the first two.
+
+Sparseness in the loadings is imposed by `sparse = "varnum"`, which limits the number of non-zero loading parameters, and `para = c(4, 4)` means that each component will have four non-zero loadings.
+
+---
+# SPCA results
+
+.pull-left[
+Here are the loadings of the first two sparse PCs based on the `spca()` algorithm:
+
+```r
+spc$loadings %&gt;% round(1)
+```
+We can now proceeds to PCR by tuning `K` and or `para` using cross-validation (not in this lecture.)
+]
+.pull-right[
+
+```
+##                  PC1 PC2
+## Q1_Attentive     0.0 0.0
+## Q1_Excited       0.0 0.0
+## Q1_Happy         0.0 0.0
+## Q1_Engaged       0.0 0.0
+## Q1_Curious       0.0 0.0
+## Q1_Motivated    -0.5 0.0
+## Q1_Comforted    -0.1 0.0
+## Q1_Annoyed       0.0 0.4
+## Q1_Indifferent   0.0 0.7
+## Q2_Relatable     0.0 0.0
+## Q2_Funny         0.0 0.0
+## Q2_Confusing     0.0 0.0
+## Q2_Predictable   0.0 0.6
+## Q2_Entertaining  0.0 0.0
+## Q2_Fantasy      -0.2 0.0
+## Q2_Original      0.0 0.0
+## Q2_Believable    0.0 0.0
+## Q2_Boring        0.0 0.0
+## Q2_Dramatic      0.0 0.0
+## Q2_Suspenseful  -0.8 0.0
+```
+]
+
+---
+# PCR-lasso
+
+Taddy (2019) proposes an alternative approach to PCR, where instead of tuning the number of principal components, we tune their number using lasso:
+`$$\underset{\alpha_{0}, \alpha}{\operatorname{min}} \sum_{i=1}^{N}\left(y_{i}-\alpha_{0}-\sum_{j=1}^{p} 
+\hat{f}_{i j} \alpha_{j}\right)^{2}+\lambda \lVert\boldsymbol{\alpha}\rVert_1$$`
+
+
+---
+# Tuning each Method using Cross-Validation
+
+In this example, we will compare three methods for predicting y:
+
+1. PCR-lasso for predicting y on f.
+2. Lasso for predicting y on x.
+3. PCR-lasso for predicting y on both x and f.
+
+
+```r
+lasso_pcr &lt;- cv.glmnet(x = PC, y = Y, nfold = 20)
+lasso_x &lt;- cv.glmnet(x = X , y = Y, nfold = 20)
+lasso_pcrx &lt;- cv.glmnet(x = cbind(X, PC) , y = Y, nfold = 20)
+```
+
+Note that the preferred method depends on the specific application.
+
+
+---
+# Plot cross-validation results
+
+
+```r
+par(mfrow=c(1,3))
+plot(lasso_pcr, sub = "PCR")  
+plot(lasso_x, sub = "Lasso")  
+plot(lasso_pcrx, sub = "PCR-LAsso")
+```
+
+![](05-regression-regularization_files/figure-html/unnamed-chunk-37-1..svg)&lt;!-- --&gt;
+
+---
+# Partial Least Squares (PLS)
+
+- Unlike PCR, which extracts PCs in an unsupervised way and doesn't use information on `\(y\)` during the process, PLS extracts factors in a supervised way.
+
+- In theory, PLS should have an advantage over PCR, as it may identify features that are highly correlated with `\(y\)` that PCR would discard.
+
+- However, in practice, there is usually little difference in terms of prediction performance between PLS and PCR in most applications.
+
+
+
+
+---
+# The PLS algorithm
+
+(1) Regress `\(y\)` onto each `\(x_j\)` independently, i.e., 
+`$$y_i = \phi_{1j} x_{i,j} + \varepsilon_{ij},\qquad \text{for }j=1,\ldots,p$$`
+and store `\(\phi_{11},\ldots,\phi_{1p}\)`.
+
+(2) Use the estimated vector of coefficients `\(\hat{\boldsymbol{\phi}_1}=(\phi_{11},\ldots,\phi_{1p})\)` to construct a new component `\(v_{i1}\)`, which is a linear combination of the `\(x\)`s:
+`$$v_{i1}=\hat{\boldsymbol{\phi}_1}^{\prime}\mathbf{x}_i$$`
+(3) Define the residuals from (1) as a new set of features, and proceed to (2) and estimate the second component, `\(v_{i2}=\hat{\boldsymbol{\phi}_2}^{\prime}\mathbf{x}_i\)`.
+
+(4) Continue until you reach the minimum of `\(p\)` or `\(n\)`.
+
+
+
+---
+# Run PLS with the `pls` Package
+
+.pull-left[
+We're now ready to estimate PLS using, wait for it..., the [`{pls}`](https://cran.r-project.org/web/packages/pls/index.html) package!
+
+```r
+cv_pls &lt;- plsr(
+  Y ~ X,
+  scale = TRUE,
+  validation = "CV",
+  segments = 10       
+)
+validationplot(cv_pls)
+```
+]
+.pull-right[
+![](05-regression-regularization_files/figure-html/unnamed-chunk-38-1..svg)&lt;!-- --&gt;
+]
+
+---
+# Summary
+
+_"Despite its simplicity, the linear model has distinct advantages in terms of its interpretability and often shows good predictive performance."_ (Hastie and Tibshirani)
+
+- Subset selection is slow, unstable, and infeasible when p is large.
+
+- Ridge regression is fast, works when `\(p &gt; n\)`, provides good predictions, but is hard to interpret (keeps all features in).
+
+- Lasso is also fast, works when `\(p &gt; n\)`, provides good predictions, and performs variable selection.
+
+- However, ridge and lasso shrink the parameters of the model and cannot be used out-of-the-box for econometric analysis.
+
+- Despite their advantages, linear models require a lot of bookkeeping (as well as memory and computing power) when it comes to explicitly adding non-linearities, interactions, and other complex features.
+ 
+
+---
+class: .title-slide-final, center, inverse, middle
+
+# `slides::end()`
+
+[&lt;i class="fa fa-github"&gt;&lt;/i&gt; Source code](https://github.com/ml4econ/notes-spring2023/tree/master/05-regression-regularization)  
+
+---
+
+# References
+
+Hoerl, A. E., and Kennard, R. W. 1970. Ridge regression: Biased estimation for nonorthogonal problems. _Technometrics_, 12(1), 55-67.
+
+Jolliffe, I. T. (2010). _Principal Component Analysis_. Springer.
+
+Taddy, M. 2019. _Business Data Science: Combining Machine Learning and Economics to Optimize, Automate, and Accelerate Business Decisions_ . McGraw-Hill Education. Kindle Edition. 
+
+Tibshirani, R. 1996. Regression shrinkage and selection via the lasso. _J . Roy. Statist. Soc. B_, 58(1), 267-288.
+
+Zou, H., Hastie, T., &amp; Tibshirani, R. (2006). Sparse principal component analysis. _Journal of computational and graphical statistic_s, 15(2), 265-286.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="https://platform.twitter.com/widgets.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"slideNumberFormat": "<div class=\"progress-bar-container\">\n  <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">\n  </div>\n</div>\n"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

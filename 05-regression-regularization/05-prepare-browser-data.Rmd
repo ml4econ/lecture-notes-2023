@@ -1,0 +1,135 @@
+---
+title: "Prapare Browser Data"
+author: "Itamar Caspi"
+date: '(updated: `r Sys.Date()`)'
+output:
+  html_document:
+    code_folding: show
+    highlight: haddock
+    keep_md: no
+    theme: journal
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(eval = TRUE,
+                      echo = TRUE,
+                      warning = FALSE,
+                      message = FALSE,
+                      comment = NA,
+                      dpi = 300)
+```
+
+```{r pacman, message=FALSE, warning=FALSE, eval=TRUE}
+if (!require("pacman")) install.packages("pacman")
+
+pacman::p_load(
+  tidyverse,   # for data wrangling and visualization
+  here        # for referencing folders and files
+)
+```
+
+```{r seed}
+set.seed(1203)
+```
+
+# Load browser data
+
+```{r read_web}
+web_raw <- here("05-regression-regularization/data","browser-domains.csv") %>% 
+  read_csv()
+```
+
+Read in the actual website names and relabel site factor
+```{r read_sitenames}
+sitenames_raw <- here("05-regression-regularization/data", "browser-sites.txt") %>% 
+  read_tsv(col_names = FALSE)
+```
+
+```{r read_spend}
+spend_raw <- here("05-regression-regularization/data", "browser-totalspend.csv") %>% 
+  read_csv()
+```
+
+# Data preprocessing
+
+```{r sitenames_list}
+sitenames <- sitenames_raw %>% 
+  pull()
+```
+
+```{r web_proc}
+web <- web_raw %>% 
+  mutate(
+    id = as_factor(id),
+    site_name = factor(
+      site,
+      levels = 1:length(sitenames),
+      labels = sitenames
+    )
+  ) %>% 
+  group_by(id) %>% 
+  mutate(visitpercent = 100 * visits / sum(visits)) %>% 
+  ungroup()
+```
+
+```{r log_spend}
+spend <- spend_raw %>% 
+  mutate(
+    log_spend = log(spend),
+    id = as_factor(id)
+  )
+```
+
+```{r web_to_wide}
+web_wide <- web %>% 
+  select(id, site_name, visitpercent) %>% 
+  arrange(id) %>% 
+  pivot_wider(
+    names_from = site_name,
+    values_from = visitpercent,
+    values_fill = list(visitpercent = 0)
+  )
+```
+
+random sample of size 1000 obs X 250 features
+```{r sample}
+vars_idx <- sample(1:1000, 200)
+obs_idx  <- sample(1:10000, 1200)
+```
+
+generate response and feature matrices
+```{r data_matrix}
+Xweb <- web_wide %>% 
+  select(-id) %>%
+  select(vars_idx) %>% 
+  slice(obs_idx)
+
+Yweb <- spend %>% 
+  select(log_spend) %>%
+  slice(obs_idx)
+
+browser_sample <- bind_cols(Yweb, Xweb)
+
+browser <- spend %>% 
+  left_join(web_wide) %>% 
+  select(-id, -spend)
+```
+
+# Save processed data
+
+```{r save}
+write.csv(
+  browser,
+  file = here("05-regression-regularization/data","browser-all.csv"),
+  row.names = FALSE
+  )
+write.csv(
+  browser_sample,
+  file = here("05-regression-regularization/data","browser-sample.csv"),
+  row.names = FALSE
+  )
+```
+
