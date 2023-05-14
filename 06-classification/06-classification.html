@@ -417,12 +417,10 @@ The constant term includes terms related to the likelihood of a "perfect" model 
 # Deviance and Estimation
 
 In the estimation process, our goal is to minimize the deviance.
-$$
-\begin{aligned}
+`$$\begin{aligned}
 \text{Deviance} &amp;= -2\sum_{i=1}^{N} \left[\log \left(1+e^{\left(\beta_{0}+x_{i}^{\prime} \beta\right)}\right)-y_{i} \cdot\left(\beta_{0}+x_{i}^{\prime} \beta\right)\right] + \text{Constant} \\
 &amp;\propto \sum_{i=1}^{N} \left[\log \left(1+e^{\left(\beta_{0}+x_{i}^{\prime} \beta\right)}\right)-y_{i} \cdot\left(\beta_{0}+x_{i}^{\prime} \beta\right)\right]
-\end{aligned}
-$$
+\end{aligned}$$`
 This is what R's `glm` function minimizes when performing logistic regressions.
 
 __NOTE:__ In linear models, the deviance is proportional to the Residual Sum of Squares (RSS).
@@ -503,7 +501,7 @@ logit_model &lt;- glm(
 Alternatively, we can estimate the regularized version of the model using `glmnet` with `family = "binomial"`:
 
 ```r
-logit_model &lt;- cv.glmnet(x, y, family = "binomial")
+logit_model_lasso &lt;- cv.glmnet(x, y, family = "binomial")
 ```
 
 __SPOILER ALERT:__ `cv.glmnet` selects all features.
@@ -729,6 +727,7 @@ On the left side, we can observe the ROC curve of our model, generated using the
 
 ```r
 covid_pred %&gt;% 
+  mutate(.fitted = 1-.fitted) %&gt;% 
   roc_curve(corona_result, .fitted) %&gt;% 
   autoplot() +
   geom_point(
@@ -771,7 +770,7 @@ Source: ["Machine Learning with R: Expert techniques for predictive modeling"](h
 ]
 
 
-----
+---
 # AUC and Cross-Validation
 
 When dealing with classification tasks, it is often more reasonable to tune the penalty parameter based on classification performance metrics rather than, for example, deviance.
@@ -890,9 +889,9 @@ head(fgl_wide)
 ```
 
 ---
-# Tidy the Data using `pivot_longer`
+# Tidying the Data with `pivot_longer`
 
-The following code chunk utilizes the `pivot_longer()` function from the `{tidyr}` package to transform the data from wide to long format. This step will be useful for plotting the data later on:
+The code chunk below uses the `pivot_longer()` function from the `{tidyr}` package. This function *transforms the data* from wide to long format, preparing it for later plotting:
 
 ```r
 fgl_long &lt;- 
@@ -1083,9 +1082,9 @@ fgl_pred %&gt;%
 ##      Head     0     0   0   1    2   25
 ```
 
-For example, our model correctly classified 54 observations as `WinF` out of all the predicted `WinF` samples, resulting in a precision rate of `\(54/80 = 67.5\%\)`.
+For example, our model correctly classified 53 observations as `WinF` out of all the predicted `WinF` samples, resulting in a precision rate of `\(53/80 = 66.3\%\)`.
 
-Similarly, the model correctly predicted 54 `WinF` samples out of the actual number of `WinF` samples, which is 64, resulting in a recall rate of `\(54/70 = 77.1\%\)`.
+Similarly, the model correctly predicted 58 `WinNF` samples out of the actual number of `WinNF` samples, which is 76, resulting in a recall rate of `\(58/76 = 76.3\%\)`.
  
 
 ---
@@ -1103,7 +1102,7 @@ fgl_pred %&gt;%
 ```
 where `WinF.1:Head.1` represents the model's fitted probabilities.
 
-It is noticeable that the model struggles to differentiate between `Veh` and the other classes, while its classification for `Tabl` is nearly perfect.
+The model clearly struggles to differentiate between `Veh` and the other classes, while its classification for `Tabl` is nearly perfect.
 ]
 .pull-right[
 ![](06-classification_files/figure-html/unnamed-chunk-38-1..svg)&lt;!-- --&gt;
