@@ -165,7 +165,7 @@ Next, suppose you get a sample of size $n$ and use it to estimate the model and 
 
 $$\begin{aligned}
 &y_{i}=0.0\hspace{0.35cm}+\hspace{0.35cm}2.0\times x_{i}+\widehat{\varepsilon}_{i}\\
-&\hspace{1.4cm}(0.2)\hspace{0.85cm}(10.0)
+&\hspace{1.35cm}(0.2)\hspace{0.85cm}(10.0)
 \end{aligned}$$
 
 Given a new unseen $x^0$ and the output above, how would you predict $y^0$?

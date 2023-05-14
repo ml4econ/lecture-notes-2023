@@ -18,14 +18,10 @@ output:
 
 Load packages
 ```{r pacman, message=FALSE, warning=FALSE, eval=TRUE}
-if (!require("pacman")) install.packages("pacman")
-
-pacman::p_load(
-  tidyverse,   # for data wrangling and visualization
-  tidymodels,  # for data modeling
-  plsmod,      # for estimating pls regression
-  here         # for referencing files and folders
-)
+library(tidyverse)   # for data wrangling and visualization
+library(tidymodels)  # for data modeling
+library(plsmod)      # for estimating pls regression
+library(here)         # for referencing files and folders
 ```
 
 and set seed for replication
