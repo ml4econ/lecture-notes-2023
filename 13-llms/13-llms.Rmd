@@ -1,0 +1,753 @@
+---
+title: "13 - Using Large Language Models"
+subtitle: "ml4econ, HUJI 2023"
+author: "Itamar Caspi"
+date: "March 19, 2023 (updated: `r Sys.Date()`)"
+output:
+  xaringan::moon_reader:
+    css: [default, "style/middlebury.css", "style/middlebury-fonts.css"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+      slideNumberFormat: |
+        <div class="progress-bar-container">
+          <div class="progress-bar" style="width: calc(%current% / %total% * 100%);">
+          </div>
+        </div>
+      
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+
+knitr::opts_chunk$set(eval = TRUE,
+               echo = TRUE,
+               warning = FALSE,
+               message = FALSE,
+               cache = FALSE)
+
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+```
+
+```{r plots_and_figures, include=FALSE}
+library(tidyverse)
+library(openai)
+
+theme_set(theme_gray(15))
+```
+
+```{r, references, echo=FALSE, cache=FALSE}
+library(RefManageR)
+BibOptions(check.entries = FALSE, 
+           bib.style = "numeric", 
+           cite.style = "authoryear", 
+           style = "markdown",
+           hyperlink = FALSE, 
+           dashed = FALSE)
+bib <- ReadBib("refs/refs.bib", check = FALSE)
+```
+
+
+---
+class: title-slide-section-gray
+
+# Outline
+
+1. [What are LLMs?](#llms)
+
+2. [GPT-4 and ChatGPT](#chatgpt)
+
+3. [Principles of Prompting](#prompt)
+
+4. [The AI Research Assistant](#assist)
+
+5. [Real World Impact](#ahead)
+
+
+
+---
+class: title-slide-section-blue, center, middle
+name: llms
+
+# What are LLMs?
+
+
+---
+# Large Language Models (LLMs)
+
+.pull-left[
+<midd-blockquote> _"Large language models, like GPT-4, are AI systems trained on vast amounts of text data. They use patterns in this data to generate human-like text, answer questions, translate languages, and perform other language-related tasks. They don't understand information, but predict what text should come next based on their training."_ .right[—ChatGPT (2023)] </midd-blockquote>
+]
+.pull-right[
+```{r echo=FALSE, out.width = "95%", fig.align='center'}
+
+knitr::include_graphics("figs/tree.jpg")
+
+```
+*Source*: [https://arxiv.org/abs/2304.13712](https://arxiv.org/abs/2304.13712)
+]
+
+
+---
+# Collect a Lot of Data
+
+.pull-left[
+- **Internet:** A vast ocean of diverse topics and styles.
+- **Books:** Boosts language proficiency and narrative comprehension.
+- **Wikipedia:** Encyclopedic knowledge for a broad understanding.
+- **Non-Proprietary Databases:** Broad, general knowledge without user or company specifics.
+
+*Important*: OpenAI doesn't disclose the exact sources of these datasets. 
+]
+.pull-right[
+```{r echo=FALSE, out.width = "90%", fig.align='center'}
+
+knitr::include_graphics("figs/books.jpg")
+
+```
+_Source_: Bing image generator ("a huge pile of book")
+]
+
+---
+# Contextual Embedding: From Text to Numbers
+
+.pull-left[
+- **LLMs:** Transform language queries into numerical representations.
+- **Text Segmentation:** Breaks down text into chunks called tokens.
+- **Tokens:** Include words, affixes, and punctuation.
+- **Meaning Space:** Area where tokens with similar meanings cluster together.
+]
+.pull-right[
+```{r echo=FALSE, out.width = "100%", fig.align='center'}
+
+knitr::include_graphics("figs/token.png")
+
+```
+
+```{r echo=FALSE, out.width = "100%", fig.align='center'}
+
+knitr::include_graphics("figs/embed.png")
+
+```
+Source: [The Economist.](https://www.economist.com/interactive/science-and-technology/2023/04/22/large-creative-ai-models-will-transform-how-we-live-and-work)
+]
+
+---
+# Attention Network
+
+.pull-left[
+- LLMs use "attention networks" to connect different parts of the prompt.
+
+- Attention networks enable models to focus on the most informative parts of the input data, improving performance and accuracy.
+
+- LLMs translate language structure into numerical "weights" in the neural network during training.
+
+- LLMs comprehend language statistically rather than grammatically.
+]
+.pull-right[
+```{r echo=FALSE, out.width = "100%", fig.align='center'}
+
+knitr::include_graphics("figs/attention.png")
+
+```
+Source: [The Economist.](https://www.economist.com/interactive/science-and-technology/2023/04/22/large-creative-ai-models-will-transform-how-we-live-and-work)
+]
+
+---
+# Next Word Prediction
+
+.pull-left[
+- Upon processing the prompt, the LLM begins generating a response.
+
+- The attention network assigns each token a probability, suggesting its likelihood as the next part of the sentence.
+
+- The token with the highest probability isn't always selected. The LLM's creativity level, determined by its operators, impacts this choice.
+]
+.pull-right[
+```{r echo=FALSE, out.width = "100%", fig.align='center'}
+
+knitr::include_graphics("figs/completion.png")
+
+```
+Source: [The Economist.](https://www.economist.com/interactive/science-and-technology/2023/04/22/large-creative-ai-models-will-transform-how-we-live-and-work)
+]
+
+---
+# Autoregression: The Loop of Response Generation
+
+.pull-left[
+- The LLM produces a word and feeds the output back into itself.
+- This cycle, known as autoregression, repeats until the LLM completes its response.
+]
+.pull-right[
+```{r echo=FALSE, out.width = "100%", fig.align='center'}
+
+knitr::include_graphics("figs/autoreg.png")
+
+```
+Source: [The Economist.](https://www.economist.com/interactive/science-and-technology/2023/04/22/large-creative-ai-models-will-transform-how-we-live-and-work)
+]
+
+
+---
+# Reinforcement Learning from Human Feedback (RLHF)
+
+.pull-left[
+- RLHF uses human ratings to train chatbots in three stages:
+  1. Pretrain the language model.
+  2. Collect and implement human feedback.
+  3. Fine-tune using reinforcement learning.
+
+- Advantages: Mimics human preferences, refines chatbot responses, and boosts user satisfaction.
+]
+
+.pull-right[
+```{r echo=FALSE, out.width = "110%", fig.align='center'}
+
+knitr::include_graphics("figs/rlhf.png")
+
+```
+]
+
+---
+class: title-slide-section-blue, center, middle
+name: chatgpt
+
+# GPT-4 and ChatGPT
+
+---
+# Key Resources for Beginners
+
+* [ChatGPT Prompt Engineering for Developers](https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/): A free course suitable for beginners. It offers a tutorial on using the OpenAI API and large language models for innovative applications. It places a strong emphasis on effective prompt engineering through practical examples.
+
+* [Language Models and Cognitive Automation for Economic Research](https://www.nber.org/papers/w30957) by Anton Korinek: It includes general instructions and specific examples on how to utilize LLMs. It also categorizes the capabilities of LLMs from experimental to highly practical.
+
+* [One Useful Thing](https://www.oneusefulthing.org/) blog by Ethan Mollick (Wharton): For regular updates, follow [@emollick](https://twitter.com/emollick) on Twitter.
+
+* [What Is ChatGPT Doing … and Why Does It Work?](https://writings.stephenwolfram.com/2023/02/what-is-chatgpt-doing-and-why-does-it-work/) by Stephen Wolfram: This is a comprehensive introduction to the scientific principles behind ChatGPT.
+
+
+
+
+---
+# GPT-4: The Latest Advancement in AI
+
+.pull-left[
+- Introducing Generative Pre-trained Transformer 4 (GPT-4).
+
+- A *multimodal* language model capable of processing text and images.
+
+- Developed by OpenAI, released in March 2023.
+
+- Abilities include chatting, coding, tutoring, translating, and more.
+
+- However, it shares some issues with its predecessors: hallucinations, biases, and the ability to inadvertently reveal secrets.
+]
+.pull-right[
+```{r echo=FALSE, out.width = "80%", fig.align='center'}
+
+knitr::include_graphics("figs/altman.png")
+
+```
+_Source_: [The ChatGPT King Isn’t Worried](https://www.nytimes.com/2023/03/31/technology/sam-altman-open-ai-chatgpt.html)
+]
+
+---
+# The Big Bang
+
+```{r echo=FALSE, out.width = "40%", fig.align='center'}
+
+knitr::include_graphics("figs/100mil.png")
+
+```
+
+---
+# Accessing GPT-4: A Step-by-Step Guide
+
+.pull-left[
+First, create an OpenAI account.
+
+- Option 1: Access via [ChatGPT](https://chat.openai.com/)
+- Option 2: Try the [OpenAI Playground](https://platform.openai.com/playground)
+- Option 3: Use the [OpenAI API](https://platform.openai.com/account/api-keys)
+- Option 4: Explore through [Bing](https://www.bing.com/)
+
+*Important*: GPT-3.5 and Bing offer free access. GPT-4 costs approximately $20 per month. To save costs, consider using the API ($0.03 per token). 
+
+[Google's Bard](https://bard.google.com/) provides a free alternative (not GPT-4).
+]
+.pull-right[
+```{r echo=FALSE, out.width = "90%", fig.align='center'}
+
+knitr::include_graphics("figs/enterence.png")
+
+```
+]
+
+
+---
+# Yes, ChatGPT Can Hallucinate
+
+.pull-left[
+- ChatGPT may produce text that appears credible but is inaccurate.
+
+- Its goal is to sound convincing, not necessarily to deliver accurate or reliable information.
+
+- This could potentially mislead unsuspecting readers.
+
+- OpenAI is continually striving to improve the model's accuracy and reliability.
+]
+.pull-right[
+```{r echo=FALSE, out.width = "100%", fig.align='center'}
+
+knitr::include_graphics("figs/shortbio.png")
+
+```
+]
+
+
+---
+# Powerful, Not Dumb: The Capabilities of ChatGPT
+
+.pull-left[
+- Despite occasional errors, ChatGPT's prowess should not be underestimated.
+
+- It demonstrated an impressive IQ of 147 on a verbal-linguistic test (99.9th percentile).
+
+- Each new iteration of ChatGPT enhances its accuracy and power.
+
+- The potential for substantial societal impact must not be dismissed or underestimated.
+]
+.pull-right[
+```{r echo=FALSE, out.width = "100%", fig.align='center'}
+
+knitr::include_graphics("figs/scores.jpg")
+
+```
+]
+
+---
+# A Note on Bing
+
+.pull-left[
+- Bing provides free access to GPT-4 in both "precise" and "creative" modes.
+
+- Unlike ChatGPT, Bing Chat utilizes an active internet connection to its advantage.
+
+- Integration with Microsoft's Edge browser enables it to "read" visited webpages.
+
+- One constraint to be aware of is the 2000 character limit per input.
+]
+
+.pull-right[
+```{r echo=FALSE, out.width = "100%", fig.align='center'}
+
+knitr::include_graphics("figs/bing.png")
+
+```
+]
+
+---
+class: title-slide-section-blue, center, middle
+name: prompting
+
+# Principles of Prompting
+
+
+---
+# Understanding Your Model Parameters
+
+.pull-left[
+* **Temperature**: Controls the randomness in text generation.
+* **Max Length**: Determines the maximum length of the generated text.
+* **Top P**: Allocates the probability of each potential next word, based on the model's output distribution.
+* **Frequency Penalty**: Discourages the use of commonly occurring words in the generated text.
+* **Presence Penalty**: Imposes a penalty on repeated words or phrases in the generated text.
+]
+.pull-right[
+```{r echo=FALSE, out.width = "90%", fig.align='center'}
+
+knitr::include_graphics("figs/finetune.png")
+
+```
+
+_Note_: You can only adjust these parameters in "playground" mode or via the API.
+]
+
+
+---
+# Principle #1: Clarity and Specificity in Instructions
+
+* Define the input using *delimiters*:
+    * Triple quotes:"""
+    * Triple backticks: ```,
+    * Triple dashes: ---,
+    * and so on.
+
+* Request *structured output* (e.g., HTML, JSON).
+
+* Verify if the *conditions* are satisfied and *assumptions* required to perform the task.
+
+* Provide successful *examples* of task completion, also known as __Few-shot prompting__.
+
+
+---
+# Defining Input with Delimiters
+
+.pull-left[
+
+- Prompt: `Summarize the text enclosed by triple backticks into one sentence.`
+
+- Alternatively: `Condense the text within triple quotes into a single sentence.`
+
+- Or: `Summarize the text bounded by <> into one sentence.`
+
+- And so on.
+]
+.pull-right[
+```{r echo=FALSE, out.width = "100%", fig.align='center'}
+knitr::include_graphics("figs/delim.png")
+```
+]
+
+
+---
+# An aside: Extracting text and equations from everything
+
+.pull-left[
+* [Mathpix](https://mathpix.com/) is an OCR tool that rapidly converts handwritten or printed math equations into LaTeX code.
+
+* This tool greatly simplifies the task of extracting elements from academic papers, such as **symbols**, **equations**, and even **tables**.
+
+* ChatGPT can recognize LaTeX code with ease.
+]
+.pull-right[
+```{r echo=FALSE, out.width = "90%", fig.align='center'}
+knitr::include_graphics("figs/mathpix.png")
+```
+]
+
+
+---
+# Request Structured Output 
+
+Requesting structured output enhances stability and allows for the replication of your results.
+
+
+```{r echo=FALSE, out.width = "70%", fig.align='center'}
+
+knitr::include_graphics("figs/golda.png")
+
+```
+
+---
+# Use Case: Web Scraping
+
+Execute tasks like translating content from Hebrew to English, monitoring changes in item prices, and formatting the output in JSON.
+
+
+```{r echo=FALSE, out.width = "70%", fig.align='center'}
+
+knitr::include_graphics("figs/scraping.jpg")
+
+```
+
+
+---
+# Few-shot Learning
+
+.pull-left[
+- Few-shot learning is a machine learning approach that aims to train models to perform well on new tasks with only a limited amount of labeled data.
+]
+.pull-right[
+```{r echo=FALSE, out.width = "120%", fig.align='center'}
+
+knitr::include_graphics("figs/fewshot.PNG")
+
+```
+Source: [ChatGPT Prompt Engineering for Developers](https://learn.deeplearning.ai/chatgpt-prompt-eng/lesson/2/guidelines)
+]
+
+
+
+---
+# Principle #2: Allowing AI Time to Think
+
+- Clearly state the steps needed to complete the task.
+
+- Encourage the model to think and generate its own solution before rushing to a conclusion.
+
+
+
+---
+class: title-slide-section-blue, center, middle
+name: assist
+
+# The AI Research Assistant
+
+
+
+---
+# Brainstorming with Language Models
+
+.pull-left[
+- LLMs have extensive knowledge archives and can retrieve information upon request.
+
+- You can incorporate ChatGPT into your idea generation process, including brainstorming, evaluations, counterarguments, and more.
+]
+.pull-right[
+```{r echo=FALSE, out.width = "90%", fig.align='center'}
+
+knitr::include_graphics("figs/brainstorm.PNG")
+
+```
+]
+
+
+---
+# Summarizing
+
+```{r echo=FALSE, out.width = "80%", fig.align='center'}
+
+knitr::include_graphics("figs/ft.png")
+
+```
+
+
+---
+# Proofread and Edit
+
+.pull-left[
+- ChatGPR have proofread and edited this presentation, which is written using the R [`Xaringan`](https://github.com/yihui/xaringan) package. 
+
+- I used the following prompt:
+]
+.pull-right[
+```{r echo=FALSE, out.width = "100%", fig.align='center'}
+
+knitr::include_graphics("figs/editingxar.png")
+
+```
+]
+
+---
+# Draw Graphs (Using TikZ and LaTeX)
+
+.pull-left[
+Prompt: `"Draw an aggregate supply and demand graph using the TikZ package."`
+]
+.pull-right[
+```{r echo=FALSE, out.width = "90%", fig.align='center'}
+
+knitr::include_graphics("figs/adas.png")
+
+```
+]
+
+---
+# Coding Capabilities of ChatGPT
+
+ChatGPT can perform the following coding tasks:
+
+- **Code Generation** (and soon code execution): It can generate code, such as writing an R function that sorts a vector in descending order.
+
+- **Code Translation**: ChatGPT is capable of translating code, for example, from Python to R and vice versa.
+
+- **Code Debugging**: Simply copying and pasting error messages allows ChatGPT to assist with code debugging.
+
+- **Code Annotation**: You can ask ChatGPT to explain what a particular piece of code is doing.
+
+
+---
+# Example: Translate from STATA to R
+
+Prompt: `Translate the following STATA code to R`
+
+
+```{r echo=FALSE, out.width = "70%", fig.align='center'}
+
+knitr::include_graphics("figs/stata.png")
+
+```
+
+
+
+---
+# Other Use Cases
+
+.pull-left[
+- Generating keywords and JEL classification codes.
+- Crafting titles for papers, sections, figures, and tables.
+- Enhancing accessibility, such as providing alternate text for figures and tables.
+- Creating metaphors and analogies.
+
+For more inspiration, check out the [35 Ways Real People Are Using A.I. Right Now (NYT)](https://www.nytimes.com/interactive/2023/04/14/upshot/up-ai-uses.html) article.
+]
+.pull-right[
+```{r echo=FALSE, out.width = "60%", fig.align='center'}
+
+knitr::include_graphics("figs/ny35.png")
+
+```
+]
+
+---
+# Getting serious: The OpenAI API
+
+Follow these steps to get started with the OpenAI API:
+
+1. Establish a new OpenAI account at [https://platform.openai.com/signup](https://platform.openai.com/signup).
+
+2. Generate an API key by navigating to [https://platform.openai.com/account/api-keys](https://platform.openai.com/account/api-keys) and clicking "Create new secret key."
+
+3. Ensure that you've installed the openai library (for [Python](https://github.com/openai/openai-python) or [R](https://irudnyts.github.io/openai/)).
+
+For an example of using R + OpenAI API to proofread text and track changes, click [here](https://raw.githack.com/itamarcaspi/openai-api-test/master/proofread-and-track.html).
+
+
+
+
+---
+class: title-slide-section-blue, center, middle
+name: evidence
+
+# Real World Impact
+
+
+---
+# LLMs and productivity gains
+
+
+```{r echo=FALSE, out.width = "100%", fig.align='center'}
+
+knitr::include_graphics("figs/noy2023.png")
+
+```
+
+
+---
+# LLMs and the Fedspeak
+
+```{r echo=FALSE, out.width = "100%", fig.align='center'}
+
+knitr::include_graphics("figs/sophia2023.png")
+
+```
+
+---
+# LLMs and financial advise
+
+
+```{r echo=FALSE, out.width = "85%", fig.align='center'}
+
+knitr::include_graphics("figs/lopez2023.png")
+
+```
+
+---
+# LLMs and survey expectations
+
+```{r echo=FALSE, out.width = "85%", fig.align='center'}
+
+knitr::include_graphics("figs/bydee2023.png")
+
+```
+
+---
+# LLMs and education
+
+```{r echo=FALSE, out.width = "80%", fig.align='center'}
+
+knitr::include_graphics("figs/edu.png")
+
+```
+
+
+_Source_: [https://www.khanacademy.org/khan-labs](https://www.khanacademy.org/khan-labs)
+
+---
+# One Caveat Though...
+
+.pull-left[
+<midd-blockquote> _"[T]he computer age was everywhere except for the productivity statistics."_ .right[—Robert Solow (1987)] </midd-blockquote>
+]
+.pull-right[
+```{r echo=FALSE, out.width = "80%", fig.align='center'}
+
+knitr::include_graphics("figs/solow.jpg")
+
+```
+]
+
+
+
+---
+# Intriguing Topics Yet to Explore
+
+.pull-left[
+- **Computing Power**: The impact of powerful hardware on AI.
+
+- **Emergent Abilities**: Unforeseen AI capabilities arising from learning.
+
+- **AI Safety / Alignment**: Ensuring AI behavior aligns with human values.
+
+- **Misinformation**: The risks and mitigation of AI-generated false info.
+]
+
+.pull-right[
+Can you spot the fake?
+
+
+```{r echo=FALSE, out.width = "120%", fig.align='center'}
+
+knitr::include_graphics("figs/bibi-trump.png")
+
+```
+*Source*: [USA Today, March 15, 2019](https://www.usatoday.com/story/news/world/2019/03/25/how-donald-trump-and-benajmin-netanyahu-israel-benefit-close-relationship/3249644002/)
+]
+
+
+---
+# The New Wave of Generative AI 
+
+.pull-left[
+The new wave of AI extends beyond language:
+
+- **Images**: MidJourney
+- **Video**: Runway
+- **Music**: MusicML
+- **Coding**: Copilot X
+- **3D**: Imagine 3D
+]
+.pull-right[
+```{r echo=FALSE, out.width = "85%", fig.align='center'}
+
+knitr::include_graphics("figs/genai.png")
+
+```
+]
+
+---
+class: center, middle
+name: isit
+
+# So, is it just adding one word at a time...?
+
+
+---
+class: .title-slide-final, center, inverse, middle
+
+# `slides %>% end()`
+
+[<i class="fa fa-github"></i> Source code](https://github.com/ml4econ/lecture-notes-2023/blob/master/01-overview/01-overview.Rmd)  
+
+---
+# References
+
+```{r, 'refs', results='asis', echo=FALSE, eval=TRUE}
+PrintBibliography(bib)
+```
+
