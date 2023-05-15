@@ -154,14 +154,14 @@ covid_raw %&gt;% glimpse()
 ```
 ## Rows: 107,542
 ## Columns: 8
-## $ cough               &lt;dbl&gt; 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0,~
-## $ fever               &lt;dbl&gt; 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1,~
-## $ sore_throat         &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,~
-## $ shortness_of_breath &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0,~
-## $ head_ache           &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,~
-## $ corona_result       &lt;chr&gt; "negative", "negative", "negative", "positive", "negativ~
-## $ age_60_and_above    &lt;chr&gt; "No", "No", "Yes", "Yes", "Yes", "Yes", "No", "No", "No"~
-## $ gender              &lt;chr&gt; "male", "male", "male", "male", "female", "male", "male"~
+## $ cough               &lt;dbl&gt; 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, ~
+## $ fever               &lt;dbl&gt; 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, ~
+## $ sore_throat         &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+## $ shortness_of_breath &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, ~
+## $ head_ache           &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+## $ corona_result       &lt;chr&gt; "negative", "negative", "negative", "positive", "negative", "positive~
+## $ age_60_and_above    &lt;chr&gt; "No", "No", "Yes", "Yes", "Yes", "Yes", "No", "No", "No", "No", "No",~
+## $ gender              &lt;chr&gt; "male", "male", "male", "male", "female", "male", "male", "female", "~
 ```
 
 
@@ -557,21 +557,21 @@ covid_pred
 
 ```
 ## # A tibble: 107,542 x 14
-##    corona_~1 cough fever sore_~2 short~3 head_~4 age_6~5 gender .fitted .resid .std.~6
-##    &lt;fct&gt;     &lt;fct&gt; &lt;fct&gt; &lt;fct&gt;   &lt;fct&gt;   &lt;fct&gt;   &lt;fct&gt;   &lt;fct&gt;    &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;
-##  1 negative  1     0     0       0       0       No      male    0.0709 -0.383  -0.383
-##  2 negative  1     1     0       0       0       No      male    0.342  -0.916  -0.916
-##  3 negative  0     1     0       0       0       Yes     male    0.287  -0.822  -0.823
-##  4 positive  1     1     0       0       0       Yes     male    0.437   1.29    1.29 
-##  5 negative  1     0     0       0       0       Yes     female  0.0770 -0.400  -0.400
-##  6 positive  1     1     0       0       0       Yes     male    0.437   1.29    1.29 
-##  7 negative  0     0     0       0       0       No      male    0.0381 -0.279  -0.279
-##  8 negative  1     1     1       0       1       No      female  1.00   -4.19   -4.19 
-##  9 negative  1     0     1       0       0       No      female  0.817  -1.84   -1.85 
-## 10 negative  1     1     1       1       0       No      female  1.00   -3.91   -3.91 
-## # ... with 107,532 more rows, 3 more variables: .hat &lt;dbl&gt;, .sigma &lt;dbl&gt;,
-## #   .cooksd &lt;dbl&gt;, and abbreviated variable names 1: corona_result, 2: sore_throat,
-## #   3: shortness_of_breath, 4: head_ache, 5: age_60_and_above, 6: .std.resid
+##    coron~1 cough fever sore_~2 short~3 head_~4 age_6~5 gender .fitted .resid .std.~6    .hat .sigma
+##    &lt;fct&gt;   &lt;fct&gt; &lt;fct&gt; &lt;fct&gt;   &lt;fct&gt;   &lt;fct&gt;   &lt;fct&gt;   &lt;fct&gt;    &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;
+##  1 negati~ 1     0     0       0       0       No      male    0.0709 -0.383  -0.383 8.63e-5  0.621
+##  2 negati~ 1     1     0       0       0       No      male    0.342  -0.916  -0.916 1.99e-4  0.621
+##  3 negati~ 0     1     0       0       0       Yes     male    0.287  -0.822  -0.823 4.50e-4  0.621
+##  4 positi~ 1     1     0       0       0       Yes     male    0.437   1.29    1.29  4.03e-4  0.621
+##  5 negati~ 1     0     0       0       0       Yes     female  0.0770 -0.400  -0.400 1.55e-4  0.621
+##  6 positi~ 1     1     0       0       0       Yes     male    0.437   1.29    1.29  4.03e-4  0.621
+##  7 negati~ 0     0     0       0       0       No      male    0.0381 -0.279  -0.279 1.84e-5  0.621
+##  8 negati~ 1     1     1       0       1       No      female  1.00   -4.19   -4.19  5.26e-6  0.621
+##  9 negati~ 1     0     1       0       0       No      female  0.817  -1.84   -1.85  2.18e-3  0.621
+## 10 negati~ 1     1     1       1       0       No      female  1.00   -3.91   -3.91  1.65e-5  0.621
+## # ... with 107,532 more rows, 1 more variable: .cooksd &lt;dbl&gt;, and abbreviated variable names
+## #   1: corona_result, 2: sore_throat, 3: shortness_of_breath, 4: head_ache, 5: age_60_and_above,
+## #   6: .std.resid
 ```
 
 ---
@@ -653,7 +653,7 @@ covid_pred
 ---
 # Sensitivity-Specificity Trade-off
 
-As we have observed, classifying everyone as "negative" `\((p^* = 1)\)` fails to achieve specificity, meaning it fails to correctly identify any positive results, which is what we truly care about!
+As we have observed, classifying everyone as "negative" `\((p^* = 0)\)` fails to achieve specificity, meaning it fails to correctly identify any positive results, which is what we truly care about!
 
 __Sensitivity:__ the fraction of positive examples that are correctly classified as positive ("true positive rate"). In this example, it is `\(98,586/98,586 = 100\%\)`.
 
@@ -959,16 +959,15 @@ head(fgl_interact)
 
 ```
 ## # A tibble: 6 x 18
-##       RI    Na    Mg    Al    Si     K    Ca    Ba    Fe type  RI_x_Na RI_x_Mg RI_x_Al
-##    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;fct&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
-## 1  3.01   13.6  4.49  1.1   71.8  0.06  8.75     0  0    WinF    41.1    13.5    3.31 
-## 2 -0.390  13.9  3.6   1.36  72.7  0.48  7.83     0  0    WinF    -5.42   -1.40  -0.530
-## 3 -1.82   13.5  3.55  1.54  73.0  0.39  7.78     0  0    WinF   -24.6    -6.46  -2.80 
-## 4 -0.340  13.2  3.69  1.29  72.6  0.57  8.22     0  0    WinF    -4.49   -1.25  -0.439
-## 5 -0.580  13.3  3.62  1.24  73.1  0.55  8.07     0  0    WinF    -7.70   -2.10  -0.719
-## 6 -2.04   12.8  3.61  1.62  73.0  0.64  8.07     0  0.26 WinF   -26.1    -7.36  -3.30 
-## # ... with 5 more variables: RI_x_Si &lt;dbl&gt;, RI_x_K &lt;dbl&gt;, RI_x_Ca &lt;dbl&gt;,
-## #   RI_x_Ba &lt;dbl&gt;, RI_x_Fe &lt;dbl&gt;
+##       RI    Na    Mg    Al    Si     K    Ca    Ba    Fe type  RI_x_Na RI_x_Mg RI_x_Al RI_x_Si
+##    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;fct&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+## 1  3.01   13.6  4.49  1.1   71.8  0.06  8.75     0  0    WinF    41.1    13.5    3.31    216. 
+## 2 -0.390  13.9  3.6   1.36  72.7  0.48  7.83     0  0    WinF    -5.42   -1.40  -0.530   -28.4
+## 3 -1.82   13.5  3.55  1.54  73.0  0.39  7.78     0  0    WinF   -24.6    -6.46  -2.80   -133. 
+## 4 -0.340  13.2  3.69  1.29  72.6  0.57  8.22     0  0    WinF    -4.49   -1.25  -0.439   -24.7
+## 5 -0.580  13.3  3.62  1.24  73.1  0.55  8.07     0  0    WinF    -7.70   -2.10  -0.719   -42.4
+## 6 -2.04   12.8  3.61  1.62  73.0  0.64  8.07     0  0.26 WinF   -26.1    -7.36  -3.30   -149. 
+## # ... with 4 more variables: RI_x_K &lt;dbl&gt;, RI_x_Ca &lt;dbl&gt;, RI_x_Ba &lt;dbl&gt;, RI_x_Fe &lt;dbl&gt;
 ```
 
 ---

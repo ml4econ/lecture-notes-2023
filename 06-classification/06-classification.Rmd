@@ -558,7 +558,7 @@ covid_pred
 ---
 # Sensitivity-Specificity Trade-off
 
-As we have observed, classifying everyone as "negative" $(p^* = 1)$ fails to achieve specificity, meaning it fails to correctly identify any positive results, which is what we truly care about!
+As we have observed, classifying everyone as "negative" $(p^* = 0)$ fails to achieve specificity, meaning it fails to correctly identify any positive results, which is what we truly care about!
 
 __Sensitivity:__ the fraction of positive examples that are correctly classified as positive ("true positive rate"). In this example, it is $98,586/98,586 = 100\%$.
 
