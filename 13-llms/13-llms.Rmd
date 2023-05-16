@@ -359,7 +359,7 @@ knitr::include_graphics("figs/scores.jpg")
 .pull-right[
 ```{r echo=FALSE, out.width = "100%", fig.align='center'}
 
-knitr::include_graphics("figs/bing.png")
+knitr::include_graphics("figs/bing.PNG")
 
 ```
 ]
@@ -631,7 +631,7 @@ For more inspiration, check out the [35 Ways Real People Are Using A.I. Right No
 .pull-right[
 ```{r echo=FALSE, out.width = "60%", fig.align='center'}
 
-knitr::include_graphics("figs/ny35.png")
+knitr::include_graphics("figs/ny35.PNG")
 
 ```
 ]
