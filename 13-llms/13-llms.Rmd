@@ -1,8 +1,8 @@
 ---
-title: "13 - Using Large Language Models"
-subtitle: "ml4econ, HUJI 2023"
-author: "Itamar Caspi"
-date: "March 19, 2023 (updated: `r Sys.Date()`)"
+title: "An Overview of Large Language Models"
+subtitle: ""
+author: "Itamar Caspi (Bank of Israel)"
+date: "May 16, 2023 (updated: `r Sys.Date()`)"
 output:
   xaringan::moon_reader:
     css: [default, "style/middlebury.css", "style/middlebury-fonts.css"]
@@ -17,7 +17,6 @@ output:
           <div class="progress-bar" style="width: calc(%current% / %total% * 100%);">
           </div>
         </div>
-      
 ---
 
 ```{r setup, include=FALSE}
@@ -51,8 +50,6 @@ bib <- ReadBib("refs/refs.bib", check = FALSE)
 ```
 
 
----
-class: title-slide-section-gray
 
 # Outline
 
@@ -73,6 +70,22 @@ class: title-slide-section-blue, center, middle
 name: llms
 
 # What are LLMs?
+
+
+---
+class: center, middle
+name: 
+
+# "_It's Just adding one word at a time_"
+## [Stephen Wolfram (Feb, 2023)](https://writings.stephenwolfram.com/2023/02/what-is-chatgpt-doing-and-why-does-it-work/)
+
+```{r echo=FALSE, out.width = "30%", fig.align='center'}
+
+knitr::include_graphics("figs/add.png")
+
+```
+Source: Midjourney (V5.1). 
+Prompt: `It's just adding one word at a time.`
 
 
 ---
@@ -108,7 +121,7 @@ knitr::include_graphics("figs/tree.jpg")
 knitr::include_graphics("figs/books.jpg")
 
 ```
-_Source_: Bing image generator ("a huge pile of book")
+_Source_: Bing image generator ("a huge pile of books")
 ]
 
 ---
@@ -116,7 +129,7 @@ _Source_: Bing image generator ("a huge pile of book")
 
 .pull-left[
 - **LLMs:** Transform language queries into numerical representations.
-- **Text Segmentation:** Breaks down text into chunks called tokens.
+- **Tokenization:** Breaks down text into chunks called tokens.
 - **Tokens:** Include words, affixes, and punctuation.
 - **Meaning Space:** Area where tokens with similar meanings cluster together.
 ]
@@ -210,6 +223,7 @@ Source: [The Economist.](https://www.economist.com/interactive/science-and-techn
 knitr::include_graphics("figs/rlhf.png")
 
 ```
+_Source_: [OpenAI: Introducing ChatGPT](https://openai.com/blog/chatgpt)
 ]
 
 ---
@@ -358,7 +372,7 @@ name: prompting
 
 
 ---
-# Understanding Your Model Parameters
+# Perquisite: Understanding Model Parameters
 
 .pull-left[
 * **Temperature**: Controls the randomness in text generation.
@@ -481,6 +495,36 @@ Source: [ChatGPT Prompt Engineering for Developers](https://learn.deeplearning.a
 - Encourage the model to think and generate its own solution before rushing to a conclusion.
 
 
+---
+# Principle #3: Prompting is an Iterative Process 
+
+```{r echo=FALSE, out.width = "40%", fig.align='center'}
+
+knitr::include_graphics("figs/iterative.PNG")
+
+```
+
+
+Source: [ChatGPT Prompt Engineering for Developers](https://learn.deeplearning.ai/chatgpt-prompt-eng/lesson/3/iterative)
+
+---
+# Principle #4: Reduce Hallucinations by by Thorough Preparation
+
+1. Initially, search for relevant information.
+2. Subsequently, formulate the answer based on this information.
+
+Example prompt:
+
+```{r, eval=FALSE}
+`step 1: Revisit and thoroughly read the policy memo.`
+
+`step 2: Conduct research to find academic papers that are relevant to the subjects discussed in the memo.`
+
+`step 3: Update the memo by incorporating references to support the assertions made within it.`
+
+`step 4: Compile a bibliography of these references and add it to the memo.`
+```
+
 
 ---
 class: title-slide-section-blue, center, middle
@@ -520,24 +564,20 @@ knitr::include_graphics("figs/ft.png")
 ---
 # Proofread and Edit
 
-.pull-left[
 - ChatGPR have proofread and edited this presentation, which is written using the R [`Xaringan`](https://github.com/yihui/xaringan) package. 
 
 - I used the following prompt:
-]
-.pull-right[
-```{r echo=FALSE, out.width = "100%", fig.align='center'}
 
-knitr::include_graphics("figs/editingxar.png")
-
-```
-]
+`As an AI copy editor, your primary responsibility is to proofread a text enclosed by triple quotes and ensure it is clear and flows smoothly. Your task also includes avoiding passive voice, emphasizing essential concepts using boldface and italics, keeping sentences short and suitable for a presentation, and using bullets wherever possible. Additionally, you must verify that the title accurately conveys the text's message and, if necessary, change it to reflect the content. To deliver your output, you must present it in a Markdown code box, but you should ignore R code chunks and triple backticks at the beginning and end of R code chunks. Instead, you should add a backslash before the beginning and end of R code chunks. For instance, write \```{r} code \``` instead of ```{r} code ```. Once you have completed your proofreading task, request additional editing tasks if necessary.`
 
 ---
 # Draw Graphs (Using TikZ and LaTeX)
 
 .pull-left[
-Prompt: `"Draw an aggregate supply and demand graph using the TikZ package."`
+Prompt: 
+```{r eval=FALSE}
+Draw an ADAS graph using the TikZ package.
+```
 ]
 .pull-right[
 ```{r echo=FALSE, out.width = "90%", fig.align='center'}
@@ -564,10 +604,12 @@ ChatGPT can perform the following coding tasks:
 ---
 # Example: Translate from STATA to R
 
-Prompt: `Translate the following STATA code to R`
+```{r eval=FALSE} 
+Translate the following STATA code to R
+```
 
 
-```{r echo=FALSE, out.width = "70%", fig.align='center'}
+```{r echo=FALSE, out.width = "60%", fig.align='center'}
 
 knitr::include_graphics("figs/stata.png")
 
@@ -730,19 +772,45 @@ knitr::include_graphics("figs/genai.png")
 ```
 ]
 
+
+---
+# Summary
+
+- **LLMs**: Generate sentences by assembling words one at a time.
+
+- **GPT-4**: The leading-edge AI benchmark.
+- **Principles of Prompting**:
+    1. Provide explicit and precise instructions.
+    2. Allow the AI time to respond thoughtfully.
+    3. Strive for perfection through iterative refinement.
+    4. Ensure the AI conducts preliminary research.
+
+- **AI Applications**: Summarization, information extraction, idea generation, and more.
+
+- **Scope of AI**: AI encompasses more than just text generation.
+
+- **AI Impact**: Likely to revolutionize the world in the near future, with both positive and negative implications.
+
+
 ---
 class: center, middle
 name: isit
 
-# So, is it just adding one word at a time...?
+# Is it just adding one word at a time...?
+```{r echo=FALSE, out.width = "30%", fig.align='center'}
 
+knitr::include_graphics("figs/terminator.png")
+
+```
+Source: Midjourney (V5.1). 
+Prompt: `Arnold Schwarzenegger, portraying the iconic character of The Terminator, sits next to a laptop, wearing a smile and winking mischievously.`
 
 ---
 class: .title-slide-final, center, inverse, middle
 
 # `slides %>% end()`
 
-[<i class="fa fa-github"></i> Source code](https://github.com/ml4econ/lecture-notes-2023/blob/master/01-overview/01-overview.Rmd)  
+[<i class="fa fa-github"></i> Source code](https://github.com/ml4econ/lecture-notes-2023/blob/master/13-llms/13-llms.Rmd)  
 
 ---
 # References
