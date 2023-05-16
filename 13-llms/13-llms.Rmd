@@ -220,7 +220,7 @@ Source: [The Economist.](https://www.economist.com/interactive/science-and-techn
 .pull-right[
 ```{r echo=FALSE, out.width = "110%", fig.align='center'}
 
-knitr::include_graphics("figs/rlhf.png")
+knitr::include_graphics("figs/rlhf.PNG")
 
 ```
 _Source_: [OpenAI: Introducing ChatGPT](https://openai.com/blog/chatgpt)
