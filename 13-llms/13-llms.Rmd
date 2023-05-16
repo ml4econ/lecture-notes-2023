@@ -479,7 +479,7 @@ knitr::include_graphics("figs/scraping.jpg")
 .pull-right[
 ```{r echo=FALSE, out.width = "120%", fig.align='center'}
 
-knitr::include_graphics("figs/fewshot.PNG")
+knitr::include_graphics("figs/fewshot.png")
 
 ```
 Source: [ChatGPT Prompt Engineering for Developers](https://learn.deeplearning.ai/chatgpt-prompt-eng/lesson/2/guidelines)
@@ -500,7 +500,7 @@ Source: [ChatGPT Prompt Engineering for Developers](https://learn.deeplearning.a
 
 ```{r echo=FALSE, out.width = "40%", fig.align='center'}
 
-knitr::include_graphics("figs/iterative.PNG")
+knitr::include_graphics("figs/iterative.png")
 
 ```
 
@@ -545,7 +545,7 @@ name: assist
 .pull-right[
 ```{r echo=FALSE, out.width = "90%", fig.align='center'}
 
-knitr::include_graphics("figs/brainstorm.PNG")
+knitr::include_graphics("figs/brainstorm.png")
 
 ```
 ]
@@ -810,12 +810,4 @@ class: .title-slide-final, center, inverse, middle
 
 # `slides %>% end()`
 
-[<i class="fa fa-github"></i> Source code](https://github.com/ml4econ/lecture-notes-2023/blob/master/13-llms/13-llms.Rmd)  
-
----
-# References
-
-```{r, 'refs', results='asis', echo=FALSE, eval=TRUE}
-PrintBibliography(bib)
-```
-
+[<i class="fa fa-github"></i> Source code](https://github.com/ml4econ/lecture-notes-2023/blob/master/13-llms/13-llms.Rmd)
