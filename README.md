@@ -87,6 +87,9 @@ The following schedule is subject to change based on class interests and time co
   6.1[Classification: A Tidymodels workflow](https://raw.githack.com/ml4econ/lecture-notes-2023/master/06-classification/06-tidymodels-workflow-covid.html)
 
 
+13. LLMs [(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/13-llms/13-llms.html) [(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/13-llms/13-llms.pdf)  
+
+
 ### Part II: Causal Inference and ML
 
 TBA
