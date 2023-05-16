@@ -727,7 +727,7 @@ knitr::include_graphics("figs/solow.jpg")
 
 
 ---
-# Intriguing Topics Yet to Explore
+# Intriguing Topics Not Covered Today
 
 .pull-left[
 - **Computing Power**: The impact of powerful hardware on AI.
