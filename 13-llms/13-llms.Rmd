@@ -1,5 +1,5 @@
 ---
-title: "An Overview of Large Language Models"
+title: "Beyond Words: Exploring Large Language Models"
 subtitle: ""
 author: "Itamar Caspi (Bank of Israel)"
 date: "May 16, 2023 (updated: `r Sys.Date()`)"
@@ -98,7 +98,7 @@ knitr::include_graphics("figs/bibi-trump.png")
 ]
 
 
-
+---
 # Outline
 
 1. [What are LLMs?](#llms)
