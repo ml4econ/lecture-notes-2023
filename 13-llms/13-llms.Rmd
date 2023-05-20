@@ -83,6 +83,8 @@ knitr::include_graphics("figs/genai.png")
 - **AI Safety / Alignment**: Ensuring AI behavior aligns with human values.
 
 - **Misinformation**: The risks and mitigation of AI-generated false info.
+
+- **Ethics**: The ethical considerations surrounding AI, such as fairness, accountability, and privacy.
 ]
 
 .pull-right[

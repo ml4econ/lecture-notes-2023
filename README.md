@@ -85,6 +85,9 @@ The following schedule is subject to change based on class interests and time co
 6. Classification
 [(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/06-classification/06-classification.html) [(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/06-classification/06-classification.pdf)  
   6.1[Classification: A Tidymodels workflow](https://raw.githack.com/ml4econ/lecture-notes-2023/master/06-classification/06-tidymodels-workflow-covid.html)
+  
+7. Trees and Forests
+[(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/07-trees-forests/07-trees-forests.html) [(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/07-trees-forests/07-trees-forests.pdf)
 
 
 13. LLMs [(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/13-llms/13-llms.html) [(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/13-llms/13-llms.pdf)  
