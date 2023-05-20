@@ -1,6 +1,6 @@
 ---
 title: "07 - Trees and Forests"
-subtitle: "ml4econ, HUJI 2021"
+subtitle: "ml4econ, HUJI 2023"
 author: "Itamar Caspi"
 date: "May 21, 2023 (updated: `r Sys.Date()`)"
 output:

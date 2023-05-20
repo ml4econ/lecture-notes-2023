@@ -34,6 +34,8 @@ htmltools::tagList(rmarkdown::html_dependency_font_awesome())
 ```{r plots_and_figures, include=FALSE}
 library(tidyverse)
 library(openai)
+library(xaringan)
+library(xaringanExtra)
 
 theme_set(theme_gray(15))
 ```
@@ -112,7 +114,6 @@ knitr::include_graphics("figs/bibi-trump.png")
 4. [The AI Research Assistant](#assist)
 
 5. [Real World Impact](#ahead)
-
 
 
 ---
@@ -710,7 +711,7 @@ name: evidence
 
 
 ---
-# LLMs and Productivity Gains
+# LLMs and Productivity
 
 
 ```{r echo=FALSE, out.width = "100%", fig.align='center'}
@@ -719,6 +720,15 @@ knitr::include_graphics("figs/noy2023.png")
 
 ```
 
+
+---
+# LLMs and Inequality
+
+```{r echo=FALSE, out.width = "100%", fig.align='center'}
+
+knitr::include_graphics("figs/acemoglu.png")
+
+```
 
 ---
 # LLMs and Fedspeak
