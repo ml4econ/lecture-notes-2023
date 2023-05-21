@@ -2,7 +2,7 @@
 title: "Beyond Words: Exploring Large Language Models"
 subtitle: ""
 author: "Itamar Caspi (Bank of Israel)"
-date: "May 16, 2023 (updated: `r Sys.Date()`)"
+date: "May 22, 2023 (updated: `r Sys.Date()`)"
 output:
   xaringan::moon_reader:
     css: [default, "style/middlebury.css", "style/middlebury-fonts.css"]
@@ -711,26 +711,6 @@ name: evidence
 
 
 ---
-# LLMs and Productivity
-
-
-```{r echo=FALSE, out.width = "100%", fig.align='center'}
-
-knitr::include_graphics("figs/noy2023.png")
-
-```
-
-
----
-# LLMs and Inequality
-
-```{r echo=FALSE, out.width = "100%", fig.align='center'}
-
-knitr::include_graphics("figs/acemoglu.png")
-
-```
-
----
 # LLMs and Fedspeak
 
 ```{r echo=FALSE, out.width = "100%", fig.align='center'}
@@ -766,13 +746,32 @@ knitr::include_graphics("figs/bydee2023.png")
 knitr::include_graphics("figs/edu.png")
 
 ```
-
-
 _Source_: [https://www.khanacademy.org/khan-labs](https://www.khanacademy.org/khan-labs)
 
 
 ---
-# One Caveat Though...
+# LLMs and Productivity
+
+```{r echo=FALSE, out.width = "100%", fig.align='center'}
+
+knitr::include_graphics("figs/noy2023.png")
+
+```
+
+
+---
+# LLMs and Inequality
+
+```{r echo=FALSE, out.width = "70%", fig.align='center'}
+
+knitr::include_graphics("figs/acemoglu.png")
+
+```
+Source: [https://twitter.com/DAcemogluMIT/status/1659593945318342656?s=20](https://twitter.com/DAcemogluMIT/status/1659593945318342656?s=20)
+
+
+---
+# Can We Measure the Benefits or Costs?
 
 .pull-left[
 <midd-blockquote> _"[T]he computer age was everywhere except for the productivity statistics."_ .right[—Robert Solow (1987)] </midd-blockquote>
@@ -784,9 +783,6 @@ knitr::include_graphics("figs/solow.jpg")
 
 ```
 ]
-
-
-
 
 
 ---
