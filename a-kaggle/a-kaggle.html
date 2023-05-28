@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Midterm Assignment</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Itamar Caspi" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/all.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/v4-shims.css" rel="stylesheet" />
+    <link rel="stylesheet" href="style/middlebury.css" type="text/css" />
+    <link rel="stylesheet" href="style/middlebury-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Midterm Assignment
+]
+.subtitle[
+## Kaggle Prediction Competition
+]
+.author[
+### Itamar Caspi
+]
+.date[
+### May 28, 2023 (updated: 2023-05-27)
+]
+
+---
+
+
+
+# Kaggle: A Global Hub for Data Science Competitions
+
+.pull-left[
+- **Kaggle** is a *vibrant data science community* where machine learning practitioners worldwide compete.
+
+- Public companies and private users alike upload the datasets used in Kaggle competitions.
+
+- A "kaggler" clinches victory by developing the most *accurate* algorithm for a specific dataset.
+
+- Kaggle competitions serve as *platforms* for practicing ML skills and keeping abreast of state-of-the-art ML methods.
+]
+
+
+.pull-right[
+
+
+&lt;img src="figs/titanic.jpg" width="50%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+# Getting Started with Kaggle
+
+.pull-left[
+1. **Step One:** Visit [www.kaggle.com](www.kaggle.com) and sign-up.
+
+2. **Step Two:** Navigate to the ml4econ course competition [webpage](https://www.kaggle.com/t/7d925d886da049b88e99e4d2eb3a9add).
+
+3. **Step Three:** Thoroughly review the competition details including objectives, deadlines, data, evaluation criteria, submission rules, and so on.
+]
+
+.pull-right[
+&lt;img src="figs/ml4econ-kaggle.png" width="1265" style="display: block; margin: auto;" /&gt;
+]
+
+
+---
+# Understanding the Kaggle Competition Data Structure
+
+.pull-left[
+- *Immediate Feedback:* The Mean Squared Error (MSE) for the public test set (30%) is available immediately upon submission.
+- *Delayed Feedback:* The MSE for the private test set (70%) is disclosed only after the competition closes.
+- *Unpredictable Split:* The division between the public and private test sets is arbitrary and undisclosed to competitors in advance.
+
+Remember, your *final ranking* hinges on your performance on the *private* test set.
+]
+
+.pull-right[
+&lt;img src="figs/mse.png" width="865" style="display: block; margin: auto;" /&gt;
+]
+
+
+---
+# Mastering the Basic Kaggle Competition Workflow
+
+1. **Acquire Domain Knowledge:** Build understanding around the problem domain.
+
+2. **Explore the Data:** Perform an initial data analysis.
+
+3. **Preprocessing:** Employ techniques such as standardization, creating dummy variables, determining interactions, etc.
+
+4. **Choose a Model Class:** Decide on a model class, like Lasso, Ridge, Trees, and so forth.
+
+5. **Tune Complexity:** Use cross-validation for optimizing model parameters.
+
+6. **Submit Your Prediction:** Forward your model's prediction for evaluation.
+
+7. **Document Your Workflow:** Keep a well-structured record of your process using *R Markdown*.
+
+
+
+---
+# Monitoring Your Performance
+
+.pull-left[
+- Leverage the public leaderboard to *track your performance*.  
+
+- Your interim ranking (reflected in the "scores" column) is determined by your MSE on the public test set.  
+
+- After the competition closes, the final ranking will hinge on the MSE on the private test set.  
+
+- While you may submit multiple predictions, exercise caution to avoid overfitting the public test set!
+]
+
+.pull-right[
+&lt;img src="figs/tracking.png" width="1085" style="display: block; margin: auto;" /&gt;
+]
+
+
+---
+# Kickstarting Your Kaggle Journey
+
+Executing this code chunk will automatically download the essential data for our Kaggle competition. This includes train data, test data, and a sample submission file.
+
+
+
+```r
+library(tidyverse)
+
+train &lt;- read.csv("https://raw.githubusercontent.com/ml4econ/lecture-notes-2023/master/a-kaggle/data/train.csv")
+
+test &lt;- read.csv("https://raw.githubusercontent.com/ml4econ/lecture-notes-2023/master/a-kaggle/data/test.csv")
+
+sample_submission &lt;- read.csv("https://raw.githubusercontent.com/ml4econ/lecture-notes-2023/master/a-kaggle/data/sample_submission.csv")
+```
+
+__NOTE:__ By default, a new project will be created on your desktop.
+
+---
+class: .title-slide-final, center, inverse, middle
+
+# `slides %&gt;% end()`
+
+[&lt;i class="fa fa-github"&gt;&lt;/i&gt; Source code](https://raw.githack.com/ml4econ/notes-spring2021/master/a-kaggle/a-kaggle.html)  
+
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"slideNumberFormat": "<div class=\"progress-bar-container\">\n  <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">\n  </div>\n</div>\n"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

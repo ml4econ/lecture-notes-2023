@@ -523,19 +523,14 @@ knitr::include_graphics("figs/scraping.jpg")
 
 ---
 # Few-shot Learning
+Few-shot learning is a machine learning approach that aims to train models to perform well on new tasks with only a limited amount of labeled data.
 
-.pull-left[
-- Few-shot learning is a machine learning approach that aims to train models to perform well on new tasks with only a limited amount of labeled data.
-]
-.pull-right[
-```{r echo=FALSE, out.width = "120%", fig.align='center'}
 
-knitr::include_graphics("figs/fewshot.png")
+```{r echo=FALSE, out.width = "70%", fig.align='center'}
+
+knitr::include_graphics("figs/fewshot_term.png")
 
 ```
-Source: [ChatGPT Prompt Engineering for Developers](https://learn.deeplearning.ai/chatgpt-prompt-eng/lesson/2/guidelines)
-]
-
 
 
 ---
@@ -758,7 +753,6 @@ knitr::include_graphics("figs/noy2023.png")
 
 ```
 
-
 ---
 # LLMs and Inequality
 
@@ -768,6 +762,16 @@ knitr::include_graphics("figs/acemoglu.png")
 
 ```
 Source: [https://twitter.com/DAcemogluMIT/status/1659593945318342656?s=20](https://twitter.com/DAcemogluMIT/status/1659593945318342656?s=20)
+
+
+---
+# AI Opertunity Space
+
+```{r echo=FALSE, out.width = "80%", fig.align='center'}
+
+knitr::include_graphics("figs/ai_space.png")
+
+```
 
 
 ---

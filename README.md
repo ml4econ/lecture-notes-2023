@@ -89,17 +89,14 @@ The following schedule is subject to change based on class interests and time co
 7. Trees and Forests
 [(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/07-trees-forests/07-trees-forests.html) [(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/07-trees-forests/07-trees-forests.pdf)
 
-
-13. Large Language Models (LLMs) [(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/13-llms/13-llms.html) [(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/13-llms/13-llms.pdf)  
-
-
 ### Part II: Causal Inference and ML
 
-TBA
+8. Causal Inference
+[(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/08-causal-inference/08-causal-inference.html) [(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/08-causal-inference/08-causal-inference.pdf)
 
-### Part III: Unsupervised Learning
+### Part III: Language Models
 
-TBA
+13. Large Language Models (LLMs) [(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/13-llms/13-llms.html) [(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/13-llms/13-llms.pdf)  
 
 ### Part IV: Miscellaneous
 
@@ -107,7 +104,8 @@ TBA
 
 ### Projects
 
-TBA
+A. Kaggle competition [(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/a-kaggle/a-kaggle.html)
+[(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/a-kaggle/a-kaggle.pdf)
 
 ## Readings
 
