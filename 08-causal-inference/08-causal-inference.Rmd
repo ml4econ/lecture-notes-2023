@@ -119,7 +119,7 @@ __Source__: The Book of Why (Pearl and Mackenzie)
 
 - To put it briefly, identification refers to:
 
-_"Model parameters or features being uniquely determined from the observable population that generates the data."_ - (Lewbel, 2019)
+>_"Model parameters or features being uniquely determined from the observable population that generates the data."_ - (Lewbel, 2019)
 
 - To be more specific, consider identifying the parameter of interest when you have access to unlimited data (the entire population).
 
@@ -393,7 +393,7 @@ fit %>%
   kable(digits = 4, format = "html")
 ```
 
-**Interpretation:** Being selected in the lottery increases the probability of visiting a primary care physician in the following year by 5.72 [4.47, 7.97] percentage points.
+**Interpretation:** Being selected in the lottery increases the probability of visiting a primary care physician in the following year by 5.72 [4.47, 6.79] percentage points.
 
 
 
@@ -417,7 +417,9 @@ ohie %>%
 # ATE Under Adjustment for `numhh`
 
 The model with adjustment:
+
 $$doc\_any\_12m_i = \alpha + \tau\times selected_i + \beta\times numhh_i+ \varepsilon_i$$
+
 Estimation:
 ```{r}
 fit_adj <- lm(doc_any_12m ~ treatment + numhh_list, data = ohie)

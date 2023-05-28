@@ -25,7 +25,7 @@ class: center, middle, inverse, title-slide
 ### Itamar Caspi
 ]
 .date[
-### May 28, 2023 (updated: 2023-05-27)
+### May 28, 2023 (updated: 2023-05-28)
 ]
 
 ---
@@ -114,7 +114,7 @@ __Source__: The Book of Why (Pearl and Mackenzie)
 
 - To put it briefly, identification refers to:
 
-_"Model parameters or features being uniquely determined from the observable population that generates the data."_ - (Lewbel, 2019)
+&gt;_"Model parameters or features being uniquely determined from the observable population that generates the data."_ - (Lewbel, 2019)
 
 - To be more specific, consider identifying the parameter of interest when you have access to unlimited data (the entire population).
 
@@ -447,7 +447,7 @@ fit %&gt;%
 &lt;/tbody&gt;
 &lt;/table&gt;
 
-**Interpretation:** Being selected in the lottery increases the probability of visiting a primary care physician in the following year by 5.72 [4.47, 7.97] percentage points.
+**Interpretation:** Being selected in the lottery increases the probability of visiting a primary care physician in the following year by 5.72 [4.47, 6.79] percentage points.
 
 
 
@@ -514,7 +514,9 @@ ohie %&gt;%
 # ATE Under Adjustment for `numhh`
 
 The model with adjustment:
+
 `$$doc\_any\_12m_i = \alpha + \tau\times selected_i + \beta\times numhh_i+ \varepsilon_i$$`
+
 Estimation:
 
 ```r
@@ -587,7 +589,7 @@ name: pot
 [Source](https://i.imgflip.com/1xhtwh.jpg)
 
 ---
-# Understanding DAGs (Directed Acyclic Graphs)
+# Understanding DAGs
 
 .pull-left[
 A DAG (Directed Acyclic Graph) is a graphical representation used to model a system of causal interactions.
@@ -603,7 +605,7 @@ A DAG (Directed Acyclic Graph) is a graphical representation used to model a sys
 ]
 
 ---
-# Confounder DAG (Directed Acyclic Graph)
+# Confounder DAG
 
 .pull-left[
 - `\(X\)` acts as a common cause of both `\(D\)` and `\(Y\)`.
@@ -759,7 +761,7 @@ Note that the "true" effect `\(D\rightarrow Y\)` is zero (i.e., `\(ATE=0\)`).
 ]
 
 ---
-# Simulation I: De-counfounding (cont.)
+# Simulation I: De-counfounding (Cont.)
 
 .pull-left[
 Raw correlation matrix:
