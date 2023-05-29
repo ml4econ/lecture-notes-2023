@@ -58,7 +58,7 @@ knitr::include_graphics("figs/titanic.jpg")
 .pull-left[
 1. **Step One:** Visit [www.kaggle.com](www.kaggle.com) and sign-up.
 
-2. **Step Two:** Navigate to the ml4econ course competition [webpage](https://www.kaggle.com/t/7d925d886da049b88e99e4d2eb3a9add).
+2. **Step Two:** Navigate to the ml4econ course competition (link on Moodle)
 
 3. **Step Three:** Thoroughly review the competition details including objectives, deadlines, data, evaluation criteria, submission rules, and so on.
 ]
