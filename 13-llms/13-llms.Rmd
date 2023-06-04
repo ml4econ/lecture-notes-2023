@@ -1,8 +1,8 @@
 ---
-title: "Beyond Words: Exploring Large Language Models"
-subtitle: ""
+title: "13 - Exploring Large Language Models"
+subtitle: "ml4econ, HUJI 2023"
 author: "Itamar Caspi (Bank of Israel)"
-date: "May 22, 2023 (updated: `r Sys.Date()`)"
+date: "June 4, 2023 (updated: `r Sys.Date()`)"
 output:
   xaringan::moon_reader:
     css: [default, "style/middlebury.css", "style/middlebury-fonts.css"]
@@ -767,7 +767,7 @@ Source: [https://twitter.com/DAcemogluMIT/status/1659593945318342656?s=20](https
 ---
 # AI Opertunity Space
 
-```{r echo=FALSE, out.width = "80%", fig.align='center'}
+```{r echo=FALSE, out.width = "70%", fig.align='center'}
 
 knitr::include_graphics("figs/ai_space.png")
 
@@ -812,7 +812,7 @@ knitr::include_graphics("figs/solow.jpg")
 class: center, middle
 name: isit
 
-# Is it just adding one word at a time...?
+# So,is it really just adding one word at a time...?
 ```{r echo=FALSE, out.width = "30%", fig.align='center'}
 
 knitr::include_graphics("figs/terminator.png")
