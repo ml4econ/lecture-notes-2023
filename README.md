@@ -94,6 +94,8 @@ The following schedule is subject to change based on class interests and time co
 8. Causal Inference
 [(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/08-causal-inference/08-causal-inference.html) [(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/08-causal-inference/08-causal-inference.pdf)
 
+9. [High-Dimensional Confounding Adjustment](https://raw.githack.com/ml4econ/lecture-notes-2023/master/09-lasso-ate/09-lasso-ate.html) [(PDF)](https://github.com/ml4econ/lecture-notes-2023/blob/master/09-lasso-ate/09-lasso-ate.pdf)
+
 ### Part III: Language Models
 
 13. Large Language Models (LLMs) [(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/13-llms/13-llms.html) [(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/13-llms/13-llms.pdf)  
