@@ -1,0 +1,845 @@
+---
+title: "10 - High-Dimensional Heterogeneous Effects"
+subtitle: "ml4econ, HUJI 2023"
+author: "Itamar Caspi"
+date: "June 11, 2023 (updated: `r Sys.Date()`)"
+output:
+  xaringan::moon_reader:
+    css: [default, "style/middlebury.css", "style/middlebury-fonts.css"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+      beforeInit: "https://platform.twitter.com/widgets.js"
+      slideNumberFormat: |
+        <div class="progress-bar-container">
+          <div class="progress-bar" style="width: calc(%current% / %total% * 100%);">
+          </div>
+        </div>
+      
+---
+
+# Replicating this presentation
+
+Use the [pacman](https://cran.r-project.org/web/packages/pacman/vignettes/Introduction_to_pacman.html) package to install and load packages:
+
+```{r packages, message=FALSE, warning=FALSE}
+
+if (!require("pacman"))
+  install.packages("pacman")
+
+pacman::p_load(
+  tidyverse,
+  tidymodels,
+  causalTree,
+  experimentdatar,
+  rpart.plot,
+  broom,
+  knitr,
+  xaringan
+)
+```
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+
+knitr::opts_chunk$set(
+  eval = TRUE,
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  cache = FALSE
+)
+
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+```
+
+```{r plots_and_figures, include=FALSE}
+ggplot2::theme_set(theme_light(15))
+```
+
+---
+
+# Outline
+
+- [Heterogenous Treatment Effects (HTE)](#cate)
+
+- [Challenges in Estimating HTE](#challenges)
+
+- [Introducing Causal Trees (and Forests)](#trees)
+
+- [Empirical Illustration](#causalTree)
+
+
+---
+class: title-slide-section-blue, center, middle
+name: projects
+
+# Heterogeneous Treatment Effects
+
+
+---
+# Treatment and potential outcomes (Rubin, 1974, 1977)
+
+- Treatment
+
+$$D_i=\begin{cases}
+    1, & \text{if unit } i \text{ received the treatment} \\
+    0, & \text{otherwise.}
+\end{cases}$$
+
+- Potential outcomes
+
+$$\begin{matrix}
+    Y_{i0} & \text{is the potential outcome for unit } i \text{ with } D_i = 0\\
+    Y_{i1} & \text{is the potential outcome for unit } i \text{ with }D_i = 1
+\end{matrix}$$
+
+
+- Observed outcome: Under the Stable Unit Treatment Value Assumption (SUTVA), The realization of unit $i$'s outcome is
+
+$$Y_i = Y_{1i}D_i + Y_{0i}(1-D_i)$$
+
+- Individual treatment effect: The difference between unit $i$'s potential outcomes:
+
+$$\tau_i = Y_{1i} - Y_{0i}$$
+
+
+__Fundamental problem of causal inference__ (Holland, 1986): We cannot observe _both_ $Y_{1i}$ and $Y_{0i}$, and thus $\tau_i$.
+
+
+---
+
+# Random treatment assignment
+
+Throughout this lecture, we assume that the treatments are randomly assigned. This means entails that $D_i$ is _independent_ of potential outcomes, namely
+
+$$\{Y_{1i}, Y_{0i}\}  \perp D_i$$
+
+Recall that randomized control trials (RCTs) enables us to estimate ATE using the average difference in outcomes by treatment status:
+
+$$\begin{aligned} \text{ATE} = \mathbb{E}\left[Y_{i} | D_{i}=1\right]-\mathbb{E}\left[Y_{i} | D_{i}=0\right]
+\end{aligned}$$
+
+and its sample counterpart
+
+$$\widehat{\tau}=\frac{1}{n_T}\sum_{i\in Treatment} Y_i - \frac{1}{n_C}\sum_{i\in Control} Y_i$$
+
+i.e., the difference in average outcomes of the treatment and control groups is an unbiased estimate  
+
+
+
+---
+
+# Why should we we care about treatment effect heterogeneity?
+
+- Typically there is reason to believe that a treatment might affect different individuals in different ways, e.g.,
+
+  - Young subjects might respond better to a medicine
+  - Short-term unemployed might respond better to job-raining programs
+
+
+- In turn, better knowledge about treatment effect heterogeneity enables better treatment allocation:
+  - Targeting treatment for those most likely to benefit from it.
+  
+
+
+---
+
+# Defining treatment effect heterogeneity
+
+Recall the definition of ATE
+
+$$\tau= \mathbb{E}[Y_{i1}-Y_{i0}]$$
+
+Conditional treatment effect (CATE) is defined as
+
+$$\tau(x) = \mathbb{E}[Y_{i1}-Y_{i0} | X_i = x]$$
+where $x$ is some specific value of $X_i$ or some range of values (a subspace of the feature space).
+
+---
+class: title-slide-section-blue, center, middle
+name: challenge
+
+# Challenges in Estimating HTE
+
+---
+
+# "Moving the goalpost"
+
+What we are really interested in are "personalized" treatment effects.
+
+Conditional average treatment effects (CATE) can be viewed as a compromise between ATE and personalized treatment effects.
+
+CATEs are ATEs for specific subgroup of individuals, where subgroups are classified based on the $X_i$'s. Formally,
+
+
+$$\text{CATE} = \tau(x) = \mathbb{E}[Y_{1i}-Y_{0i}|X_i = x, x\in \mathbb{X}]$$
+
+were now, $x$ is some partition of the features space $\mathbb{X}$.
+
+For example, $x$ might represent the subgroup of individuals below 18 years old who weight more than 75 kg. 
+
+
+---
+
+# Aside: Bias-variance trad-off in heterogeneous treatment effects
+
+
+- Again, ideally, we would like to know "personalized" treatment effects, i.e., the effect of treatment on an individual with $X_i=x$. 
+
+- Roughly speaking, the more personalized we get, the less biased is our estimate
+
+$$Bias(\widehat\tau)>Bias(\widehat\tau(x))>Bias(\widehat\tau_i)$$
+
+
+- However, the more personalized we get, the more noisy is our estimate
+
+$$Var(\widehat\tau)<Var(\widehat\tau(x))<Var(\widehat\tau_i)$$
+
+
+---
+
+# Estimating CATE using linear regression
+
+
+The most common approach: Estimate the _best linear projection_ (BLP) for $\mu = \mathbb{E}[Y_i|X_i=x]$ while including interaction terms between the treatment and the set of features.
+
+For example, for a binary treatment $D_i$ and a single feature $X_i$, estimate the following regression by OLS:
+
+$$Y_i = \alpha + \tau D_i + \beta{X}_i + \gamma D_iX_i + u_i,$$
+
+The coefficient $\gamma$ is the interaction effect and is interpreted as the difference between ATE and the effect of $D_i$ among individuals with $X_i=x$.
+
+__REMARK:__ The parameter $\gamma$ has a causal interpretation only when $X_i$ is randomly assigned.
+
+
+---
+# Potential problems with the BLP approach
+
+
+1. The above solution is infeasible when the number of attributes and interaction terms is large with respect to the number of observations.
+
+2. Lasso can be used when $k\gg n$, but can suffer from omitted variable bias (e.g., Lasso might drop some of the main effects).
+
+3. Bookkeeping.
+
+
+
+
+---
+class: title-slide-section-blue, center, middle
+name: trees
+
+# Introducing Causal Trees (and Forests)
+
+
+---
+
+# Notation: Data
+
+.pull-left[
+Data
+- $Y_i$ observed outcome for individual $i$.
+- $X_i$ individual $i$ attributes vector.
+- $D_i$ binary treatment indicator $\{0,1\}$.
+
+Sample
+- $\mathcal{S}$ the sample
+- $\mathcal{S}^{tr}$ training sample
+- $\mathcal{S}^{te}$ test sample
+- $\mathcal{S}^{est}$ estimation sample
+- $\mathcal{S}_{treat}$ treatment group
+- $\mathcal{S}_{control}$ control group
+]
+
+.pull-right[
+
+Observations
+- $N$ - total number of observations
+- $N^{tr}$ - size of the training sample
+- $N^{te}$ - size of the the test sample
+- $N^{est}$ - size of the the estimation sample
+
+]
+
+---
+
+# Notation: Trees and CATE
+
+.pull-left[
+
+Tree
+- $\mathbb{X}$ - attributes space
+- $\Pi$ - a partitioned tree
+- ${\#(\Pi)}$ - number of partitions 
+- $\ell_j$ - a leaf of $\Pi$ such that $\cup_{j=1}^{\#(\Pi)} \ell_{j}=\mathbb{X}$ 
+- $\ell(x;\Pi)$ a leaf such that $x\in\ell$
+]
+
+.pull-right[
+Treatment
+- $\tau(\ell_j)$ - treatment effect in leaf $\ell_j$
+- $p$ - marginal treatment probability, $P(D_i = 1)$.
+]
+
+
+
+---
+
+# What if we could observe $\tau_i$?
+
+Say that we have data on $\tau_i$ and $X_i$ for $i=1,\dots,N$.
+
+Our task is to provide an out-of-sample prediction of $\tau_i$ for an individual with $X_i$ equals to some $x$.
+
+A naive approach would be to fit a regression tree to the data, where splits are based on in-sample fit
+
+$$\frac{1}{N}\sum_{i=1}^N(\tau_i-\widehat\tau(X_i|\mathcal{S}^{tr},\Pi))^2$$
+
+and regularization (pruning) based on cross validation.
+
+---
+
+# Causal tree (Athey and Imbens, PNAS 2016)
+
+
+__GOAL:__ Estimate heterogeneous treatment effects (CATE) $\tau(x)$.
+
+__THE BASIC IDEA:__ use a regression tree to form a partition of the attributes space $\mathbb{X}$.
+
+__CHALLENGES:__ 
+  1. Conventional trees split leaves based on $Y_i$. We are interested in $\tau_i$, which is unobserved.
+  2. What is the regularization criteria?
+  3. How to form confidence intervals?
+
+__SOLUTIONS:__
+
+  1. Split tree based the heterogeneity and accuracy of $\tau(x)$.
+  2. Regularize based on treatment effect heterogeneity and accuracy within leaves.
+  3. Use sample splitting: Build tree on one sample and estimate CATE on a different and independent sample.
+  
+  
+
+---
+
+# The naive approach
+
+Use of-the-shelf CART to
+
+1. Estimate two trees to predict outcomes $Y_i$, one for each subsample of treated and control.
+
+2. Estimate a single tree for $Y_i$, and focus on splits in $D_i$. 
+
+__PROBLEM:__ The above naive approaches (tree construction and cross-validation) are optimized for outcome heterogeneity and not treatment heterogeneity. Implicitly relies on the assumption that treatment is highly correlated with the $X_i$'s.
+
+
+---
+
+# Approach #1: Transformed outcome trees (TOT)
+
+
+Suppose we have an RCT with probability of receiving the treatment = 50%. Define
+
+$$Y_{i}^{*}=\left\{\begin{array}{cl}{2 Y_{i}} & {\text { if } D_{i}=1}, \\ {-2 Y_{i}} & {\text { if } D_{i}=0}.\end{array}\right.$$
+Then, $Y_i^*$ is an unbiased estimate for individual $i$'s $\tau_i$.
+
+__PROOF:__ First, note that since we're in a 50-50 RCT,
+
+$$\mathbb{E}[Y_i]=\frac{1}{2}\mathbb{E}[Y_{1i}] + \frac{1}{2}\mathbb{E}[Y_{0i}]$$
+where the expectation is with respect to the _probability of being treated_. similarly, 
+
+$$\begin{aligned}
+\mathbb{E}[Y_i^*] &=2\left(\frac{1}{2}\mathbb{E}[Y_{1i}] - \frac{1}{2}\mathbb{E}[Y_{0i}]\right) \\ 
+&=\mathbb{E}[\tau_i]. \\ 
+\end{aligned}$$
+
+---
+
+# Non 50-50 assignment
+
+More generally, if the probability of treatment assignment is given by $p$, then
+
+$$Y_{i}^{*}=\frac{D_{i}-p}{p(1-p)} Y_{i}=\left\{\begin{array}{cc}{\frac{1}{p} Y_{i}} & {\text { if }\: D_{i}=1} \\ {-\frac{1}{1-p} Y_{i}} & {\text { if }\: D_{i}=0}\end{array}\right.$$
+
+In observational studies, $p$ can be estimated based on the $X$'s, i.e., use $\widehat{p}(X)$ instead of setting a constant $p$ for all $i$.
+
+
+Once $Y_i^*$ is defined, we can proceed with of-the-shelf tree methods for prediction:
+ 1. Use a conventional algorithm (e.g., `rpart`) to fit a tree to predict $Y_i^*$.
+ 2. Use the mean of $Y_i^*$ within each leaf as the estimate for $\tau(x)$.
+
+
+---
+# Problems with the TOT approach
+
+__PROBLEM:__ The TOT approach, CATE is estimated as the average $Y_i^*$ within each leaf. and not as the difference in average outcome between the treatment and control groups.
+
+__EXAMPLE:__ in a leaf $\ell$ with 7 treated and 10 untreated, $\text{CATE}(\ell)$ will be the average of $Y_i^*$, for $i=1,\dots,17$. 
+
+What we really want is the average of $Y_i^*\in Treatment$ minus the average of $Y_i^*\in Control$.
+
+
+(NOTE: As we will discuss later, the `causalTree` package estimates $\widehat\tau$ within each leaf instead of $\widehat{Y}^*$.)
+
+---
+
+# An aside: Sample splitting and honest estimation
+
+
+__sample splitting:__ divide the data in half, compute the sequence of models on one half and then evaluate their significance on the other half. 
+
+_COST_: this can lead to a significant loss of power,unless the sample size is large.
+
+_BENEFIT_: Valid inference (independent subsamples).
+
+
+In the context of causal trees, sample splitting amounts to constructing a tree using the training sample $\mathcal{S}^{tr}$ and estimating the effect using $\mathcal{S}^{est}$.
+
+---
+
+# Approach #2: Causal tree (CT)
+
+__Solution:__ Define $\widehat\tau_i$ as the ATE within the leaf.
+
+Athey and Imbens consider two splitting rules: 
+1. Adaptive causal tree (__CT-A__):
+
+$$\begin{align}
+-\widehat{\mathrm{MSE}}_{\tau}\left(\mathcal{S}^{\mathrm{tr}}, \mathcal{S}^{\mathrm{tr}}, \Pi\right)&=\underbrace{\frac{1}{N^{\mathrm{tr}}} \sum_{i \in \mathcal{S}^{\mathrm{tr}}} \hat{\tau}^{2}\left(X_{i} | \mathcal{S}^{\mathrm{tr}}, \Pi\right)}_{\text { Variance of treatment }} 
+\end{align}$$
+
+In words: perform split if it _increases_ treatment effect heterogeneity within sample.
+
+---
+
+# Approach #2: Causal tree (CT)
+
+2. Honest causal tree (__CT-H__) which uses sample splitting:
+
+$$\begin{align}
+-\widehat{\mathrm{EMSE}}_{\tau}\left(\mathcal{S}^{\mathrm{tr}}, N^{\mathrm{est}}, \Pi\right)&=\underbrace{\frac{1}{N^{\mathrm{tr}}} \sum_{i \in \mathcal{S}^{\mathrm{tr}}} \hat{\tau}^{2}\left(X_{i} | \mathcal{S}^{\mathrm{tr}}, \Pi\right)}_{\text { Variance of treatment }}\\
+& \underbrace{-\left(\frac{1}{N^{\mathrm{tr}}}+\frac{1}{N^{\mathrm{est}}}\right) \sum_{\ell \in \Pi}\left(\frac{S_{\mathcal{S}_{\mathrm{treat}}^{tr}(\ell)}}{p}+\frac{S_{\mathcal{S}_{\mathrm{control}}^{tr}}^{2}(\ell)}{1-p}\right)}_{\text{Uncertainty about leaf treatment efects}}
+\end{align}$$
+where $S_{\mathcal{S}_{\mathrm{control}}^{tr}}^{2}(\ell)$ is the within-leaf variance on outcome $Y$ for $\mathcal{S}_{\mathrm{control}}^{tr}$ control in leaf $\ell$, and $S_{\mathcal{S}_{\mathrm{treat}}^{tr}}^{2}(\ell)$  is the counter part for $\mathcal{S}_{\mathrm{treat}}$ treat.
+
+__In words:__ perform split if it _increases_ treatment effect heterogeneity _and_ reduces the uncertainty about the estimated effect.  
+
+
+---
+# Additional splitting rules
+
+Athey and Imbens (2016) consider two additional splitting rules:
+
+  1. Fit based trees: split is based on the goodness-of-fit of the _outcome_, where fitting takes into account $D_i$.
+  
+  2. Squared $T$-statistic trees: split according to largest value the square of the $t$-statistic for testing the null hypothesis that the average treatment effect is the same in the two potential leaves.
+  
+
+See Athey and Imbens (2016) for more details.
+
+
+---
+# Cross-validation and pruning
+
+
+- Cross validation in causal trees is based on the out-of-sample counterpart of the goodness-of-fit rule used for constructing the tree.
+
+- In particular, the training sample is split to training $\mathcal{S}^{tr,tr}$ and validation $\mathcal{S}^{tr,cv}$ sets and pruning the tree is constructed based on $\mathcal{S}^{tr,tr}$ and validated using $\mathcal{S}^{tr,cv}$.
+
+
+
+---
+
+# A summery of the causal tree algorithm
+
+1. Randomly split the sample $\mathcal{S}$ in half to form a training sample $\mathcal{S^{tr}}$ and an estimation sample $\mathcal{S^{est}}$.
+
+2. Using just $\mathcal{S^{tr}}$, grow a tree, where each split is based on a criteria that aims to maximize:
+  - how much the treatment effect estimates _vary_ across the two resulting subgroups (maximize treatment heterogeneity)
+  - how _accurate_ these estimates are (minimize estimate variance). 
+
+3. Using just $\mathcal{S^{est}}$, calculate $\tau(x\in\ell)$ within each terminal leaf $\ell$.  
+
+---
+# Notes on the implementation of causal trees
+
+- The causal tree algorithm is implemented in the [`{causalTree}`](https://github.com/susanathey/causalTree) package (Athey).
+
+- The user is required to select
+
+  - `minsize`: the minimum number of treatment and control observations in each leaf.
+  - `bucketNum` and `bucketMax`: used to guarantee that when we shift from one split point to the next, we add both treatment and control observations, leading to a smoother estimate of the goodness of fit function as a function of the split point.
+  
+
+---
+# Extension: Causal forests (Wager and Athey, JASA 2018)
+
+Causal Forests: As in the case of predictive trees, an individual causal tree can be noisy. We can reduce variance by using forests. Here is a sketch of the _causal forest_ algorithm:
+
+1. Draw a subsample $b$ without replacement from the $N$ observations in the dataset.
+2. Randomly split $b$ in half to form a training sample $\mathcal{S^{tr}_b}$ and an estimation sample $\mathcal{S^{est}_b}$.
+3. Using just $\mathcal{S^{tr}_b}$, grow a tree $\Pi_b$, where each split is based on a criteria that aims to maximize:
+  - how much the treatment effect estimates _vary_ across the two resulting subgroups (maximize treatment heterogeneity)
+  - how _accurate_ these estimates are (minimize estimate variance). 
+4. Using just $\mathcal{S^{est}_b}$, calculate $\widehat\tau_b(x\in\ell)$ within each terminal leaf.    
+5. Return to the full sample $N$ and assign for each $i$, based on where it is located in $\Pi_b$.
+6. Repeat 1-5 $B$ times.
+7. Define subject $i$'s CATE as $B^{-1}\sum_{j=1}^{B}\widehat\tau_b$.
+
+
+---
+# Notes on the implementation of causal forests
+
+- The causal forest algorithm is implemented in the [`{grf}`](https://github.com/grf-labs/grf) package (Tibshirani, Athey, and Wager).
+
+- The user is required to select
+
+  - number of trees.
+  - subsample size.
+  - minimum number of treatment and control observations in each leaf.
+  - number of variables considered at each split (`mtry`).
+  
+
+- An excellent reference is Davis and Heller (2017) who apply causal forest to RCT that evaluates the impact of a summer jobs program on disadvantaged youth in Chicago.
+
+---
+class: title-slide-section-blue, center, middle
+name: causalTree
+
+# Empirical Illustration
+
+
+---
+# `{experimentdatar}` 
+
+A description from the [`{experimentdatar}`](https://github.com/itamarcaspi/experimentdatar) GitHub repository:
+
+> _"The [`experimentdatar`](https://github.com/itamarcaspi/experimentdatar) data package contains publicly available datasets that were used in Susan Athey and Guido Imbens’ course “Machine Learning and Econometrics” (AEA continuing Education, 2018). The datasets are conveniently packed for R users."_
+
+You can install the _development_ version from GitHub
+
+```{r, eval = FALSE}
+install.packages("devtools")
+devtools::install_github("itamarcaspi/experimentdatar")
+```
+
+
+---
+
+# The `social` dataset
+
+The data is from Gerber, Green, and Larimer (2008)'s paper ["Social Pressure and Voter Turnout: Evidence from a Large-Scale Field Experiment"](http://isps.yale.edu/sites/default/files/publication/2012/12/ISPS08-001.pdf).
+
+For this illustration, we will make use of the `social` dataset
+```{r}
+data(social)
+```
+
+The following command will open a link to Gerber, Green, and Larimer (2008)'s paper
+```{r, eval=FALSE}
+dataDetails("social")
+```
+
+
+---
+
+# Experimental design
+
+A large sample of voters were _randomly assigned_ to two groups: 
+
+- Treatment group $(D_i=1)$ that received a message stating that, after the election, the recent voting record of everyone on their households would be sent to their neighbors.
+- Control group $(D_i=0)$ that did not receive any message.
+
+This study seeks evidence for a "social pressure" effect on voters turnout.
+
+
+---
+
+# The treatment and control messages
+
+```{r, echo=FALSE, out.width = "120%", fig.align='center'}
+include_graphics("figs/vote_mail.png")
+```
+
+---
+# `social`: Outcome, treatment and attributes
+
+.pull-left[
+- __`outcome_voted`__: Dummy where $1$ indicates voted in the August 2006
+- __`treat_neighbors`__: Dummy where $1$ indicates _Neighbors mailing_ treatment
+- `sex`: male / female
+- `yob`: Year of birth
+- `g2000`: voted in the 2000 general
+- `g2002`: voted in the 2002 general
+- `p2000`: voted in the 2000 primary
+- `p2002`: voted in the 2002 primary
+- `p2004`: voted in the 2004 primary
+- `city`: City index
+- `hh_size`: Household size
+- `totalpopulation_estimate`: City population
+- `percent_male`: $\%$ males in household
+]
+
+.pull-right[
+
+- `median_age`: Median age in household
+- `median_income`: Median income in household
+- `percent_62yearsandover`: $\%$ of subjects of age higher than 62 yo
+- `percent_white`: $\%$ white in household
+- `percent_black`: $\%$ black in household
+- `percent_asian`: $\%$ Asian in household
+- `percent_hispanicorlatino`: $\%$ Hispanic or Latino in household
+- `employ_20to64`: $\%$ of employed subjects of age 20 to 64 yo 
+- `highschool`: $\%$ having only high school degree
+- `bach_orhigher`: $\%$ having bachelor degree or higher
+]
+
+
+---
+# Data preprocessing
+
+First, we define the outcome, treatment and other covariates
+```{r}
+Y <- "outcome_voted"
+
+D <- "treat_neighbors"
+
+X <- c("yob", "city", "hh_size",
+       "totalpopulation_estimate",
+       "percent_male", "median_age",
+       "percent_62yearsandover",
+       "percent_white", "percent_black",
+       "percent_asian", "median_income",
+       "employ_20to64", "highschool",
+       "bach_orhigher", "percent_hispanicorlatino",
+       "sex","g2000", "g2002", "p2000",
+       "p2002", "p2004")
+
+```
+
+
+__NOTE:__ The `social` dataset includes a much richer feature set. It includes additional treatments, as well as features.
+
+---
+# Data wrangling
+
+
+Rename the outcome and treatment variables
+```{r}
+df <- social %>% 
+  select(Y, D, X) %>% 
+  rename(Y = outcome_voted, D = treat_neighbors)
+```
+
+We will only use a subset of the sample to make things run faster
+```{r}
+set.seed(1203)
+
+df_smpl <- df %>%
+  sample_n(50000)
+```
+
+
+---
+# Split the data to training, estimate, and test sets
+
+Before we start, we need to split our sample to a training and estimation sets, where training will be used to construct the tree and estimation for honest estimation of $\tau(x)$:
+
+
+```{r}
+split    <- initial_split(df_smpl, prop = 0.5)
+
+df_train <- training(split) 
+df_estim <- testing(split)
+```
+
+---
+# The `causalTree` package
+
+A description from the [`{causalTree}`]((https://github.com/susanathey/causalTree) GitHub repository
+
+>_"The `causalTree` function builds a regression model and returns an `rpart` object, which is the object derived from `rpart` package, implementing many ideas in the CART (Classification and Regression Trees), written by Breiman, Friedman, Olshen and Stone. Like `rpart`, `causalTree` builds a binary regression tree model in two stages, but focuses on estimating heterogeneous causal effect."_
+
+To install the package, run the following commands:
+```{r, eval = FALSE}
+install.packages("devtools")
+devtools::install_github("susanathey/causalTree")
+```
+
+
+---
+# Estimate causal tree
+
+We now proceed to estimating the tree using the __CT-H__ approach:
+
+```{r}
+tree <- honest.causalTree(
+  formula = "I(Y) ~ . - D",
+  
+  data      = df_train,
+  treatment = df_train$D,
+  
+  est_data      = df_estim,
+  est_treatment = df_estim$D,
+  
+  split.Rule   = "CT",
+  split.Honest = TRUE,
+  
+  cv.option = "CT",  
+  cv.Honest = TRUE,
+  
+  minsize = 200,
+  HonestSampleSize = nrow(df_estim),
+  cp=0
+)
+```
+
+---
+# Prune the tree based on (honest) cross-validation
+
+Extract table of cross-validated values by tuning parameter
+```{r}
+cptable <- as.data.frame(tree$cptable)
+```
+
+Obtain optimal $cp$ to prune tree
+```{r}
+min_cp      <- which.min(cptable$xerror)
+optim_cp_ct <- cptable[min_cp, "CP"]
+```
+
+Prune the tree at optimal $cp$
+```{r}
+pruned_tree <- prune(tree = tree, cp = optim_cp_ct)
+```
+
+
+---
+# The estimated tree
+
+```{r, echo=FALSE, out.width = "50%", fig.align='center'}
+rpart.plot(
+  tree,
+  type = 3,
+  clip.right.labs = TRUE,
+  branch = .3
+)
+```
+
+---
+# Pruned tree
+
+```{r, echo=FALSE, out.width = "60%", fig.align='center'}
+rpart.plot(
+  pruned_tree,
+  type = 3,
+  clip.right.labs = TRUE,
+  branch = .3
+)
+```
+
+
+---
+
+# Assign each observation to a specific leaf
+
+Form a tibble which holds the training and estimation samples
+
+```{r}
+df_all <- tibble(
+  sample = c("training", "estimation"),
+  data   = list(df_train, df_estim)
+)
+
+```
+Assign each observation in the training and estimation sets to a leaf based on `tree`:
+
+```{r}
+df_all_leaf <- df_all %>% 
+  mutate(leaf = map(data, ~ predict(pruned_tree,
+                        newdata = .x,
+                        type = "vector"))) %>% 
+  mutate(leaf = map(leaf, ~ round(.x, 3))) %>%
+  mutate(leaf = map(leaf, ~ as.factor(.x))) %>%
+  mutate(leaf = map(leaf, ~ enframe(.x, name = NULL, value = "leaf"))) %>% 
+  mutate(data = map2(data, leaf, ~ bind_cols(.x, .y)))
+```
+
+---
+# Estimate CATE using the causal tree
+
+Use `lm()` with interaction terms, e.g.,
+
+```
+lm(Y ~ leaf + D * leaf - D - 1)
+```
+
+to estimate the average treatment effect within each leaf and to get confidence intervals:
+
+```{r}
+df_all_lm  <- 
+  df_all_leaf %>% 
+  mutate(model = map(data, ~ lm(Y ~ leaf + D * leaf 
+                                - D - 1, data = .x))) %>% 
+  mutate(tidy = map(model, broom::tidy, conf.int = TRUE)) %>% 
+  unnest(tidy)
+```
+
+
+---
+# Plot coefficients and confidence intervals
+
+```{r coefs, echo=FALSE, out.width = "50%", fig.align='center'}
+df_all_lm %>% 
+  filter(str_detect(term, pattern = ":D")) %>%  # keep only interaction terms
+  ggplot(aes(x = term,
+             y = estimate, 
+             ymin = conf.low,
+             ymax = conf.high
+            )
+  ) +
+  geom_hline(yintercept = 0, color = "red") +
+  geom_pointrange(position = position_dodge(width = 1), size = 0.8) +
+  labs(
+    x = "",
+    y = "CATE and confidence interval"
+  ) +
+  facet_grid(. ~ sample) +
+  coord_flip()
+```
+
+
+---
+
+# On the interpretation of causal trees
+
+```{r, echo=FALSE, out.width = "60%", fig.align='center'}
+include_graphics("figs/cate_xs.png")
+```
+
+Source: [https://drive.google.com/open?id=1FuF4_q4HCzbU_ImFoLW4r4Gop6A0YsO_](https://drive.google.com/open?id=1FuF4_q4HCzbU_ImFoLW4r4Gop6A0YsO_)
+
+---
+class: .title-slide-final, center, inverse, middle
+
+# `slides %>% end()`
+
+[<i class="fa fa-github"></i> Source code](https://github.com/ml4econ/lecture-notes-2021/tree/master/10-trees-cate)  
+
+
+
+---
+# Selected references
+
+Athey, S., & Imbens, G. (2016). Recursive partitioning for heterogeneous causal effects. _Proceedings of the National Academy of Sciences_, 113(27), 7353-7360.
+
+Athey, S., Imbens, G. W., Kong, Y., & Ramachandra, V. (2016). An Introduction to Recursive Partitioning for Heterogeneous Causal Effects Estimation Using `causalTree` package. 1–15.
+
+Davis, J.M. V & Heller, S.B., 2017. Using Causal Forests to Predict Treatment Heterogeneity : An Application to Summer Jobs. _American Economic Review: Papers & Proceedings_, 107(5), pp.546–550.
+
+Lundberg, I., 2017. Causal forests: A tutorial in high-dimensional causal inference. [https://scholar.princeton.edu/sites/default/files/bstewart/files/lundberg_methods_tutorial_reading_group_version.pdf](https://scholar.princeton.edu/sites/default/files/bstewart/files/lundberg_methods_tutorial_reading_group_version.pdf)
+
+Wager, S., & Athey, S. (2018). Estimation and Inference of Heterogeneous Treatment Effects using Random Forests. _Journal of the American Statistical Association_, 113(523), 1228–1242.
