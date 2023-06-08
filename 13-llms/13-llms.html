@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>More than Words?</title>
+    <title>13 - Exploring Large Language Models (LLMs)</title>
     <meta charset="utf-8" />
     <meta name="author" content="Itamar Caspi" />
     <script src="libs/header-attrs/header-attrs.js"></script>
@@ -16,16 +16,16 @@
 class: center, middle, inverse, title-slide
 
 .title[
-# More than Words?
+# 13 - Exploring Large Language Models (LLMs)
 ]
 .subtitle[
-## Exploring Large Language Models
+## ml4econ, HUJI 2023
 ]
 .author[
 ### Itamar Caspi
 ]
 .date[
-### BOI Research Department Workshop, June 12, 2023 (updated: 2023-06-08)
+### June 11, 2023 (updated: 2023-06-08)
 ]
 
 ---
@@ -41,7 +41,7 @@ class: center, middle, inverse, title-slide
 # The New Wave of Generative AI 
 
 .pull-left[
-The new wave of AI extends beyond language models:
+Generative AI's poster child is ChatGPT, but the new wave of AI extends way beyond large language models:
 
 - **Images**
 - **Video**
@@ -55,19 +55,20 @@ The new wave of AI extends beyond language models:
 
 
 ---
-# AI and Key Challenges Looming Ahead
+# Addressing Key Challenges in AI Development
 
 .pull-left[
-- **Computing Power**: The impact of powerful hardware on AI.
-- **Emergent Abilities**: Unforeseen AI capabilities arising from learning.
-- **AI Safety / Alignment**: Ensuring AI behavior aligns with human values.
-- **Misinformation**: The risks and mitigation of AI-generated false info.
-- **Ethics**: The ethical considerations surrounding AI, such as fairness, accountability, and privacy.
-- **Regulation**: How to treat AIs? e.g., "robo-advisors".
+- **Computing Power**: The role of advanced hardware in driving AI performance.
+- **Emergent Abilities**: Identifying and harnessing unexpected abilities emerging from AI learning.
+- **AI Safety / Alignment**: Maintaining AI behavior in sync with human values for safety.
+- **Ethics**: Ensuring ethical considerations like fairness, accountability, and privacy are central to AI development.
+- **Regulation**: Defining the legal framework for AI entities, such as "robo-advisors".
 ]
-
 .pull-right[
-Can you spot the fake?
+- **Misinformation**: Tackling the risks of AI-generated false information and mitigation strategies.
+
+&gt;Can you spot the fake?
+
 &lt;img src="figs/bibi-trump.png" width="120%" style="display: block; margin: auto;" /&gt;
 &lt;!-- *Source*: [USA Today, March 15, 2019](https://www.usatoday.com/story/news/world/2019/03/25/how-donald-trump-and-benajmin-netanyahu-israel-benefit-close-relationship/3249644002/) --&gt;
 ]
@@ -102,7 +103,6 @@ name:
 ## [Stephen Wolfram (Feb, 2023)](https://writings.stephenwolfram.com/2023/02/what-is-chatgpt-doing-and-why-does-it-work/)
 
 &lt;img src="figs/add.png" width="30%" style="display: block; margin: auto;" /&gt;
-
 Source: Midjourney (V5.1). 
 
 Prompt: `It's just adding one word at a time.`
@@ -132,8 +132,10 @@ Prompt: `It's just adding one word at a time.`
 *Important*: OpenAI doesn't disclose the exact sources of these datasets. 
 ]
 .pull-right[
-&lt;img src="figs/books.jpg" width="90%" style="display: block; margin: auto;" /&gt;
-_Source_: Bing image generator ("a huge pile of books")
+&lt;img src="figs/books.jpg" width="80%" style="display: block; margin: auto;" /&gt;
+Source: Bing image generator 
+
+Prompt: `a huge pile of books`
 ]
 
 ---
@@ -295,7 +297,7 @@ First, create an OpenAI account.
 
 
 ---
-# Powerful, Not Dumb: The Capabilities of ChatGPT
+# But Don't Mistake it for Being Dumb
 
 .pull-left[
 - Despite occasional errors, ChatGPT's prowess should not be underestimated.
@@ -347,7 +349,7 @@ name: prompting
 .pull-right[
 &lt;img src="figs/finetune.png" width="75%" style="display: block; margin: auto;" /&gt;
 
-&gt;_Note_: ChatGPT comes with default settings, You can only adjust these parameters in "playground" mode or via the API.
+_Note_: ChatGPT comes with default settings, You can only adjust these parameters in "playground" mode or via the API.
 ]
 
 ---
@@ -412,7 +414,7 @@ Source: [GPT Best Practices](https://platform.openai.com/docs/guides/gpt-best-pr
 
 Few-shot learning is a machine learning approach that aims to train models to perform well on new tasks with only a limited amount of labeled data.
 
-&lt;img src="figs/fewshot_term.png" width="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/fewshot_term.png" width="65%" style="display: block; margin: auto;" /&gt;
 
 ---
 # Principle 2: Provide Reference Text
@@ -431,7 +433,7 @@ Source: [GPT Best Practices](https://platform.openai.com/docs/guides/gpt-best-pr
 
 
 ---
-# Tip: Extracting Text and Equations from Every Document
+# Tip: Extracting Text and Equations from Documents
 
 .pull-left[
 * [Mathpix](https://mathpix.com/) is an OCR tool that rapidly converts handwritten or printed math equations into LaTeX code.
@@ -453,15 +455,14 @@ Source: [GPT Best Practices](https://platform.openai.com/docs/guides/gpt-best-pr
 Example prompt:
 
 
-```r
-`step 1: Revisit and thoroughly read the policy memo.`
+&gt;`step 1: Revisit and thoroughly read the policy memo.`
 
-`step 2: Conduct research to find academic papers that are relevant to the subjects discussed in the memo.`
+&gt;`step 2: Conduct research to find academic papers that are relevant to the subjects discussed in the memo.`
 
-`step 3: Update the memo by incorporating references to support the assertions made within it.`
+&gt;`step 3: Update the memo by incorporating references to support the assertions made within it.`
 
-`step 4: Compile a bibliography of these references and add it to the memo.`
-```
+&gt;`step 4: Compile a bibliography of these references and add it to the memo.`
+
 
 ---
 # Principle 3: Split Complex Tasks into Simpler Subtasks
@@ -538,11 +539,11 @@ name: assist
 
 
 ---
-# Proofreading and Editing
+# Proofreading and Editing 
 
-- ChatGPT have proofread and edited this presentation, which is written using the R [`Xaringan`](https://github.com/yihui/xaringan) package. For example, I've used the following prompt:
+- ChatGPT has proofread and edited this presentation, which was written using the R [`Xaringan`](https://github.com/yihui/xaringan) package. Here's the prompt I've used:
 
-`As an AI copy editor, your primary responsibility is to proofread a text enclosed by triple quotes and ensure it is clear and flows smoothly. Your task also includes avoiding passive voice, emphasizing essential concepts using boldface and italics, keeping sentences short and suitable for a presentation, and using bullets wherever possible. Additionally, you must verify that the title accurately conveys the text's message and, if necessary, change it to reflect the content. To deliver your output, you must present it in a Markdown code box, but you should ignore R code chunks and triple backticks at the beginning and end of R code chunks. Instead, you should add a backslash before the beginning and end of R code chunks. For instance, write \```{r} code \``` instead of ```{r} code ```. Once you have completed your proofreading task, request additional editing tasks if necessary.`
+&gt;`As an AI copy editor, your primary responsibility is to proofread a text enclosed by triple quotes and ensure it is clear and flows smoothly. Your task also includes avoiding passive voice, emphasizing essential concepts using boldface and italics, keeping sentences short and suitable for a presentation, and using bullets wherever possible. Additionally, you must verify that the title accurately conveys the text's message and, if necessary, change it to reflect the content. To deliver your output, you must present it in a Markdown code box. Once you have completed your proofreading task, request additional editing tasks if necessary.`
 
 ---
 # Drawing Graphs (Using TikZ and LaTeX)
@@ -550,9 +551,8 @@ name: assist
 .pull-left[
 Prompt: 
 
-```r
-Draw an ADAS graph using the TikZ package.
-```
+&gt;`Draw an ADAS graph using the TikZ package.`
+
 ]
 .pull-right[
 &lt;img src="figs/adas.png" width="90%" style="display: block; margin: auto;" /&gt;
@@ -563,39 +563,36 @@ Draw an ADAS graph using the TikZ package.
 
 ChatGPT can perform the following coding tasks:
 
-- **Code Generation** (and soon code execution): It can generate code, such as writing an R function that sorts a vector in descending order.
+- **Generation** (and soon code execution): It can generate code, such as writing an R function that sorts a vector in descending order.
 
-- **Code Translation**: ChatGPT is capable of translating code, for example, from Python to R and vice versa.
+- **Debugging**: Simply copying and pasting error messages allows ChatGPT to assist with code debugging.
 
-- **Code Debugging**: Simply copying and pasting error messages allows ChatGPT to assist with code debugging.
+- **Annotation**: You can ask ChatGPT to explain what a particular piece of code is doing.
 
-- **Code Annotation**: You can ask ChatGPT to explain what a particular piece of code is doing.
+- **Translation**: ChatGPT is capable of translating code, for example, from Python to R and vice versa.
 
 
 ---
 # Example: Translate from STATA to R
 
-
-```r
-Translate the following STATA code to R
-```
+Prompt: 
+&gt;`Translate the following STATA code to R`
 
 
-&lt;img src="figs/stata.png" width="60%" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/stata.png" width="50%" style="display: block; margin: auto;" /&gt;
 
 
 
 ---
-# Other Use Cases
+# Diverse Applications of ChatGPT
 
 .pull-left[
-- Translation (Google/Bing translate from Hebrew -&gt; edit with ChatGPT)
-- Generating keywords and JEL classification codes.
-- Crafting titles for papers, sections, figures, and tables.
-- Enhancing accessibility, such as providing alternate text for figures and tables.
-- Creating metaphors and analogies.
-
-&gt;For more inspiration, check out the [35 Ways Real People Are Using A.I. Right Now (NYT)](https://www.nytimes.com/interactive/2023/04/14/upshot/up-ai-uses.html) article.
+- **Translation**: Enhancing translations (e.g., Google/Bing translate from Hebrew -&gt; fine-tuning with ChatGPT).
+- **Keyword Generation**: Producing keywords and JEL classification codes.
+- **Title Creation**: Developing compelling titles for papers, sections, figures, and tables.
+- **Accessibility Enhancement**: Providing alternative text for figures and tables to increase accessibility.
+- **Content Development**: Formulating creative metaphors and analogies.
+&gt;Bonus: [35 Ways Real People Are Using A.I. Right Now](https://www.nytimes.com/interactive/2023/04/14/upshot/up-ai-uses.html)
 ]
 .pull-right[
 &lt;img src="figs/cfr2023.png" width="100%" style="display: block; margin: auto;" /&gt;
@@ -615,27 +612,38 @@ Follow these steps to get started with the OpenAI API:
 &gt;For an example of using R + OpenAI API to proofread text and track changes, click [here](https://raw.githack.com/itamarcaspi/openai-api-test/master/proofread-and-track.html).
 
 ---
-# Getting Serious 2: ChatGPT Plugins
+# Enhancing Functionality with ChatGPT Plugins
 
 .pull-left[
-- ChatGPT plugins are "agents" that enhance the fundamental capabilities of ChatGPT.
+- [ChatGPT plugins](https://openai.com/blog/chatgpt-plugins) act as "agents" that augment the core capabilities of ChatGPT.
 
-- OpenAI provides "Native" plugins which offer features like web browsing and code interpretation.
+- OpenAI supplies "native" plugins with features such as web browsing and code interpretation.
 
-- Additionally, there are over 100 third-party plugins available and that number continues to grow.
+- Over 100 third-party plugins are accessible and this figure keeps expanding.
 
-- For research: [Wolfram]() for doing math, [AskYourPDF]() for handling long documents, and [ScholarAI]() for conducting literature reviews.
+- Research tasks: Utilize [Wolfram]() for mathematics, [AskYourPDF]() for lengthy documents, and [ScholarAI]() for literature reviews.
 ]
+
 .pull-right[
 &lt;img src="figs/plugins.PNG" width="100%" style="display: block; margin: auto;" /&gt;
 ]
 
 
 ---
-# Putting it all together: boiGPT Interest Rate Decision
+# Putting it All Together: Meet boiGPT!
 
-[Introducing "boiGPT"!](https://chat.openai.com/share/c3268915-8795-47e1-a81a-aa3641a5576b)
+.pull-left[
+[boiGPT monetary policy committee](https://chat.openai.com/share/c3268915-8795-47e1-a81a-aa3641a5576b)
+]
+.pull-right[
+&lt;img src="figs/boigpt.png" width="90%" style="display: block; margin: auto;" /&gt;
+_Source_: Midjourney (V5.1)
+]
 
+
+???
+
+Prompt: `A realistic robo-central-banker is stationed in front of a laptop within an office setting. In the background, screens display stock charts, depicted as yellow lines against a stark black backdrop.`
 
 ---
 class: title-slide-section-blue, center, middle

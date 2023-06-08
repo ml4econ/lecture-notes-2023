@@ -1,8 +1,9 @@
 ---
-title: "More than Words? "
-subtitle: "Exploring Large Language Models"
+title: "13 - Exploring Large Language Models (LLMs)"
+subtitle: "ml4econ, HUJI 2023"
 author: "Itamar Caspi"
-date: "BOI Research Department Workshop, June 12, 2023 (updated: `r Sys.Date()`)"
+date: "June 11, 2023 (updated: `r Sys.Date()`)"
+# date: "BOI Research Department Workshop, June 12, 2023 (updated: `r Sys.Date()`)"
 output:
   xaringan::moon_reader:
     css: [default, "style/middlebury.css", "style/middlebury-fonts.css"]
@@ -55,7 +56,7 @@ bib <- ReadBib("refs/refs.bib", check = FALSE)
 # The New Wave of Generative AI 
 
 .pull-left[
-The new wave of AI extends beyond language models:
+Generative AI's poster child is ChatGPT, but the new wave of AI extends way beyond large language models:
 
 - **Images**
 - **Video**
@@ -73,19 +74,20 @@ knitr::include_graphics("figs/genai.png")
 
 
 ---
-# AI and Key Challenges Looming Ahead
+# Addressing Key Challenges in AI Development
 
 .pull-left[
-- **Computing Power**: The impact of powerful hardware on AI.
-- **Emergent Abilities**: Unforeseen AI capabilities arising from learning.
-- **AI Safety / Alignment**: Ensuring AI behavior aligns with human values.
-- **Misinformation**: The risks and mitigation of AI-generated false info.
-- **Ethics**: The ethical considerations surrounding AI, such as fairness, accountability, and privacy.
-- **Regulation**: How to treat AIs? e.g., "robo-advisors".
+- **Computing Power**: The role of advanced hardware in driving AI performance.
+- **Emergent Abilities**: Identifying and harnessing unexpected abilities emerging from AI learning.
+- **AI Safety / Alignment**: Maintaining AI behavior in sync with human values for safety.
+- **Ethics**: Ensuring ethical considerations like fairness, accountability, and privacy are central to AI development.
+- **Regulation**: Defining the legal framework for AI entities, such as "robo-advisors".
 ]
-
 .pull-right[
-Can you spot the fake?
+- **Misinformation**: Tackling the risks of AI-generated false information and mitigation strategies.
+
+>Can you spot the fake?
+
 ```{r echo=FALSE, out.width = "120%", fig.align='center'}
 
 knitr::include_graphics("figs/bibi-trump.png")
@@ -128,7 +130,6 @@ name:
 knitr::include_graphics("figs/add.png")
 
 ```
-
 Source: Midjourney (V5.1). 
 
 Prompt: `It's just adding one word at a time.`
@@ -162,12 +163,14 @@ knitr::include_graphics("figs/tree.jpg")
 *Important*: OpenAI doesn't disclose the exact sources of these datasets. 
 ]
 .pull-right[
-```{r echo=FALSE, out.width = "90%", fig.align='center'}
+```{r echo=FALSE, out.width = "80%", fig.align='center'}
 
 knitr::include_graphics("figs/books.jpg")
 
 ```
-_Source_: Bing image generator ("a huge pile of books")
+Source: Bing image generator 
+
+Prompt: `a huge pile of books`
 ]
 
 ---
@@ -369,7 +372,7 @@ knitr::include_graphics("figs/shortbio.png")
 
 
 ---
-# Powerful, Not Dumb: The Capabilities of ChatGPT
+# But Don't Mistake it for Being Dumb
 
 .pull-left[
 - Despite occasional errors, ChatGPT's prowess should not be underestimated.
@@ -433,7 +436,7 @@ knitr::include_graphics("figs/finetune.png")
 
 ```
 
->_Note_: ChatGPT comes with default settings, You can only adjust these parameters in "playground" mode or via the API.
+_Note_: ChatGPT comes with default settings, You can only adjust these parameters in "playground" mode or via the API.
 ]
 
 ---
@@ -504,7 +507,7 @@ Source: [GPT Best Practices](https://platform.openai.com/docs/guides/gpt-best-pr
 
 Few-shot learning is a machine learning approach that aims to train models to perform well on new tasks with only a limited amount of labeled data.
 
-```{r echo=FALSE, out.width = "70%", fig.align='center'}
+```{r echo=FALSE, out.width = "65%", fig.align='center'}
 
 knitr::include_graphics("figs/fewshot_term.png")
 
@@ -529,7 +532,7 @@ Source: [GPT Best Practices](https://platform.openai.com/docs/guides/gpt-best-pr
 
 
 ---
-# Tip: Extracting Text and Equations from Every Document
+# Tip: Extracting Text and Equations from Documents
 
 .pull-left[
 * [Mathpix](https://mathpix.com/) is an OCR tool that rapidly converts handwritten or printed math equations into LaTeX code.
@@ -552,15 +555,15 @@ knitr::include_graphics("figs/mathpix.png")
 
 Example prompt:
 
-```{r, eval=FALSE}
-`step 1: Revisit and thoroughly read the policy memo.`
 
-`step 2: Conduct research to find academic papers that are relevant to the subjects discussed in the memo.`
+>`step 1: Revisit and thoroughly read the policy memo.`
 
-`step 3: Update the memo by incorporating references to support the assertions made within it.`
+>`step 2: Conduct research to find academic papers that are relevant to the subjects discussed in the memo.`
 
-`step 4: Compile a bibliography of these references and add it to the memo.`
-```
+>`step 3: Update the memo by incorporating references to support the assertions made within it.`
+
+>`step 4: Compile a bibliography of these references and add it to the memo.`
+
 
 ---
 # Principle 3: Split Complex Tasks into Simpler Subtasks
@@ -655,20 +658,20 @@ knitr::include_graphics("figs/ft.png")
 
 
 ---
-# Proofreading and Editing
+# Proofreading and Editing 
 
-- ChatGPT have proofread and edited this presentation, which is written using the R [`Xaringan`](https://github.com/yihui/xaringan) package. For example, I've used the following prompt:
+- ChatGPT has proofread and edited this presentation, which was written using the R [`Xaringan`](https://github.com/yihui/xaringan) package. Here's the prompt I've used:
 
-`As an AI copy editor, your primary responsibility is to proofread a text enclosed by triple quotes and ensure it is clear and flows smoothly. Your task also includes avoiding passive voice, emphasizing essential concepts using boldface and italics, keeping sentences short and suitable for a presentation, and using bullets wherever possible. Additionally, you must verify that the title accurately conveys the text's message and, if necessary, change it to reflect the content. To deliver your output, you must present it in a Markdown code box, but you should ignore R code chunks and triple backticks at the beginning and end of R code chunks. Instead, you should add a backslash before the beginning and end of R code chunks. For instance, write \```{r} code \``` instead of ```{r} code ```. Once you have completed your proofreading task, request additional editing tasks if necessary.`
+>`As an AI copy editor, your primary responsibility is to proofread a text enclosed by triple quotes and ensure it is clear and flows smoothly. Your task also includes avoiding passive voice, emphasizing essential concepts using boldface and italics, keeping sentences short and suitable for a presentation, and using bullets wherever possible. Additionally, you must verify that the title accurately conveys the text's message and, if necessary, change it to reflect the content. To deliver your output, you must present it in a Markdown code box. Once you have completed your proofreading task, request additional editing tasks if necessary.`
 
 ---
 # Drawing Graphs (Using TikZ and LaTeX)
 
 .pull-left[
 Prompt: 
-```{r eval=FALSE}
-Draw an ADAS graph using the TikZ package.
-```
+
+>`Draw an ADAS graph using the TikZ package.`
+
 ]
 .pull-right[
 ```{r echo=FALSE, out.width = "90%", fig.align='center'}
@@ -683,24 +686,23 @@ knitr::include_graphics("figs/adas.png")
 
 ChatGPT can perform the following coding tasks:
 
-- **Code Generation** (and soon code execution): It can generate code, such as writing an R function that sorts a vector in descending order.
+- **Generation** (and soon code execution): It can generate code, such as writing an R function that sorts a vector in descending order.
 
-- **Code Translation**: ChatGPT is capable of translating code, for example, from Python to R and vice versa.
+- **Debugging**: Simply copying and pasting error messages allows ChatGPT to assist with code debugging.
 
-- **Code Debugging**: Simply copying and pasting error messages allows ChatGPT to assist with code debugging.
+- **Annotation**: You can ask ChatGPT to explain what a particular piece of code is doing.
 
-- **Code Annotation**: You can ask ChatGPT to explain what a particular piece of code is doing.
+- **Translation**: ChatGPT is capable of translating code, for example, from Python to R and vice versa.
 
 
 ---
 # Example: Translate from STATA to R
 
-```{r eval=FALSE} 
-Translate the following STATA code to R
-```
+Prompt: 
+>`Translate the following STATA code to R`
 
 
-```{r echo=FALSE, out.width = "60%", fig.align='center'}
+```{r echo=FALSE, out.width = "50%", fig.align='center'}
 
 knitr::include_graphics("figs/stata.png")
 
@@ -709,16 +711,15 @@ knitr::include_graphics("figs/stata.png")
 
 
 ---
-# Other Use Cases
+# Diverse Applications of ChatGPT
 
 .pull-left[
-- Translation (Google/Bing translate from Hebrew -> edit with ChatGPT)
-- Generating keywords and JEL classification codes.
-- Crafting titles for papers, sections, figures, and tables.
-- Enhancing accessibility, such as providing alternate text for figures and tables.
-- Creating metaphors and analogies.
-
->For more inspiration, check out the [35 Ways Real People Are Using A.I. Right Now (NYT)](https://www.nytimes.com/interactive/2023/04/14/upshot/up-ai-uses.html) article.
+- **Translation**: Enhancing translations (e.g., Google/Bing translate from Hebrew -> fine-tuning with ChatGPT).
+- **Keyword Generation**: Producing keywords and JEL classification codes.
+- **Title Creation**: Developing compelling titles for papers, sections, figures, and tables.
+- **Accessibility Enhancement**: Providing alternative text for figures and tables to increase accessibility.
+- **Content Development**: Formulating creative metaphors and analogies.
+>Bonus: [35 Ways Real People Are Using A.I. Right Now](https://www.nytimes.com/interactive/2023/04/14/upshot/up-ai-uses.html)
 ]
 .pull-right[
 ```{r echo=FALSE, out.width = "100%", fig.align='center'}
@@ -740,17 +741,18 @@ Follow these steps to get started with the OpenAI API:
 >For an example of using R + OpenAI API to proofread text and track changes, click [here](https://raw.githack.com/itamarcaspi/openai-api-test/master/proofread-and-track.html).
 
 ---
-# Getting Serious 2: ChatGPT Plugins
+# Enhancing Functionality with ChatGPT Plugins
 
 .pull-left[
-- ChatGPT plugins are "agents" that enhance the fundamental capabilities of ChatGPT.
+- [ChatGPT plugins](https://openai.com/blog/chatgpt-plugins) act as "agents" that augment the core capabilities of ChatGPT.
 
-- OpenAI provides "Native" plugins which offer features like web browsing and code interpretation.
+- OpenAI supplies "native" plugins with features such as web browsing and code interpretation.
 
-- Additionally, there are over 100 third-party plugins available and that number continues to grow.
+- Over 100 third-party plugins are accessible and this figure keeps expanding.
 
-- For research: [Wolfram]() for doing math, [AskYourPDF]() for handling long documents, and [ScholarAI]() for conducting literature reviews.
+- Research tasks: Utilize [Wolfram]() for mathematics, [AskYourPDF]() for lengthy documents, and [ScholarAI]() for literature reviews.
 ]
+
 .pull-right[
 ```{r echo=FALSE, out.width = "100%", fig.align='center'}
 knitr::include_graphics("figs/plugins.PNG")
@@ -759,10 +761,22 @@ knitr::include_graphics("figs/plugins.PNG")
 
 
 ---
-# Putting it all together: boiGPT Interest Rate Decision
+# Putting it All Together: Meet boiGPT!
 
-[Introducing "boiGPT"!](https://chat.openai.com/share/c3268915-8795-47e1-a81a-aa3641a5576b)
+.pull-left[
+[boiGPT monetary policy committee](https://chat.openai.com/share/c3268915-8795-47e1-a81a-aa3641a5576b)
+]
+.pull-right[
+```{r echo=FALSE, out.width = "90%", fig.align='center'}
+knitr::include_graphics("figs/boigpt.png")
+```
+_Source_: Midjourney (V5.1)
+]
 
+
+???
+
+Prompt: `A realistic robo-central-banker is stationed in front of a laptop within an office setting. In the background, screens display stock charts, depicted as yellow lines against a stark black backdrop.`
 
 ---
 class: title-slide-section-blue, center, middle
