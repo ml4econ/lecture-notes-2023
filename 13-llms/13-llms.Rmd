@@ -1,8 +1,8 @@
 ---
-title: "13 - Exploring Large Language Models (LLMs)"
-subtitle: "ml4econ, HUJI 2023"
+title: "More Than Words?"
+subtitle: "Exploring Large Language Models (LLMs)"
 author: "Itamar Caspi"
-date: "June 11, 2023 (updated: `r Sys.Date()`)"
+date: "June 12, 2023 (updated: `r Sys.Date()`)"
 # date: "BOI Research Department Workshop, June 12, 2023 (updated: `r Sys.Date()`)"
 output:
   xaringan::moon_reader:
@@ -761,7 +761,7 @@ knitr::include_graphics("figs/plugins.PNG")
 
 
 ---
-# Putting it All Together: Meet boiGPT!
+# Putting it All Together: Meet boiGPT
 
 .pull-left[
 [boiGPT monetary policy committee](https://chat.openai.com/share/c3268915-8795-47e1-a81a-aa3641a5576b)
@@ -854,18 +854,45 @@ knitr::include_graphics("figs/ai_space.png")
 ```
 
 ---
-# Can We Measure the Benefits or Costs?
+# Some (Sobering) Facts
+
+["Eight Things to Know about Large Language Models"](https://arxiv.org/abs/2304.00612) by Sam Bowman (2023):
 
 .pull-left[
-<midd-blockquote> _"[T]he computer age was everywhere except for the productivity statistics."_ .right[—Robert Solow (1987)] </midd-blockquote>
+- LLMs predictably get more capable with increasing investment, even without targeted innovation.
+
+- Many important LLM behaviors emerge unpredictably as a byproduct of increasing investment.
+
+- LLMs often appear to learn and use representations of the outside world.
+
+- There are no reliable techniques for steering the behavior of LLMs.
 ]
 .pull-right[
-```{r echo=FALSE, out.width = "80%", fig.align='center'}
+- Experts are not yet able to interpret the inner workings of LLMs.
 
-knitr::include_graphics("figs/solow.jpg")
+- Human performance on a task isn't an upper bound on LLM performance.
+
+- LLMs need not express the values of their creators nor the values encoded in web text.
+
+- Brief interactions with LLMs are often misleading.
+]
+
+
+---
+class: center, middle
+name: isit
+
+# So, is it really just adding one word at a time...?
+```{r echo=FALSE, out.width = "30%", fig.align='center'}
+
+knitr::include_graphics("figs/terminator.png")
 
 ```
-]
+Source: Midjourney (V5.1). 
+
+
+Prompt: `Arnold Schwarzenegger, portraying the iconic character of The Terminator, sits next to a laptop, wearing a smile and winking mischievously.`
+
 
 ---
 # AI and Existential Risk? 
@@ -895,20 +922,6 @@ knitr::include_graphics("figs/existential.png")
 - **AI Impact**: Likely to revolutionize the world in the near future, with both positive and negative implications.
 
 
----
-class: center, middle
-name: isit
-
-# So, is it really just adding one word at a time...?
-```{r echo=FALSE, out.width = "30%", fig.align='center'}
-
-knitr::include_graphics("figs/terminator.png")
-
-```
-Source: Midjourney (V5.1). 
-
-
-Prompt: `Arnold Schwarzenegger, portraying the iconic character of The Terminator, sits next to a laptop, wearing a smile and winking mischievously.`
 
 ---
 class: .title-slide-final, center, inverse, middle
