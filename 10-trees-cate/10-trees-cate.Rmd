@@ -398,11 +398,11 @@ In other words: perform a split if it _increases_ the heterogeneity of the treat
 
 2. Honest causal tree (__CT-H__) which uses sample splitting:
 
-$$\begin{align}
--\widehat{\mathrm{EMSE}}_{\tau}\left(\mathcal{S}^{\mathrm{tr}}, N^{\mathrm{est}}, \Pi\right)&=\underbrace{\frac{1}{N^{\mathrm{tr}}} \sum_{i \in \mathcal{S}^{\mathrm{tr}}} \hat{\tau}^{2}\left(X_{i} | \mathcal{S}^{\mathrm{tr}}, \Pi\right)}_{\text { Variance of treatment }}\\
-& \underbrace{-\left(\frac{1}{N^{\mathrm{tr}}}+\frac{1}{N^{\mathrm{est}}}\right) \sum_{\ell \in \Pi}\left(\frac{S_{\mathcal{S}_{\mathrm{treat}}^{tr}(\ell)}}{p}+\frac{S_{\mathcal{S}_{\mathrm{control}}^{tr}}^{2}(\ell)}{1-p}\right)}_{\text{Uncertainty about leaf treatment efects}}
-\end{align}$$
-where $S_{\mathcal{S}_{\mathrm{control}}^{tr}}^{2}(\ell)$ is the within-leaf variance on outcome $Y$ for $\mathcal{S}_{\mathrm{control}}^{tr}$ control in leaf $\ell$, and $S_{\mathcal{S}_{\mathrm{treat}}^{tr}}^{2}(\ell)$  is the counter part for $\mathcal{S}_{\mathrm{treat}}$ treat.
+$$\begin{aligned}
+& \widehat{\operatorname{EMSE}}_\tau\left(\mathcal{S}^{\text {tr }}, \Pi\right) \equiv \frac{1}{N^{\operatorname{tr}}} \sum_{i \in \mathcal{S}^{\text {tr }}} \hat{\tau}^2\left(X_i ; \mathcal{S}^{\text {tr }}, \Pi\right) \\
+& -\frac{2}{N^{\text {tr }}} \cdot \sum_{\ell \in \Pi}\left(\frac{S_{\mathcal{S}_{\text {treat }}^{\text {tr }}}^2(\ell)}{p}+\frac{S_{\mathcal{S}_{\text {control }}^{\text {tr }}}^2(\ell)}{1-p}\right) .
+\end{aligned}$$
+where $S_{\mathcal{S}_{\mathrm{control}}^{tr}}^{2}(\ell)$ is the within-leaf variance on outcome $Y$ for $\mathcal{S}_{\mathrm{control}}^{tr}$ control group in leaf $\ell$, and $S_{\mathcal{S}_{\mathrm{treat}}^{tr}}^{2}(\ell)$  is the counter part for $\mathcal{S}^{tr}_{\mathrm{treat}}$ treatment group.
 
 __In words:__ perform split if it _increases_ treatment effect heterogeneity _and_ reduces the uncertainty about the estimated effect.  
 
