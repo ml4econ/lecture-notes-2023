@@ -113,6 +113,8 @@ TBA
 
 A. Kaggle competition [(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/a-kaggle/a-kaggle.html)
 [(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/a-kaggle/a-kaggle.pdf)
+B.Replication Project Example [(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/b-replication/Ariel%20Karlinsky%20-%20Replication.html)
+
 
 ## Readings
 
