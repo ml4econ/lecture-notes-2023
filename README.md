@@ -45,16 +45,17 @@ The following schedule is subject to change based on class interests and time co
 
 | Week                  | Topic                                               |
 |:----------------------|:----------------------------------------------------|
-| [**1**](#week-1)      | Course Overview & Basic ML Concepts                 |
-| [**2**](#week-2)      | Reproducibility & ML Workflow                       |
-| [**3**](#week-3)      | Regression and Regularization                       |
-| [**4**](#week-4)      | Classification                                      |
-| [**5**](#week-5)      | Trees and Forests                                   |
-| [**6**](#week-6)      | Causal inference                                    | 
-| [**7**](#week-7)      | High-Dimensional Counfounding Adjustment            |
-| [**8**](#week-7)      | High-Dimensional Heterogeneous Treatment Effects    |
-| [**9**](#week-10)     | Text Analysis                                       |
-| [**10**](#week-11)    | Large Language Models                               |
+| [**1**](#week-1)      | Course Overview                                     |
+| [**2**](#week-2)      | Basic ML Concepts                                   |
+| [**3**](#week-3)      | Reproducibility & ML Workflow                       |
+| [**4**](#week-4)      | Regression and Regularization                       |
+| [**5**](#week-5)      | Classification                                      |
+| [**6**](#week-6)      | Trees and Forests                                   |
+| [**7**](#week-7)      | Causal inference                                    | 
+| [**8**](#week-8)      | High-Dimensional Counfounding Adjustment            |
+| [**9**](#week-9)      | High-Dimensional Heterogeneous Treatment Effects    |
+| [**10**](#week-10)    | Text Analysis                                       |
+| [**11**](#week-11)    | Large Language Models                               |
 
 
 ## Slides
