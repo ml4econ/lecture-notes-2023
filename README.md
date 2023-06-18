@@ -53,10 +53,8 @@ The following schedule is subject to change based on class interests and time co
 | [**6**](#week-6)      | Causal inference                                    | 
 | [**7**](#week-7)      | High-Dimensional Counfounding Adjustment            |
 | [**8**](#week-7)      | High-Dimensional Heterogeneous Treatment Effects    |
-| [**9**](#week-8)      | Prediction Policy Problems                          |
-| [**10**](#week-9)     | Unsupervised Learning                               |
-| [**11**](#week-10)    | Text Analysis                                       |
-| [**12**](#week-11)    | TBA                                                 |
+| [**9**](#week-10)     | Text Analysis                                       |
+| [**10**](#week-11)    | Large Language Models                               |
 
 
 ## Slides
