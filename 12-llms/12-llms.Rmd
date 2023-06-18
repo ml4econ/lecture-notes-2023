@@ -1,0 +1,936 @@
+---
+title: "12 - Exploring Large Language Models (LLMs)"
+subtitle: "ml4econ, HUJI 2023"
+author: "Itamar Caspi"
+date: "June 25, 2023 (updated: `r Sys.Date()`)"
+# date: "BOI Research Department Workshop, June 12, 2023 (updated: `r Sys.Date()`)"
+output:
+  xaringan::moon_reader:
+    css: [default, "style/middlebury.css", "style/middlebury-fonts.css"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+      slideNumberFormat: |
+        <div class="progress-bar-container">
+          <div class="progress-bar" style="width: calc(%current% / %total% * 100%);">
+          </div>
+        </div>
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+
+knitr::opts_chunk$set(eval = TRUE,
+               echo = TRUE,
+               warning = FALSE,
+               message = FALSE,
+               cache = FALSE)
+
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+```
+
+```{r plots_and_figures, include=FALSE}
+library(tidyverse)
+library(openai)
+library(xaringan)
+library(xaringanExtra)
+
+theme_set(theme_gray(15))
+```
+
+```{r, references, echo=FALSE, cache=FALSE}
+library(RefManageR)
+BibOptions(check.entries = FALSE, 
+           bib.style = "numeric", 
+           cite.style = "authoryear", 
+           style = "markdown",
+           hyperlink = FALSE, 
+           dashed = FALSE)
+bib <- ReadBib("refs/refs.bib", check = FALSE)
+```
+
+
+# The New Wave of Generative AI 
+
+.pull-left[
+Generative AI's poster child is ChatGPT, but the new wave of AI extends way beyond large language models:
+
+- **Images**
+
+- **Video**
+
+- **Music**
+
+- **Coding**
+
+- **3D**
+]
+.pull-right[
+```{r echo=FALSE, out.width = "85%", fig.align='center'}
+
+knitr::include_graphics("figs/genai.png")
+
+```
+]
+
+
+---
+# Addressing Key Challenges in AI Development
+
+.pull-left[
+- **Computing Power**: The role of advanced hardware in driving AI performance.
+- **Emergent Abilities**: Identifying and harnessing unexpected abilities emerging from AI learning.
+- **AI Safety / Alignment**: Maintaining AI behavior in sync with human values for safety.
+- **Ethics**: Ensuring ethical considerations like fairness, accountability, and privacy are central to AI development.
+- **Regulation**: Defining the legal framework for AI entities, such as "robo-advisors".
+]
+.pull-right[
+- **Misinformation**: Tackling the risks of AI-generated false information and mitigation strategies.
+
+>Can you spot the fake?
+
+```{r echo=FALSE, out.width = "120%", fig.align='center'}
+
+knitr::include_graphics("figs/bibi-trump.png")
+
+```
+<!-- *Source*: [USA Today, March 15, 2019](https://www.usatoday.com/story/news/world/2019/03/25/how-donald-trump-and-benajmin-netanyahu-israel-benefit-close-relationship/3249644002/) -->
+]
+
+
+---
+# Outline
+
+1. [What are LLMs?](#llms)
+
+2. [GPT-4 and ChatGPT](#chatgpt)
+
+3. [Principles of Prompting](#prompt)
+
+4. [The AI Research Assistant](#assist)
+
+5. [Real World Impact](#ahead)
+
+
+---
+class: title-slide-section-blue, center, middle
+name: llms
+
+# What are LLMs?
+
+
+---
+class: center, middle
+name: 
+
+# "_It's Just adding one word at a time_"
+## [Stephen Wolfram (Feb, 2023)](https://writings.stephenwolfram.com/2023/02/what-is-chatgpt-doing-and-why-does-it-work/)
+
+```{r echo=FALSE, out.width = "30%", fig.align='center'}
+
+knitr::include_graphics("figs/add.png")
+
+```
+Source: Midjourney (V5.1). 
+
+Prompt: `It's just adding one word at a time.`
+
+
+---
+# Large Language Models (LLMs)
+
+.pull-left[
+<midd-blockquote> _"Large language models, like GPT-4, are AI systems trained on vast amounts of text data. They use patterns in this data to generate human-like text, answer questions, translate languages, and perform other language-related tasks. They don't understand information, but predict what text should come next based on their training."_ .right[—ChatGPT (2023)] </midd-blockquote>
+]
+.pull-right[
+```{r echo=FALSE, out.width = "95%", fig.align='center'}
+
+knitr::include_graphics("figs/tree.jpg")
+
+```
+*Source*: [https://arxiv.org/abs/2304.13712](https://arxiv.org/abs/2304.13712)
+]
+
+
+---
+# Collect a Lot of Data
+
+.pull-left[
+- **Internet:** A vast ocean of diverse topics and styles.
+- **Books:** Boosts language proficiency and narrative comprehension.
+- **Wikipedia:** Encyclopedic knowledge for a broad understanding.
+- **Non-Proprietary Databases:** Broad, general knowledge without user or company specifics.
+
+*Important*: OpenAI doesn't disclose the exact sources of these datasets. 
+]
+.pull-right[
+```{r echo=FALSE, out.width = "80%", fig.align='center'}
+
+knitr::include_graphics("figs/books.jpg")
+
+```
+Source: Bing image generator 
+
+Prompt: `a huge pile of books`
+]
+
+---
+# Contextual Embedding: From Text to Numbers
+
+.pull-left[
+- **LLMs:** Transform language queries into numerical representations.
+- **Tokenization:** Breaks down text into chunks called tokens.
+- **Tokens:** Include words, affixes, and punctuation.
+- **Meaning Space:** Area where tokens with similar meanings cluster together.
+]
+.pull-right[
+```{r echo=FALSE, out.width = "100%", fig.align='center'}
+
+knitr::include_graphics("figs/token.png")
+
+```
+
+```{r echo=FALSE, out.width = "100%", fig.align='center'}
+
+knitr::include_graphics("figs/embed.png")
+
+```
+Source: [The Economist.](https://www.economist.com/interactive/science-and-technology/2023/04/22/large-creative-ai-models-will-transform-how-we-live-and-work)
+]
+
+---
+# Attention Network
+
+.pull-left[
+- LLMs use "attention networks" to connect different parts of the prompt.
+
+- Attention networks enable models to focus on the most informative parts of the input data, improving performance and accuracy.
+
+- LLMs translate language structure into numerical "weights" in the neural network during training.
+
+- LLMs comprehend language statistically rather than grammatically.
+]
+.pull-right[
+```{r echo=FALSE, out.width = "100%", fig.align='center'}
+
+knitr::include_graphics("figs/attention.png")
+
+```
+Source: [The Economist.](https://www.economist.com/interactive/science-and-technology/2023/04/22/large-creative-ai-models-will-transform-how-we-live-and-work)
+]
+
+---
+# Next Word Prediction
+
+.pull-left[
+- Upon processing the prompt, the LLM begins generating a response.
+
+- The attention network assigns each token a probability, suggesting its likelihood as the next part of the sentence.
+
+- The token with the highest probability isn't always selected. The LLM's creativity level, determined by its operators, impacts this choice.
+]
+.pull-right[
+```{r echo=FALSE, out.width = "100%", fig.align='center'}
+
+knitr::include_graphics("figs/completion.png")
+
+```
+Source: [The Economist.](https://www.economist.com/interactive/science-and-technology/2023/04/22/large-creative-ai-models-will-transform-how-we-live-and-work)
+]
+
+---
+# Autoregression: The Loop of Response Generation
+
+.pull-left[
+- The LLM produces a word and feeds the output back into itself.
+- This cycle, known as autoregression, repeats until the LLM completes its response.
+]
+.pull-right[
+```{r echo=FALSE, out.width = "100%", fig.align='center'}
+
+knitr::include_graphics("figs/autoreg.png")
+
+```
+Source: [The Economist.](https://www.economist.com/interactive/science-and-technology/2023/04/22/large-creative-ai-models-will-transform-how-we-live-and-work)
+]
+
+
+---
+# Reinforcement Learning from Human Feedback (RLHF)
+
+.pull-left[
+- RLHF uses human ratings to train chatbots in three stages:
+  1. Pretrain the language model.
+  2. Collect and implement human feedback.
+  3. Fine-tune using reinforcement learning.
+
+- Advantages: Mimics human preferences, refines chatbot responses, and boosts user satisfaction.
+]
+
+.pull-right[
+```{r echo=FALSE, out.width = "110%", fig.align='center'}
+
+knitr::include_graphics("figs/rlhf.PNG")
+
+```
+_Source_: [OpenAI: Introducing ChatGPT](https://openai.com/blog/chatgpt)
+]
+
+
+---
+# Some (Sobering) Facts
+
+["Eight Things to Know about Large Language Models"](https://arxiv.org/abs/2304.00612) by Sam Bowman (2023):
+
+.pull-left[
+- LLMs predictably get more capable with increasing investment, even without targeted innovation.
+
+- Many important LLM behaviors emerge unpredictably as a byproduct of increasing investment.
+
+- LLMs often appear to learn and use representations of the outside world.
+
+- There are no reliable techniques for steering the behavior of LLMs.
+]
+.pull-right[
+- Experts are not yet able to interpret the inner workings of LLMs.
+
+- Human performance on a task isn't an upper bound on LLM performance.
+
+- LLMs need not express the values of their creators nor the values encoded in web text.
+
+- Brief interactions with LLMs are often misleading.
+]
+
+---
+class: title-slide-section-blue, center, middle
+name: chatgpt
+
+# GPT-4 and ChatGPT
+
+---
+# Key Resources for Beginners
+
+* [GPT Best Practices](https://platform.openai.com/docs/guides/gpt-best-practices): strategies and tactics for getting better results from GPTs.
+
+* [ChatGPT Prompt Engineering for Developers](https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/): A free online course that offers a tutorial on using the OpenAI API for innovative applications.
+
+* [Language Models and Cognitive Automation for Economic Research](https://www.nber.org/papers/w30957) by Anton Korinek: Includes general instructions and specific examples on how to utilize LLMs. It also categorizes the capabilities of LLMs from experimental to highly practical.
+
+* [One Useful Thing](https://www.oneusefulthing.org/) blog by Ethan Mollick (Wharton): For regular updates, follow [@emollick](https://twitter.com/emollick) on Twitter.
+
+* [What Is ChatGPT Doing ... and Why Does It Work?](https://writings.stephenwolfram.com/2023/02/what-is-chatgpt-doing-and-why-does-it-work/) by Stephen Wolfram: This is a comprehensive introduction to the scientific principles behind ChatGPT.
+
+
+---
+# GPT-4: The Latest Advancement in AI
+
+.pull-left[
+- Introducing Generative Pre-trained Transformer 4 (GPT-4).
+
+- A *multimodal* language model capable of processing text and images.
+
+- Developed by OpenAI, released in March 2023.
+
+- Abilities include chatting, coding, tutoring, translating, and more.
+
+- However, it shares some issues with its predecessors: hallucinations, biases, and the ability to inadvertently reveal secrets.
+]
+.pull-right[
+```{r echo=FALSE, out.width = "100%", fig.align='center'}
+
+knitr::include_graphics("figs/altman.jpg")
+
+```
+]
+
+---
+# The Big Bang
+
+```{r echo=FALSE, out.width = "40%", fig.align='center'}
+
+knitr::include_graphics("figs/100mil.png")
+
+```
+
+---
+# Accessing GPT-4
+
+.pull-left[
+First, create an OpenAI account.
+
+- Option 1: Access via [ChatGPT *Plus*](https://chat.openai.com/)
+- Option 2: Try the [OpenAI Playground](https://platform.openai.com/playground)
+- Option 3: Use the [OpenAI API](https://platform.openai.com/account/api-keys)
+- Option 4: Explore through [Bing](https://www.bing.com/)
+
+*Important*: GPT-3.5 and Bing offer free access. ChatGPT with GPT-4 costs $20 per month. To reduce costs, consider using the API. 
+
+[Google's Bard](https://bard.google.com/) provides a free alternative (not GPT-4).
+]
+.pull-right[
+```{r echo=FALSE, out.width = "90%", fig.align='center'}
+
+knitr::include_graphics("figs/enterence.png")
+
+```
+]
+
+
+---
+# Yes, ChatGPT Can Hallucinate
+
+.pull-left[
+- ChatGPT may produce text that appears credible but is inaccurate.
+
+- Its goal is to sound convincing, not necessarily to deliver accurate or reliable information.
+
+- This could potentially mislead unsuspecting readers.
+
+- OpenAI is continually striving to improve the model's accuracy and reliability.
+]
+.pull-right[
+```{r echo=FALSE, out.width = "100%", fig.align='center'}
+
+knitr::include_graphics("figs/shortbio.png")
+
+```
+]
+
+
+---
+# But Don't Mistake it for Being Dumb
+
+.pull-left[
+- Despite occasional errors, ChatGPT's prowess should not be underestimated.
+
+- It demonstrated an impressive IQ of 147 on a verbal-linguistic test (99.9th percentile).
+
+- Each new iteration of ChatGPT enhances its accuracy and power.
+
+- The potential for substantial societal impact must not be dismissed or underestimated.
+]
+.pull-right[
+```{r echo=FALSE, out.width = "100%", fig.align='center'}
+
+knitr::include_graphics("figs/scores.jpg")
+
+```
+]
+
+---
+# A Note on Bing
+
+.pull-left[
+- Bing provides free access to GPT-4 in both "precise" and "creative" modes.
+
+- Unlike ChatGPT, Bing Chat utilizes an active internet connection to its advantage.
+
+- __Integration with Microsoft's Edge browser enables it to "read" visited webpages.__
+
+- One constraint to be aware of is the 2000 character limit per input.
+]
+
+.pull-right[
+```{r echo=FALSE, out.width = "100%", fig.align='center'}
+
+knitr::include_graphics("figs/bing.PNG")
+
+```
+]
+
+---
+class: title-slide-section-blue, center, middle
+name: prompting
+
+# Principles of Prompting
+
+
+---
+# Perquisite: Understanding Model Parameters
+
+.pull-left[
+* **Temperature**: Controls the randomness in text generation.
+* **Max Length**: Determines the maximum length of the generated text.
+* **Top P**: Allocates the probability of each potential next word, based on the model's output distribution.
+* **Frequency Penalty**: Discourages the use of commonly occurring words in the generated text.
+* **Presence Penalty**: Imposes a penalty on repeated words or phrases in the generated text.
+]
+.pull-right[
+```{r echo=FALSE, out.width = "75%", fig.align='center'}
+
+knitr::include_graphics("figs/finetune.png")
+
+```
+
+_Note_: ChatGPT comes with default settings, You can only adjust these parameters in "playground" mode or via the API.
+]
+
+---
+# Principle 1: Write Clear Instructions
+
+.pull-left[
+ChatGPT can't read your mind: specify your needs clearly. If outputs are too long, ask for brief replies; if too simple, ask for expert-level writing. Also, specify the format you desire.
+
+### Tactics:
+- __Provide detailed queries__
+- Request model to adopt a persona
+- Use delimiters for distinct input parts
+- Specify required steps
+- Provide examples
+- Indicate desired output length
+]
+.pull-right[
+```{r echo=FALSE, out.width = "130%", fig.align='center'}
+knitr::include_graphics("figs/specific.png")
+```
+Source: [GPT Best Practices](https://platform.openai.com/docs/guides/gpt-best-practices)
+]
+
+---
+# Principle 1: Write Clear Instructions
+
+.pull-left[
+ChatGPT can't read your mind: specify your needs clearly. If outputs are too long, ask for brief replies; if too simple, ask for expert-level writing. Also, specify the format you desire.
+
+### Tactics:
+- Provide detailed queries
+- Request model to adopt a persona
+- __Use delimiters for distinct input parts__
+- Specify required steps
+- Provide examples
+- Indicate desired output length
+]
+.pull-right[
+```{r echo=FALSE, out.width = "110%", fig.align='center'}
+knitr::include_graphics("figs/delim.png")
+```
+Source: [GPT Best Practices](https://platform.openai.com/docs/guides/gpt-best-practices)
+]
+
+---
+# Principle 1: Write Clear Instructions
+
+.pull-left[
+ChatGPT can't read your mind: specify your needs clearly. If outputs are too long, ask for brief replies; if too simple, ask for expert-level writing. Also, specify the format you desire.
+
+### Tactics:
+- Provide detailed queries
+- Request model to adopt a persona
+- Use delimiters for distinct input parts
+- Specify required steps
+- __Provide examples ("few shot prompting")__
+- Indicate desired output length
+]
+.pull-right[
+```{r echo=FALSE, out.width = "110%", fig.align='center'}
+knitr::include_graphics("figs/example.png")
+```
+Source: [GPT Best Practices](https://platform.openai.com/docs/guides/gpt-best-practices)
+]
+
+---
+# Tip: Few-shot Learning
+
+Few-shot learning is a machine learning approach that aims to train models to perform well on new tasks with only a limited amount of labeled data.
+
+```{r echo=FALSE, out.width = "65%", fig.align='center'}
+
+knitr::include_graphics("figs/fewshot_term.png")
+
+```
+
+---
+# Principle 2: Provide Reference Text
+
+.pull-left[
+ChatGPT can fabricate answers, especially for esoteric topics or citations. Reference text can guide GPTs to produce more accurate answers.
+
+### Tactics:
+- __Ask the model to use a reference text for answers__
+- Request model to cite from a reference text
+]
+.pull-right[
+```{r echo=FALSE, out.width = "110%", fig.align='center'}
+knitr::include_graphics("figs/cite.png")
+```
+Source: [GPT Best Practices](https://platform.openai.com/docs/guides/gpt-best-practices)
+]
+
+
+---
+# Tip: Extracting Text and Equations from Documents
+
+.pull-left[
+* [Mathpix](https://mathpix.com/) is an OCR tool that rapidly converts handwritten or printed math equations into LaTeX code.
+
+* This tool greatly simplifies the task of extracting elements from academic papers, such as **symbols**, **equations**, and even **tables**.
+
+* ChatGPT can recognize LaTeX code with ease.
+]
+.pull-right[
+```{r echo=FALSE, out.width = "90%", fig.align='center'}
+knitr::include_graphics("figs/mathpix.png")
+```
+]
+
+---
+# Principle 3: Split Complex Tasks into Simpler Subtasks
+
+.pull-left[
+Decomposing complex tasks into simpler subtasks reduces error rates. Complex tasks can be redefined as workflows of simpler tasks.
+
+### Tactics:
+- __Provide step-by-step instruction__
+- Construct full summary recursively from piecewise summaries of long documents
+]
+.pull-right[
+```{r echo=FALSE, out.width = "100%", fig.align='center'}
+knitr::include_graphics("figs/scraping.jpg")
+```
+]
+
+---
+# Tip: Reduce Hallucinations Thorough Preparation
+
+1. Initially, search for relevant information.
+2. Subsequently, formulate the answer based on this information.
+
+Example prompt:
+
+
+>`step 1: Revisit and thoroughly read the policy memo.`
+
+>`step 2: Conduct research to find academic papers that are relevant to the subjects discussed in the memo.`
+
+>`step 3: Update the memo by incorporating references to support the assertions made within it.`
+
+>`step 4: Compile a bibliography of these references and add it to the memo.`
+
+
+---
+# Tip: Request Structured Output 
+
+Requesting structured output enhances stability and allows for the replication of your results.
+
+```{r echo=FALSE, out.width = "70%", fig.align='center'}
+knitr::include_graphics("figs/golda.png")
+```
+
+
+---
+# Principle 4: Give GPTs Time to "Think"
+
+.pull-left[
+GPTs make more reasoning errors when rushed. Requesting reasoning before an answer improves reliability.
+
+### Tactics:
+- Ask model to work out solutions before concluding
+- Use a sequence of queries or inner monologue to guide reasoning process
+- __Ask the model to review its previous answers__
+]
+.pull-right[
+```{r echo=FALSE, out.width = "100%", fig.align='center'}
+knitr::include_graphics("figs/review.png")
+```
+Source: [GPT Best Practices](https://platform.openai.com/docs/guides/gpt-best-practices)
+]
+
+---
+# Remeber: Prompting is an Iterative Process 
+
+```{r echo=FALSE, out.width = "40%", fig.align='center'}
+
+knitr::include_graphics("figs/iterative.png")
+
+```
+Source: [ChatGPT Prompt Engineering for Developers](https://learn.deeplearning.ai/chatgpt-prompt-eng/lesson/3/iterative)
+
+
+
+
+---
+class: title-slide-section-blue, center, middle
+name: assist
+
+# The AI Research Assistant
+
+
+
+---
+# Brainstorming
+
+.pull-left[
+- LLMs have extensive knowledge archives and can retrieve information upon request.
+
+- You can incorporate ChatGPT into your idea generation process, including brainstorming, evaluations, counterarguments, and more.
+]
+.pull-right[
+```{r echo=FALSE, out.width = "90%", fig.align='center'}
+
+knitr::include_graphics("figs/brainstorm.png")
+
+```
+]
+
+
+---
+# Summarizing in Differnt Formats
+
+```{r echo=FALSE, out.width = "80%", fig.align='center'}
+
+knitr::include_graphics("figs/ft.png")
+
+```
+
+
+---
+# Proofreading and Editing 
+
+- ChatGPT has proofread and edited this presentation, which was written using the R [`Xaringan`](https://github.com/yihui/xaringan) package. Here's the prompt I've used:
+
+>`As an AI copy editor, your primary responsibility is to proofread a text enclosed by triple quotes and ensure it is clear and flows smoothly. Your task also includes avoiding passive voice, emphasizing essential concepts using boldface and italics, keeping sentences short and suitable for a presentation, and using bullets wherever possible. Additionally, you must verify that the title accurately conveys the text's message and, if necessary, change it to reflect the content. To deliver your output, you must present it in a Markdown code box. Once you have completed your proofreading task, request additional editing tasks if necessary.`
+
+---
+# Drawing Graphs (Using TikZ and LaTeX)
+
+.pull-left[
+Prompt: 
+
+>`Draw an ADAS graph using the TikZ package.`
+
+]
+.pull-right[
+```{r echo=FALSE, out.width = "90%", fig.align='center'}
+
+knitr::include_graphics("figs/adas.png")
+
+```
+]
+
+---
+# Coding
+
+ChatGPT can perform the following coding tasks:
+
+- **Generation** (and soon code execution): It can generate code, such as writing an R function that sorts a vector in descending order.
+
+- **Debugging**: Simply copying and pasting error messages allows ChatGPT to assist with code debugging.
+
+- **Annotation**: You can ask ChatGPT to explain what a particular piece of code is doing.
+
+- **Translation**: ChatGPT is capable of translating code, for example, from Python to R and vice versa.
+
+
+---
+# Example: Translate from STATA to R
+
+Prompt: 
+>`Translate the following STATA code to R`
+
+
+```{r echo=FALSE, out.width = "50%", fig.align='center'}
+
+knitr::include_graphics("figs/stata.png")
+
+```
+
+
+
+---
+# Diverse Applications of ChatGPT
+
+.pull-left[
+- **Translation**: Enhancing translations (e.g., Google/Bing translate from Hebrew -> fine-tuning with ChatGPT).
+- **Keyword Generation**: Producing keywords and JEL classification codes.
+- **Title Creation**: Developing compelling titles for papers, sections, figures, and tables.
+- **Accessibility Enhancement**: Providing alternative text for figures and tables to increase accessibility.
+- **Content Development**: Formulating creative metaphors and analogies.
+>Bonus: [35 Ways Real People Are Using A.I. Right Now](https://www.nytimes.com/interactive/2023/04/14/upshot/up-ai-uses.html)
+]
+.pull-right[
+```{r echo=FALSE, out.width = "100%", fig.align='center'}
+knitr::include_graphics("figs/cfr2023.png")
+```
+]
+
+---
+# Getting Serious 1: The OpenAI API
+
+Follow these steps to get started with the OpenAI API:
+
+1. Establish a new OpenAI account at [https://platform.openai.com/signup](https://platform.openai.com/signup).
+
+2. Generate an API key by navigating to [https://platform.openai.com/account/api-keys](https://platform.openai.com/account/api-keys) and clicking "Create new secret key."
+
+3. Ensure that you've installed the openai library (for [Python](https://github.com/openai/openai-python) or [R](https://irudnyts.github.io/openai/)).
+
+>For an example of using R + OpenAI API to proofread text and track changes, click [here](https://raw.githack.com/itamarcaspi/openai-api-test/master/proofread-and-track.html).
+
+---
+# Enhancing Functionality with ChatGPT Plugins
+
+.pull-left[
+- [ChatGPT plugins](https://openai.com/blog/chatgpt-plugins) act as "agents" that augment the core capabilities of ChatGPT.
+
+- OpenAI supplies "native" plugins with features such as web browsing and code interpretation.
+
+- Over 100 third-party plugins are accessible and this figure keeps expanding.
+
+- Research tasks: Utilize [Wolfram]() for mathematics, [AskYourPDF]() for lengthy documents, and [ScholarAI]() for literature reviews.
+]
+
+.pull-right[
+```{r echo=FALSE, out.width = "100%", fig.align='center'}
+knitr::include_graphics("figs/plugins.PNG")
+```
+]
+
+
+---
+# Putting it All Together: Meet boiGPT
+
+.pull-left[
+[boiGPT monetary policy committee](https://chat.openai.com/share/c3268915-8795-47e1-a81a-aa3641a5576b)
+]
+.pull-right[
+```{r echo=FALSE, out.width = "90%", fig.align='center'}
+knitr::include_graphics("figs/boigpt.png")
+```
+_Source_: Midjourney (V5.1)
+]
+
+
+???
+
+Prompt: `A realistic robo-central-banker is stationed in front of a laptop within an office setting. In the background, screens display stock charts, depicted as yellow lines against a stark black backdrop.`
+
+---
+class: title-slide-section-blue, center, middle
+name: evidence
+
+# Real World Impact
+
+
+---
+# LLMs and Fedspeak
+
+```{r echo=FALSE, out.width = "100%", fig.align='center'}
+
+knitr::include_graphics("figs/sophia2023.png")
+
+```
+
+---
+# LLMs and Financial Advise
+
+
+```{r echo=FALSE, out.width = "85%", fig.align='center'}
+
+knitr::include_graphics("figs/lopez2023.png")
+
+```
+
+---
+# LLMs and Survey Expectations
+
+```{r echo=FALSE, out.width = "85%", fig.align='center'}
+
+knitr::include_graphics("figs/bydee2023.png")
+
+```
+
+---
+# LLMs and Education
+
+```{r echo=FALSE, out.width = "80%", fig.align='center'}
+
+knitr::include_graphics("figs/edu.png")
+
+```
+_Source_: [https://www.khanacademy.org/khan-labs](https://www.khanacademy.org/khan-labs)
+
+
+---
+# LLMs and Productivity
+
+```{r echo=FALSE, out.width = "100%", fig.align='center'}
+
+knitr::include_graphics("figs/noy2023.png")
+
+```
+
+---
+# LLMs and Inequality
+
+```{r echo=FALSE, out.width = "70%", fig.align='center'}
+
+knitr::include_graphics("figs/acemoglu.png")
+
+```
+Source: [https://twitter.com/DAcemogluMIT/status/1659593945318342656?s=20](https://twitter.com/DAcemogluMIT/status/1659593945318342656?s=20)
+
+
+---
+# AI Opertunity Space
+
+```{r echo=FALSE, out.width = "70%", fig.align='center'}
+
+knitr::include_graphics("figs/ai_space.png")
+
+```
+
+
+---
+class: center, middle
+name: isit
+
+# So, is it really just adding one word at a time...?
+```{r echo=FALSE, out.width = "30%", fig.align='center'}
+
+knitr::include_graphics("figs/terminator.png")
+
+```
+Source: Midjourney (V5.1). 
+
+
+Prompt: `Arnold Schwarzenegger, portraying the iconic character of The Terminator, sits next to a laptop, wearing a smile and winking mischievously.`
+
+
+---
+# AI and Existential Risk? 
+```{r echo=FALSE, out.width = "100%", fig.align='center'}
+
+knitr::include_graphics("figs/existential.png")
+
+```
+
+
+---
+# Summary
+
+- **LLMs**: Generate sentences by assembling words one at a time.
+
+- **GPT-4**: The leading-edge AI benchmark.
+- **Principles of Prompting**:
+    1. Provide explicit and precise instructions.
+    2. Allow the AI time to respond thoughtfully.
+    3. Prompting is an iterative process.
+    4. Ensure the AI conducts preliminary research.
+
+- **AI Applications**: Summarization, information extraction, idea generation, and more.
+
+- **Scope of AI**: AI encompasses more than just text generation.
+
+- **AI Impact**: Likely to revolutionize the world in the near future, with both positive and negative implications.
+
+
+
+---
+class: .title-slide-final, center, inverse, middle
+
+# `slides %>% end()`
+
+[<i class="fa fa-github"></i> Source code](https://github.com/ml4econ/lecture-notes-2023/blob/master/13-llms/13-llms.Rmd)

@@ -1,0 +1,335 @@
+---
+title: "Text Mining Hands-on"
+author: 
+  name: Itamar Caspi
+  affiliation: Hebrew University, ML for Economists, 2023
+  email: caspi.itamar@gmail.com
+date: "June 18, 2023 (updated: `r Sys.Date()`)"
+output: 
+  html_document:
+    theme: flatly
+    highlight: haddock 
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+    keep_md: true
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  eval = TRUE,
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  comment = NA,
+  dpi = 300
+)
+```
+
+
+Okay, let's install, if necessary, the packages we need. We will load each package as we proceed.
+
+```{r packages, message=FALSE}
+if (!require("pacman")) install.packages("pacman")
+
+library(quanteda)
+library(quanteda.textstats)
+library(readtext)
+library(textdata)
+library(tidytext)
+library(tidyverse)
+library(readxl)
+library(glmnet)
+library(stm)
+library(text2vec)
+library(knitr)
+
+```
+
+
+```{r packages_2, message=FALSE}
+theme_set(theme_light())
+```
+
+---
+
+# Read data
+
+our data is stored in pdf files. We will read them with the help of the `readtext` package
+```{r}
+boi_raw_text <- 
+  readtext(
+    "11-text-mining/docs/*",
+    docvarsfrom = "filenames",
+    docvarsname = c("year", "month"),
+    dvsep = "-"
+)
+```
+ 
+Now we will turn raw text to a corpus
+```{r}
+boi_corpus <- 
+  boi_raw_text %>%
+  corpus()
+```
+
+The next code chunk uses the `corpus_segment` function to cut all the text that comes before the the narrow-discussion section
+```{r}
+boi_corpus_seg <-
+  boi_corpus %>%
+  corpus_segment(
+    pattern = "THE NARROW-FORUM DISCUSSION",
+    case_insensitive = FALSE,
+    extract_pattern = FALSE
+  )
+```
+
+```{r}
+boi_courpus_seg_docs <- 
+  boi_corpus_seg %>%
+  convert(to = "data.frame") %>%
+  mutate(
+    segid = seq_len(n()) %% 2
+  ) %>% 
+  filter(segid == 0) %>% 
+  corpus()
+```
+
+
+Here we exclude month names from the text (No reason to do this actually. Just for illustration purposes.) We also remove stop words, punctuation marks, numbers, and stem each word.
+
+```{r }
+month_names <- 
+  c("January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November",
+    "December"
+  )
+```
+
+
+```{r }
+boi_dfm_clean <- 
+  boi_courpus_seg_docs %>% 
+  dfm(
+    remove = c(stopwords(("english")), month_names),
+    remove_punct = TRUE,
+    remove_numbers = TRUE,
+    stem = TRUE,
+    verbose = TRUE
+  ) %>% 
+  dfm_trim(
+    min_termfreq = 10,
+    min_docfreq = 2
+  )
+```
+
+Lets have a look at our DTM's top features
+```{r }
+topfeatures(boi_dfm_clean)
+```
+
+
+## Multi-word expressions
+
+In this section we look for multi-word expressions , e.g., "interest rate" and "Bank of Israel" and define them as bi- and tri-grams in order to preserve their meaning.
+
+```{r}
+
+textstat_collocations(boi_courpus_seg_docs)
+
+multiwords <- c(
+  "interest rate", "bank of israel", "committee members",
+  "monetary committee", "economic activity", "housing market",
+  "global economy", "monetary policy", "home prices",
+  "inflation expectations", "world trade", "financial markets",
+  "effective exchange rate"
+)
+
+boi_dfm_multi <- 
+  tokens(boi_courpus_seg_docs) %>% 
+  tokens_compound(pattern = phrase(multiwords)) %>% 
+  dfm(
+    remove = c(stopwords(("english")), month_names, "percent"),
+    remove_numbers = TRUE,
+    remove_punct = TRUE,
+    stem = FALSE,
+    verbose = TRUE
+  ) %>% 
+  dfm_trim(
+    min_termfreq = 10,
+    min_docfreq = 2
+  )
+```
+
+
+## Most frequent words
+
+Here we take a glimpse over the most frequent words. We also apply the tf-idf method in order to take into account word frequency between documents.
+
+```{r}
+topfeatures(boi_dfm_multi, 20)
+
+boi_dfm_tfmitf <- dfm_tfidf(boi_dfm_multi)
+
+topfeatures(boi_dfm_tfmitf, 20)
+```
+
+
+## Which words predict rate changes?
+
+Here we'll preform a naive lasso estimation. Specifically, we will use our DTM to predict interest changes (stored in `rate-changes.xlsx`). Then, we will examine which words contribute most to predicting rate changes.
+
+Read the data
+```{r}
+df_chng <- read_excel(
+  path = "11-text-mining/data/rate-changes.xlsx",
+  sheet = "data"
+)
+
+Y <- 
+  df_chng %>% 
+  select(change) %>% 
+  pull()
+```
+
+Estimate Lasso
+```{r }
+model <- cv.glmnet(
+  x = boi_dfm_multi,
+  y = Y,
+  family = "binomial",
+  keep = TRUE
+)
+```
+
+Tidy the results using `broom`
+```{r }
+coefs <- model$glmnet.fit %>%
+  tidy() %>%
+  filter(step == 10)
+  # filter(lambda == model$lambda.1se) 
+```
+Unfortunately, setting lambda at its optimal level, leaves us with zero features...
+
+Plot coefficients
+```{r }
+devtools::install_github("https://github.com/dgrtwo/drlib")
+library(drlib)
+
+coefs %>%
+  group_by(estimate > 0) %>%
+  top_n(10, abs(estimate)) %>%
+  ungroup() %>%
+  ggplot(aes(fct_reorder(term, estimate), estimate, fill = estimate > 0)) +
+  geom_col(alpha = 0.8, show.legend = FALSE) +
+  coord_flip() +
+  labs(
+    x = NULL,
+    title = "Coefficients that increase/decrease probability of rate change"
+  )
+```
+
+
+## Topic modeling
+
+Here we use the `stm` package to estimate a Correlated Topic Model. Note that we don't run `topicmodels::LDA` since it is much slower.
+```{r lda_boi, eval = FALSE}
+# topic_model <- LDA(convert(boi_dfm_multi, to = "topicmodels"), k = 10)
+
+topic_model <- stm(boi_dfm_multi, K = 4, verbose = FALSE)
+```
+
+
+Tidy the results and plot $\beta$
+```{r}
+td_beta <- tidy(topic_model)
+
+td_beta %>%
+    group_by(topic) %>%
+    top_n(10, beta) %>%
+    ungroup() %>%
+    mutate(topic = paste0("Topic ", topic),
+           term = reorder_within(term, beta, topic)) %>%
+    ggplot(aes(term, beta, fill = as.factor(topic))) +
+    geom_col(alpha = 0.8, show.legend = FALSE) +
+    facet_wrap(~ topic, scales = "free_y") +
+    coord_flip() +
+    scale_x_reordered() +
+    labs(
+      x = NULL,
+      y = expression(beta),
+      title = "Highest word probabilities for each topic"
+    )
+
+```
+
+Tidy the results and plot $\gamma$ (The distribution of correlated LDA's $\mu$)
+
+```{r}
+td_gamma <- topic_model %>% 
+  tidy(
+    matrix = "gamma",
+    document_names = rownames(dfm)
+  )
+```
+Each of these values is an estimated proportion of words from that document that are generated from that topic.
+
+```{r}
+td_gamma %>% 
+  ggplot(aes(gamma, fill = as.factor(topic))) +
+  geom_histogram(show.legend = FALSE) +
+  facet_wrap(~ topic) +
+  labs(
+    title = "Distribution of document probabilities for each topic",
+    y = "Number of documents",
+    x = expression(gamma)
+  )
+```
+
+
+```{r}
+td_gamma %>%
+  filter(document %in% c(1, 20, 60, 70)) %>% 
+  mutate(document = reorder(document, gamma * topic)) %>%
+  ggplot(aes(factor(topic), gamma)) +
+  geom_point() +
+  facet_wrap(~ document) +
+  labs(x = "topic", y = expression(gamma))
+```
+
+
+Here I'll use Tyler Rinker's `optimal_k` function (see [here]("https://raw.githubusercontent.com/trinker/topicmodels_learning/master/functions")) to estimate the optimal $K$
+
+```{r optimal_k, eval=FALSE}
+source("11-text-mining/optimal_k.R")
+
+dtm <- convert(boi_dfm_multi, to = "topicmodels")
+
+control <- list(burnin = 500, iter = 1000, keep = 100)
+
+(k <- optimal_k(boi_dfm_multi, 15, control = control))
+```
+
+
+## Visualizing LDA using the `{text2vec}` and `{LDAvis}` packages
+```{r}
+lda_model <-  
+  LDA$new(
+    n_topics = 4,
+    doc_topic_prior = 0.1,
+    topic_word_prior = 0.01
+  )
+
+lda_model$fit_transform(x = boi_dfm_multi)
+
+lda_model$get_top_words(
+  n = 10,
+  topic_number = c(1, 2, 3, 4),
+  lambda = 0.5
+)
+
+lda_model$plot()
+```
+
+See [here](https://community.alteryx.com/t5/Data-Science/Getting-to-the-Point-with-Topic-Modeling-Part-3-Interpreting-the/ba-p/614992) an explanation on how to interpret the LDA visuallization tool.

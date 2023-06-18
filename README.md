@@ -103,7 +103,11 @@ The following schedule is subject to change based on class interests and time co
 
 ### Part III: Language Models
 
-13. Large Language Models (LLMs) [(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/13-llms/13-llms.html) [(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/13-llms/13-llms.pdf)  
+11. Text Mining
+[(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/11-text-mining/11-text-mining.html)
+[(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/11-text-mining/11-text-mining.pdf)
+
+12. Large Language Models (LLMs) [(HTML)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/12-llms/12-llms.html) [(PDF)](https://raw.githack.com/ml4econ/lecture-notes-2023/master/12-llms/12-llms.pdf)  
 
 ### Part IV: Miscellaneous
 
