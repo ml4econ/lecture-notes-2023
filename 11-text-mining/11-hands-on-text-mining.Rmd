@@ -88,7 +88,7 @@ boi_corpus_seg <-
 ```{r}
 boi_courpus_seg_docs <- 
   boi_corpus_seg %>%
-  convert(to = "data.frame") %>%
+  convert(to = "data.frame") %>% 
   mutate(
     segid = seq_len(n()) %% 2
   ) %>% 
