@@ -202,6 +202,29 @@ Source: [The Economist.](https://www.economist.com/interactive/science-and-techn
 ]
 
 ---
+# Word Embeddings Basics
+
+.pull-left[
+**Objective**: Convert words into numbers to make them computer-readable.
+
+- Simple Method: Assign each word a unique number. 
+- One-Hot Encoding (dummies): Use binary representation for words. Note: This is not efficient for large vocabularies.
+- **Embeddings: Group similar words close together in vector space. This enhances language understanding.**
+
+> GPT-3 uses a whopping ~ 13K to encode its vocabulary!
+
+]
+.pull-right[
+```{r echo=FALSE, out.width = "100%", fig.align='center'}
+
+knitr::include_graphics("figs/king.jpg")
+
+```
+[Source](https://twitter.com/svpino/status/1662437575242424320?s=20)
+]
+
+
+---
 # Attention Network
 
 .pull-left[
@@ -221,6 +244,71 @@ knitr::include_graphics("figs/attention.png")
 ```
 Source: [The Economist.](https://www.economist.com/interactive/science-and-technology/2023/04/22/large-creative-ai-models-will-transform-how-we-live-and-work)
 ]
+
+
+---
+# From Bias-Variance Tradeoff to Double Descent
+
+.pull-left[
+Remember the Bias-Variance tradeoff?
+
+]
+.pull-right[
+```{r echo=FALSE, out.width = "100%", fig.align='center'}
+
+knitr::include_graphics("figs/dd2.png")
+
+```
+]
+
+---
+# From Bias-Variance Tradeoff to Double Descent
+
+.pull-left[
+Remember the Bias-Variance tradeoff?
+
+What if I told you that what we know about the Bias-Variance tradeoff can sometimes be **VERY** wrong?
+
+Introducing: __DOUBLE DESCENT__
+]
+.pull-right[
+```{r echo=FALSE, out.width = "100%", fig.align='center'}
+
+knitr::include_graphics("figs/dd1.png")
+
+```
+Source: [A Farewell to the Bias-Variance Tradeoff? An Overview of the Theory of Overparameterized Machine Learning](https://arxiv.org/abs/2109.02355)
+]
+
+---
+# Conditions for Double Descent (Dar et al., 2021)
+
+Below are the factors that are both *necessary* and *sufficient* for Double Descent to occur:
+
+1. **Low-Dimensional Signal Structure**
+   - Intuition: Depicting a cat with simple shapes like circles and triangles.
+2. **Alignment with High-Energy Directions**
+   - Intuition: Amplifying the lead guitar sound in a band's mix.
+3. **Low Effective Dimension in Data**
+   - Intuition: Highlighting a few main characters in a movie with a large ensemble cast.
+4. **Overparameterization with Low-Value Directions**
+   - Intuition: Including a less focused background in a painting while the main subject remains the focus.
+
+> Note: For further understanding, refer to the lecture by [Jean Czerlinski Ortega](https://www.youtube.com/watch?v=YBKq9MK3W0M).
+
+???
+
+The text talks about "good generalization of the minimum $\ell_2$-norm interpolator". This might sound complicated, but it's really about teaching a computer to make good guesses on new examples it hasn't seen before. Imagine you have a robot that's learned to recognize cats by looking at pictures. Good generalization means that if you show the robot a picture of a cat it's never seen before, it can still tell it's a cat. The "minimum $\ell_2$-norm interpolator" is a fancy term for a specific type of guessing strategy the robot might use.
+
+"Low-dimensional signal structure" is like saying that the important information is really simple and doesn’t have a lot of different types of details. Imagine you're drawing a cat and you only need a few simple shapes - like circles for the body and triangles for the ears.
+
+When it says "non-zero components of the signal aligned with the $s$ eigenvectors corresponding to the highest-value eigenvalues", it’s like saying the important details should stand out. Let's say you're listening to a band, and the lead guitar is the most important. You want the sound of the lead guitar to be louder and more noticeable than the other instruments.
+
+"Low effective dimension in data" means that even though there might be a lot of details, only a few of them really matter. Like in a movie, there could be tons of characters, but only a few main characters are crucial to the story.
+
+"Overparameterized number of low-value (but non-zero) directions" means having extra, less important details, but they shouldn’t be completely ignored. Like in a painting, the background is not as important as the main subject, but it's still necessary for the overall image.
+
+
 
 ---
 # Next Word Prediction
@@ -281,7 +369,7 @@ _Source_: [OpenAI: Introducing ChatGPT](https://openai.com/blog/chatgpt)
 
 
 ---
-# Some (Sobering) Facts
+# Some (Sobering) Facts abour LLMs
 
 ["Eight Things to Know about Large Language Models"](https://arxiv.org/abs/2304.00612) by Sam Bowman (2023):
 
